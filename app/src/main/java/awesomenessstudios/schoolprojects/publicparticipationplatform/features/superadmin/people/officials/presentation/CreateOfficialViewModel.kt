@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.Official
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.OfficialsRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.officialsrepo.OfficialsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

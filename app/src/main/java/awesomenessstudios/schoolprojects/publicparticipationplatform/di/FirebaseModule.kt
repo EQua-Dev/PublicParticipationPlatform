@@ -1,17 +1,21 @@
 package awesomenessstudios.schoolprojects.publicparticipationplatform.di
 
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.BlockChainRepository
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.BlockChainRepositoryImpl
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.OfficialsRepository
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.OfficialsRepositoryImpl
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.CitizenRepository
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.CitizenRepositoryImpl
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.NationalDBRepository
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.NationalDBRepositoryImpl
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.PolicyRepository
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.PolicyRepositoryImpl
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.StorageRepository
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.StorageRepositoryImpl
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepositoryImpl
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.officialsrepo.OfficialsRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.officialsrepo.OfficialsRepositoryImpl
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.citizenrepo.CitizenRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.citizenrepo.CitizenRepositoryImpl
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.commentrepo.CommentRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.commentrepo.CommentRepositoryImpl
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.nationaldbrepo.NationalDBRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.nationaldbrepo.NationalDBRepositoryImpl
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.policyrepo.PolicyRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.policyrepo.PolicyRepositoryImpl
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.pollsrepo.PollsRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.pollsrepo.PollsRepositoryImpl
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.storagerepo.StorageRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.storagerepo.StorageRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -98,8 +102,27 @@ object FirebaseModule {
     @Singleton
     fun providePolicyRepository(
         firestore: FirebaseFirestore,
+        auth: FirebaseAuth,
     ): PolicyRepository {
-        return PolicyRepositoryImpl(firestore)
+        return PolicyRepositoryImpl(firestore, auth)
+    }
+
+    @Provides
+    @Singleton
+    fun providePollsRepository(
+        firestore: FirebaseFirestore,
+        auth: FirebaseAuth,
+    ): PollsRepository {
+        return PollsRepositoryImpl(firestore, auth)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCommentRepository(
+        firestore: FirebaseFirestore,
+        auth: FirebaseAuth,
+    ): CommentRepository {
+        return CommentRepositoryImpl(firestore)
     }
 
 }

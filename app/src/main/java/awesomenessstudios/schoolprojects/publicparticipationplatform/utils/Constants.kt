@@ -69,4 +69,6 @@ object Constants {
     const val AUDIT_LOGS_REF = "Audit Logs"
     const val REGISTERED_CITIZENS_REF = "Registered Citizens"
     const val POLICIES_REF = "Policies"
+    const val POLLS_REF = "Polls"
+    const val COMMENTS_REF = "Public Comments"
 }

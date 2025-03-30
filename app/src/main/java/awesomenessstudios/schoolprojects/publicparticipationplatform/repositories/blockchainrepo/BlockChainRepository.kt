@@ -1,7 +1,6 @@
-package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories
+package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.blockchainrepo
 
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.enums.TransactionTypes
-import com.google.firebase.firestore.CollectionReference
 
 interface BlockChainRepository {
     fun createBlockchainTransaction(

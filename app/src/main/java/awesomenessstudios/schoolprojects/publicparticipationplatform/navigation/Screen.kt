@@ -56,9 +56,17 @@ sealed class Screen(
         route = "create_citizen_screen",
         title = R.string.create_citizen_screen,
     )
-    object CreateCreatePolicyScreen : Screen(
+    object CreatePolicyScreen : Screen(
         route = "create_policy_screen",
         title = R.string.create_policy_screen,
+    )
+    object PolicyDetailsScreen : Screen(
+        route = "policy_details_screen/{policyId}",
+        title = R.string.policy_details_screen,
+    )
+    object CreatePollScreen : Screen(
+        route = "create_poll_screen",
+        title = R.string.create_poll_screen,
     )
     /*
         object ChildHome : Screen(

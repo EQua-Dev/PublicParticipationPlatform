@@ -32,4 +32,6 @@
     <string name="county_of_birth_label">County of Birth</string>
     <string name="county_of_birth_hint">Select county of birth</string>
     <string name="create_policy_screen">Create Policy</string>
+    <string name="create_poll_screen">Create Poll</string>
+    <string name="policy_details_screen">Policy Details</string>
 </resources>

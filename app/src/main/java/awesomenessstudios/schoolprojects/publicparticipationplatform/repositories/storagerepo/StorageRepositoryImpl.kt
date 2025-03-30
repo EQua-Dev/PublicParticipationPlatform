@@ -1,4 +1,4 @@
-package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories
+package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.storagerepo
 
 import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage

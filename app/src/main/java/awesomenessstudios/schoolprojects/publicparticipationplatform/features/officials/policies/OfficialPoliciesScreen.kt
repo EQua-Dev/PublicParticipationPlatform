@@ -60,7 +60,7 @@ fun OfficialPoliciesScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
 //    onCreatePolicyClicked: () -> Unit,
-//    onPolicyClicked: (policyId: String) -> Unit,
+    onPolicyClicked: (policyId: String) -> Unit,
     viewModel: PolicyViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -76,7 +76,7 @@ fun OfficialPoliciesScreen(
                     exit = fadeOut() + slideOutVertically { it }
                 ) {
                     FloatingActionButton(
-                        onClick = { navController.navigate(Screen.CreateCreatePolicyScreen.route) },
+                        onClick = { navController.navigate(Screen.CreatePolicyScreen.route) },
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Create Policy")
@@ -123,7 +123,8 @@ fun OfficialPoliciesScreen(
                                     .fillMaxWidth()
                                     .animateItemPlacement(),
                                 onClick = {
-                                    navController.navigate("policy_details/${policy.id}")
+                                    onPolicyClicked(policy.id)
+//                                    navController.navigate("policy_details/${policy.id}")
                                 }
                             )
                         }

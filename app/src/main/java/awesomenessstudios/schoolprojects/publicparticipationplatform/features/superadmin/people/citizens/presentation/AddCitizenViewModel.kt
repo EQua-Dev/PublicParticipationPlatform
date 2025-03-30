@@ -1,14 +1,10 @@
 package awesomenessstudios.schoolprojects.publicparticipationplatform.features.superadmin.people.citizens.presentation
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import awesomenessstudios.schoolprojects.buzortutorialplatform.features.teacher.auth.presentation.login.LoginState
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.NationalCitizen
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.CitizenRepository
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.NationalDBRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.nationaldbrepo.NationalDBRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

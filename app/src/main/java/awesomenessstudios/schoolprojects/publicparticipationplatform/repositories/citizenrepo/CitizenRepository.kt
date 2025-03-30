@@ -1,9 +1,8 @@
-package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories
+package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.citizenrepo
 
 import android.app.Activity
 import android.net.Uri
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.Citizen
-import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.NationalCitizen
 
 interface CitizenRepository {
     suspend fun getAllCitizens(): List<Citizen>

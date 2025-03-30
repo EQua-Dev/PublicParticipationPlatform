@@ -1,14 +1,14 @@
-package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories
+package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.blockchainrepo
 
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.enums.TransactionTypes
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.AuditLog
 import awesomenessstudios.schoolprojects.publicparticipationplatform.utils.Constants.AUDIT_LOGS_REF
-import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import javax.inject.Inject
 
-class BlockChainRepositoryImpl @Inject constructor(private val firestore: FirebaseFirestore): BlockChainRepository {
+class BlockChainRepositoryImpl @Inject constructor(private val firestore: FirebaseFirestore):
+    BlockChainRepository {
 
 
     override fun createBlockchainTransaction(

@@ -1,13 +1,10 @@
-package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories
+package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.citizenrepo
 
 import android.app.Activity
 import android.net.Uri
 import android.util.Log
-import awesomenessstudios.schoolprojects.publicparticipationplatform.data.enums.TransactionTypes
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.Citizen
-import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.NationalCitizen
-import awesomenessstudios.schoolprojects.publicparticipationplatform.utils.Constants.AUDIT_LOGS_REF
-import awesomenessstudios.schoolprojects.publicparticipationplatform.utils.Constants.NATIONAL_DB_REF
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import awesomenessstudios.schoolprojects.publicparticipationplatform.utils.Constants.REGISTERED_CITIZENS_REF
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth

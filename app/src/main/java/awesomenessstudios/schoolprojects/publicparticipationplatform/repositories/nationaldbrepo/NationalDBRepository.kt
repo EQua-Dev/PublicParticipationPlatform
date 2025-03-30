@@ -1,4 +1,4 @@
-package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories
+package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.nationaldbrepo
 
 import android.net.Uri
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.NationalCitizen

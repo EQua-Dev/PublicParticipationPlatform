@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.Citizen
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.CitizenRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.citizenrepo.CitizenRepository
 import awesomenessstudios.schoolprojects.publicparticipationplatform.utils.Common.mAuth
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth

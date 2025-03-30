@@ -1,9 +1,12 @@
-package awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.policies
+package awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.polls
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.officialsrepo.OfficialsRepository
 import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.policyrepo.PolicyRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.pollsrepo.PollsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,22 +15,23 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PolicyViewModel @Inject constructor(
+class PollViewModel @Inject constructor(
+    private val pollRepository: PollsRepository,
     private val policyRepository: PolicyRepository,
     private val officialRepository: OfficialsRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(PolicyState())
-    val state: StateFlow<PolicyState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(PollState())
+    val state: StateFlow<PollState> = _state.asStateFlow()
 
     init {
         loadData()
     }
 
-    fun onEvent(event: PolicyEvent) {
+    fun onEvent(event: PollEvent) {
         when (event) {
-            PolicyEvent.LoadPolicies -> loadData()
-            PolicyEvent.NavigateToCreatePolicy -> { /* Handled in UI */ }
+            PollEvent.LoadData -> loadData()
+            PollEvent.NavigateToCreatePoll -> { /* Handled in UI */ }
         }
     }
 
@@ -36,10 +40,13 @@ class PolicyViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true)
             try {
                 val official = officialRepository.getCurrentOfficial()
-                val policies = policyRepository.getAllPolicies()
+                val policies = policyRepository.getPoliciesBeforePublicOpinion()
+                val polls = pollRepository.getAllPolls()
+
                 _state.value = _state.value.copy(
+                    polls = polls,
                     policies = policies,
-                    canCreatePolicy = official.permissions.contains("create_policy"),
+                    canCreatePoll = official.permissions.contains("create_poll"),
                     isLoading = false
                 )
             } catch (e: Exception) {

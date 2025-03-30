@@ -6,16 +6,22 @@
 
 package awesomenessstudios.schoolprojects.publicparticipationplatform.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.budgets.OfficialBudgetsScreen
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.citizens.OfficialCitizensScreen
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.petitions.OfficialPetitionsScreen
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.policies.OfficialPoliciesScreen
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.policies.createpolicy.CreatePolicyScreen
+import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.policies.policydetails.OfficialPolicyDetailsScreen
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.polls.OfficialPollsScreen
+import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.polls.createpoll.CreatePollScreen
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.profile.OfficialProfileScreen
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.superadmin.audit.presentation.SuperAdminAuditScreen
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.superadmin.dashboard.presentation.SuperAdminDashboardScreen
@@ -26,6 +32,7 @@ import awesomenessstudios.schoolprojects.publicparticipationplatform.features.su
 import awesomenessstudios.schoolprojects.publicparticipationplatform.features.superadmin.publicparticipation.presentation.SuperAdminPublicParticipationScreen
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OfficialBottomNavigationGraph(navController: NavHostController) {
 
@@ -36,7 +43,14 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
         composable(
             route = OfficialBottomBarScreen.Policies.route
         ) {
-            OfficialPoliciesScreen(navController = navController)
+            OfficialPoliciesScreen(navController = navController, onPolicyClicked = { policyId ->
+                navController.navigate(
+                    Screen.PolicyDetailsScreen.route.replace(
+                        "{policyId}",
+                        policyId
+                    )
+                )
+            })
         }
         composable(
             route = OfficialBottomBarScreen.Polls.route
@@ -70,8 +84,26 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
 //                        onNavigationRequested = onNavigationRequested,
             )
         }
-        composable(Screen.CreateCreatePolicyScreen.route) {
+        composable(Screen.CreatePolicyScreen.route) {
             CreatePolicyScreen(
+                navController = navController
+            )
+        }
+        composable(
+            Screen.PolicyDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "policyId") { type = NavType.StringType }
+            ),
+        ) {
+            val policyId = it.arguments?.getString("policyId")
+
+            OfficialPolicyDetailsScreen(
+                policyId!!,
+                navController = navController
+            )
+        }
+        composable(Screen.CreatePollScreen.route) {
+            CreatePollScreen(
                 navController = navController
             )
         }

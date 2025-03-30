@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.Official
-import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.OfficialsRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.officialsrepo.OfficialsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

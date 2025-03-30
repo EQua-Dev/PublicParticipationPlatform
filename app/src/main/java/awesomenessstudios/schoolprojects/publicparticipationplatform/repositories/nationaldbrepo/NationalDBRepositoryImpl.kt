@@ -1,8 +1,9 @@
-package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories
+package awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.nationaldbrepo
 
 import android.net.Uri
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.enums.TransactionTypes
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.NationalCitizen
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import awesomenessstudios.schoolprojects.publicparticipationplatform.utils.Constants.NATIONAL_DB_REF
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

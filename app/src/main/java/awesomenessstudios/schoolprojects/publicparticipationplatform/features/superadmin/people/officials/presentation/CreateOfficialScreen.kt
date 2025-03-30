@@ -30,7 +30,14 @@ fun CreateOfficialScreen(
     viewModel: CreateOfficialViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.value
-    val permissions = listOf("create_policy", "create_poll", "create_projects", "add_citizens", "approve_citizens")
+    val permissions = listOf(
+        "create_policy",
+        "create_poll",
+        "create_projects",
+        "update_policy_stage",
+        "add_citizens",
+        "approve_citizens"
+    )
 
     Column(
         modifier = modifier
@@ -45,12 +52,12 @@ fun CreateOfficialScreen(
             onValueChange = { viewModel.onEvent(CreateOfficialUiEvent.UpdateFirstName(it)) },
             label = "Official First Name"
         )
-      /*  OutlinedTextField(
-            value = uiState.firstName,
-            onValueChange = { viewModel.onEvent(CreateOfficialUiEvent.UpdateFirstName(it)) },
-            label = { Text("First Name") },
-            modifier = Modifier.fillMaxWidth()
-        )*/
+        /*  OutlinedTextField(
+              value = uiState.firstName,
+              onValueChange = { viewModel.onEvent(CreateOfficialUiEvent.UpdateFirstName(it)) },
+              label = { Text("First Name") },
+              modifier = Modifier.fillMaxWidth()
+          )*/
 
         OutlinedTextField(
             value = uiState.lastName,
@@ -78,7 +85,13 @@ fun CreateOfficialScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     checked = uiState.permissions.contains(permission),
-                    onCheckedChange = { viewModel.onEvent(CreateOfficialUiEvent.TogglePermission(permission)) }
+                    onCheckedChange = {
+                        viewModel.onEvent(
+                            CreateOfficialUiEvent.TogglePermission(
+                                permission
+                            )
+                        )
+                    }
                 )
                 Text(permission)
             }
