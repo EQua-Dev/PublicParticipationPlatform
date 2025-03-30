@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Public Participation Platform</string>
+    <string name="super_admin_home">Super Admin Home</string>
+    <string name="citizen_registration">Citizen Registration</string>
+    <string name="login">Login</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="citizen_home">Citizen Home</string>
+    <string name="official_home">Official Home</string>
+    <string name="citizen_registration_verification_screen">Citizen Verification Screen</string>
+    <string name="signup">Sign Up</string>
+    <string name="teacher_home">Teacher Home</string>
+    <string name="teacher_registration">Teacher Registration</string>
+    <string name="student_registration">Student Registration</string>
+    <string name="student_home">Student Home</string>
+    <string name="create_wallet">Create Wallet</string>
+    <string name="subjects_label">Subjects</string>
+    <string name="subjects_hint">Select subjects of specialisation</string>
+    <string name="wallet_address_complexity_label">Wallet Address Complexity</string>
+    <string name="wallet_address_complexity_hint">Long, Average, Short</string>
+    <string name="securtiy_question_one_label">Security Question 1</string>
+    <string name="securtiy_question_one_hint">Select Question</string>
+    <string name="securtiy_question_two_label">Security Question Two</string>
+    <string name="course_subject_label">Course Subject</string>
+    <string name="course_subject_hint">Select subject for course</string>
+    <string name="course_grades_label">Target Grades</string>
+    <string name="course_grades_hint">Select the target Grades</string>
+    <string name="create_create">Create Course</string>
+    <string name="create_official_screen">Create Official</string>
+    <string name="create_citizen_screen">Create Citizen</string>
+    <string name="county_of_residence_label">County of residence</string>
+    <string name="county_of_residence_hint">Select your county of residence</string>
+    <string name="county_of_birth_label">County of Birth</string>
+    <string name="county_of_birth_hint">Select county of birth</string>
+    <string name="create_policy_screen">Create Policy</string>
+</resources>

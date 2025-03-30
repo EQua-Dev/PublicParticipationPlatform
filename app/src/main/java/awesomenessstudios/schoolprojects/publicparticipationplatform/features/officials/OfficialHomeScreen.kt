@@ -1,0 +1,339 @@
+package awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials
+
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import awesomenessstudios.schoolprojects.publicparticipationplatform.R
+import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.Official
+import awesomenessstudios.schoolprojects.publicparticipationplatform.features.officials.profile.OfficialProfileViewModel
+import awesomenessstudios.schoolprojects.publicparticipationplatform.navigation.OfficialBottomBar
+import awesomenessstudios.schoolprojects.publicparticipationplatform.navigation.OfficialBottomBarScreen
+import awesomenessstudios.schoolprojects.publicparticipationplatform.navigation.OfficialBottomNavigationGraph
+import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
+import java.util.Calendar
+
+@Composable
+fun OfficialHomeScreen(
+    baseNavHostController: NavHostController,
+    onNavigationRequested: (String, Boolean) -> Unit,
+    viewModel: OfficialProfileViewModel = hiltViewModel()
+) {
+
+    val navController = rememberNavController()
+    val state = viewModel.state.value
+
+
+//    val studentData by remember { studentHomeViewModel.studentInfo }.collectAsState()
+
+    val errorMessage = remember { mutableStateOf("") }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+//    val showLoading by remember { mutableStateOf(studentHomeViewModel.showLoading) }
+//    val openDialog by remember { mutableStateOf(studentHomeViewModel.openDialog) }
+
+    val screens = listOf(
+        OfficialBottomBarScreen.Policies,
+        OfficialBottomBarScreen.Polls,
+        OfficialBottomBarScreen.Petitions,
+        OfficialBottomBarScreen.Budget,
+        OfficialBottomBarScreen.Profile,
+        OfficialBottomBarScreen.Citizens,
+    )
+
+
+
+    LaunchedEffect(key1 = null) {
+        /* getStudentInfo(
+            mAuth.uid!!,
+            onLoading = {
+                studentHomeViewModel.updateLoadingStatus(it)
+            },
+            onStudentDataFetched = { student ->
+                studentHomeViewModel.updateStudentInfo(student)
+            },
+            onStudentNotFetched = { error ->
+                errorMessage.value = error
+            })*/
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = drawerState.isOpen,
+        drawerContent = {
+            ModalDrawerSheet {
+                // Drawer header
+                DrawerHeader(state.official)
+
+                // Drawer items
+                screens.forEach { screen ->
+                    NavigationDrawerItem(
+                        label = { Text(text = screen.title) },
+                        selected = navController.currentBackStackEntryAsState().value?.destination?.route == screen.route,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate(screen.route) {
+                                // Avoid multiple copies of the same destination
+                                launchSingleTop = true
+                                // Restore state when reselecting an item
+                                restoreState = true
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = screen.icon,
+                                contentDescription = screen.title
+                            )
+                        },
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    )
+                }
+            }
+        }
+    ) {
+        Scaffold(
+            /* bottomBar = {
+                 OfficialBottomBar(navController = navController)
+             },*/
+            topBar = {
+                AppBar(
+                    onMenuClick = {
+                        scope.launch {
+                            drawerState.apply {
+                                if (isClosed) open() else close()
+                            }
+                        }
+                    },
+                    profileImageUrl = state.official.profileImageUrl,
+                    officialName = state.official.firstName
+                )
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier.padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
+            ) {
+                OfficialBottomNavigationGraph(navController = navController)
+            }
+        }
+    }
+    /*
+
+        if (openDialog.value) {
+            AlertDialog(
+                onDismissRequest = {
+                    // Dismiss the dialog when the user clicks outside the dialog or on the back
+                    // button. If you want to disable that functionality, simply use an empty
+                    // onDismissRequest.
+                    openDialog.value = false
+                },
+                title = {
+                    Text(text = "Logout", style = Typography.titleLarge)
+                },
+                text = {
+                    Text(text = "Do you want to logout?")
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            Common.mAuth.signOut()
+                            baseNavHostController.navigate(Screen.Login.route)
+                            studentHomeViewModel.updateDialogStatus()
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            studentHomeViewModel.updateDialogStatus()
+                        }
+                    ) {
+                        Text("No")
+                    }
+                },
+
+                )
+        }
+
+        if (showLoading.value) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(modifier = Modifier.size(64.dp))
+
+            }
+        }
+    */
+
+}
+
+@Composable
+fun DrawerHeader(
+    official: Official?,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start
+    ) {
+        // Profile Image or Placeholder
+        if (official?.profileImageUrl != null) {
+            AsyncImage(
+                model = official.profileImageUrl,
+                contentDescription = "Profile image",
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Filled.AccountCircle,
+                contentDescription = "User",
+                modifier = Modifier.size(64.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Name
+        Text(
+            text = official?.let { "Welcome, ${it.firstName}" } ?: "Welcome, Official",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        // Email
+        Text(
+            text = official?.email ?: "official@example.com",
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        // Optional: Display role/permissions summary
+        if (!official?.permissions.isNullOrEmpty()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Permissions: ${official?.permissions?.size ?: 0}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppBar(
+    onMenuClick: () -> Unit,
+    profileImageUrl: String? = null,
+    officialName: String,
+    modifier: Modifier = Modifier
+) {
+    val currentHour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
+    val greeting = when (currentHour) {
+        in 6..11 -> "Good Morning"
+        in 12..17 -> "Good Afternoon"
+        in 18..21 -> "Good Evening"
+        else -> "Good Night"
+    }
+
+    CenterAlignedTopAppBar(
+        title = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "$greeting, $officialName",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                )
+            }
+        },
+        navigationIcon = {
+            Box(
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .clickable(onClick = onMenuClick)
+            ) {
+                if (!profileImageUrl.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = profileImageUrl,
+                        contentDescription = "Profile Image",
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = CircleShape
+                            ),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Menu",
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(4.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.primary
+        ),
+        modifier = modifier
+    )
+}
