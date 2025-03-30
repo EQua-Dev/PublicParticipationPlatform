@@ -239,8 +239,8 @@ fun ScaffoldSection(
                 composable(Screen.CitizenHome.route) {
                     onStatusBarColorChange(MaterialTheme.colorScheme.background)
                     CitizenHomeScreen(
-                        baseNavHostController = controller,
-                        onNavigationRequested = onNavigationRequested,
+                        navController = controller,
+//                        onNavigationRequested = onNavigationRequested,
                     )
                 }
                 composable(Screen.OfficialHomeScreen.route) {

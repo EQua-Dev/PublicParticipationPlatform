@@ -176,19 +176,19 @@ private fun CitizenCard(
                         modifier = Modifier
                             .size(8.dp)
                             .background(
-                                color = if (citizen.isApproved) Color.Green else Color.Red,
+                                color = if (citizen.approved == "true") Color.Green else Color.Red,
                                 shape = CircleShape
                             )
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = if (citizen.isApproved) "Approved" else "Pending",
+                        text = if (citizen.approved == "true") "Approved" else "Pending",
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
             }
 
-            if (canApprove && !citizen.isApproved) {
+            if (canApprove && citizen.approved !== "true") {
                 Button(onClick = onVerifyClick) {
                     Text("Verify")
                 }

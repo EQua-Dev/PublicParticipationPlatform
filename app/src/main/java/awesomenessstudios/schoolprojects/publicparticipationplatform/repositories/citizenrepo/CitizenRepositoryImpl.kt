@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import awesomenessstudios.schoolprojects.publicparticipationplatform.data.models.Citizen
 import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
+import awesomenessstudios.schoolprojects.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import awesomenessstudios.schoolprojects.publicparticipationplatform.utils.Constants.REGISTERED_CITIZENS_REF
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
@@ -12,6 +13,7 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
@@ -21,7 +23,7 @@ class CitizenRepositoryImpl(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage,
-    private val blockChainRepository: BlockChainRepository
+    private val storageRepository: StorageRepository
 ) : CitizenRepository {
     // Store verification ID for later use
     private var verificationId: String? = null
@@ -79,7 +81,7 @@ class CitizenRepositoryImpl(
         return try {
             // First upload image if provided
             val imageUrl = imageUri?.let { uri ->
-                uploadProfileImage(citizen.id, uri).getOrThrow()
+                storageRepository.uploadProfileImage(citizen.id, uri)
             }
 
             // Create citizen document with image URL
@@ -114,16 +116,16 @@ class CitizenRepositoryImpl(
         }
     }
 
-    override suspend fun uploadProfileImage(userId: String, imageUri: Uri): Result<String> {
-        return try {
-            val storageRef = storage.reference.child("profile_images/$userId.jpg")
-            val uploadTask = storageRef.putFile(imageUri).await()
-            val downloadUrl = storageRef.downloadUrl.await().toString()
-            Result.success(downloadUrl)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+    /*   override suspend fun uploadProfileImage(userId: String, imageUri: Uri): Result<String> {
+           return try {
+               val storageRef = storage.reference.child("profile_images/$userId.jpg")
+               val uploadTask = storageRef.putFile(imageUri).await()
+               val downloadUrl = storageRef.downloadUrl.await().toString()
+               Result.success(downloadUrl)
+           } catch (e: Exception) {
+               Result.failure(e)
+           }
+       }*/
 
     override suspend fun getAllCitizens(): List<Citizen> {
         return try {
@@ -145,6 +147,40 @@ class CitizenRepositoryImpl(
         } catch (e: Exception) {
             throw Exception("Failed to approve citizen: ${e.message}")
         }
+    }
+
+
+    override fun getCitizenRealtime(
+        citizenId: String,
+        onUpdate: (Citizen?) -> Unit
+    ): ListenerRegistration {
+        return firestore.collection(REGISTERED_CITIZENS_REF)
+            .document(citizenId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onUpdate(null)
+                    return@addSnapshotListener
+                }
+                onUpdate(snapshot?.toObject(Citizen::class.java))
+            }
+    }
+
+    override suspend fun getCitizen(citizenId: String): Result<Citizen> {
+        return try {
+            val snapshot = firestore.collection(REGISTERED_CITIZENS_REF)
+                .document(citizenId)
+                .get()
+                .await()
+            Result.success(
+                snapshot.toObject(Citizen::class.java) ?: throw Exception("Citizen not found")
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun logout() {
+        auth.signOut()
     }
 
 }

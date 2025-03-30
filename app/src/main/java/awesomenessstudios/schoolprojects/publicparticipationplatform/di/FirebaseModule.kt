@@ -66,9 +66,9 @@ object FirebaseModule {
         auth: FirebaseAuth,
         firestore: FirebaseFirestore,
         storage: FirebaseStorage,
-        blockchain: BlockChainRepository
+        storageRepository: StorageRepository
     ): CitizenRepository {
-        return CitizenRepositoryImpl(auth, firestore, storage, blockchain)
+        return CitizenRepositoryImpl(auth, firestore, storage, storageRepository)
     }
 
     @Provides

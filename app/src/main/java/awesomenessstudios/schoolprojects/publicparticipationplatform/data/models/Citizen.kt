@@ -14,5 +14,5 @@ data class Citizen(
     val securityHash: String = "",
     val registrationLocation: String = "",
     val dateCreated: String = "",
-    val isApproved: Boolean = false
+    val approved: String = "false"
 )
