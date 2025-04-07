@@ -13,11 +13,11 @@ plugins {
 }
 
 android {
-    namespace = "awesomenessstudios.schoolprojects.publicparticipationplatform"
+    namespace = "ngui_maryanne.dissertation.publicparticipationplatform"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "awesomenessstudios.schoolprojects.publicparticipationplatform"
+        applicationId = "ngui_maryanne.dissertation.publicparticipationplatform"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -171,6 +171,5 @@ dependencies {
     implementation(libs.coil.compose) // Use the latest version
     implementation(libs.openai.client) // Use the latest version
     implementation("io.ktor:ktor-client-cio:3.0.3")
-
 
 }

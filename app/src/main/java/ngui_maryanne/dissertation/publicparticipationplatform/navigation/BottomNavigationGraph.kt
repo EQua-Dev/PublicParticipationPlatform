@@ -1,0 +1,225 @@
+/*
+ * Copyright (c) 2023.
+ * Richard Uzor
+ * Under the authority of Devstrike Digital Limited
+ */
+
+package ngui_maryanne.dissertation.publicparticipationplatform.navigation
+
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.citizens.OfficialCitizensScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.petitions.OfficialPetitionsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.OfficialPoliciesScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.createpolicy.CreatePolicyScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.OfficialPolicyDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls.OfficialPollsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls.createpoll.CreatePollScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.profile.OfficialProfileScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.audit.presentation.SuperAdminAuditScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.dashboard.presentation.SuperAdminDashboardScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.citizens.presentation.CreateCitizenScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.officials.presentation.CreateOfficialScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.presentation.SuperAdminPeopleScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.profile.presentation.SuperAdminProfileScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.publicparticipation.presentation.SuperAdminPublicParticipationScreen
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun OfficialBottomNavigationGraph(navController: NavHostController) {
+
+    NavHost(
+        navController = navController,
+        startDestination = OfficialBottomBarScreen.Policies.route
+    ) {
+        composable(
+            route = OfficialBottomBarScreen.Policies.route
+        ) {
+            OfficialPoliciesScreen(navController = navController, onPolicyClicked = { policyId ->
+                navController.navigate(
+                    Screen.PolicyDetailsScreen.route.replace(
+                        "{policyId}",
+                        policyId
+                    )
+                )
+            })
+        }
+        composable(
+            route = OfficialBottomBarScreen.Polls.route
+        ) {
+            OfficialPollsScreen(navController = navController)
+        }
+        composable(
+            route = OfficialBottomBarScreen.Budget.route
+        ) {
+            OfficialBudgetsScreen(navController = navController)
+        }
+        composable(
+            route = OfficialBottomBarScreen.Petitions.route
+        ) {
+            OfficialPetitionsScreen(navController = navController)
+        }
+        composable(
+            route = OfficialBottomBarScreen.Profile.route
+        ) {
+            OfficialProfileScreen(navController = navController)
+        }
+        composable(
+            route = OfficialBottomBarScreen.Citizens.route
+        ) {
+            OfficialCitizensScreen(navController = navController, onAddCitizenClick = {
+                navController.navigate(Screen.CreateCitizenScreen.route)
+            })
+        }
+        composable(Screen.CreateCitizenScreen.route) {
+            CreateCitizenScreen(
+//                        onNavigationRequested = onNavigationRequested,
+            )
+        }
+        composable(Screen.CreatePolicyScreen.route) {
+            CreatePolicyScreen(
+                navController = navController
+            )
+        }
+        composable(
+            Screen.PolicyDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "policyId") { type = NavType.StringType }
+            ),
+        ) {
+            val policyId = it.arguments?.getString("policyId")
+
+            OfficialPolicyDetailsScreen(
+                policyId!!,
+                navController = navController
+            )
+        }
+        composable(Screen.CreatePollScreen.route) {
+            CreatePollScreen(
+                navController = navController
+            )
+        }
+        /*composable(
+            Screen.FeesSemester.route,
+            arguments = listOf(
+                navArgument(name = "level") { type = NavType.StringType },
+                navArgument(name = "semester") { type = NavType.StringType }
+            ),
+        ) {
+            val level = it.arguments?.getString("level")
+            val semester = it.arguments?.getString("semester")
+            FeesPaymentScreen(
+                level = level!!, semester = semester!!,
+                onBack = { navController.popBackStack() },
+                //onBackRequested = onBackRequested,
+
+            )
+        }
+        composable(
+            Screen.DuesSemesterScreen.route,
+            arguments = listOf(
+                navArgument(name = "level") { type = NavType.StringType },
+                navArgument(name = "semester") { type = NavType.StringType }
+            ),
+        ) {
+            val level = it.arguments?.getString("level")
+            val semester = it.arguments?.getString("semester")
+            DuesPaymentScreen(
+                level = level!!, semester = semester!!,
+                onBack = { navController.popBackStack() },
+                onPay = {}
+                //onBackRequested = onBackRequested,
+
+            )
+        }*/
+    }
+
+}
+
+@Composable
+fun SuperAdminBottomNavigationGraph(navController: NavHostController) {
+
+    NavHost(
+        navController = navController,
+        startDestination = SuperAdminBottomBarScreen.Dashboard.route
+    ) {
+        composable(
+            route = SuperAdminBottomBarScreen.Dashboard.route
+        ) {
+            SuperAdminDashboardScreen(navController = navController)
+        }
+        composable(
+            route = SuperAdminBottomBarScreen.PublicParticipation.route
+        ) {
+            SuperAdminPublicParticipationScreen(navController = navController)
+        }
+        composable(
+            route = SuperAdminBottomBarScreen.People.route
+        ) {
+            SuperAdminPeopleScreen(navController = navController)
+        }
+        composable(
+            route = SuperAdminBottomBarScreen.Audit.route
+        ) {
+            SuperAdminAuditScreen(navController = navController)
+        }
+        composable(
+            route = SuperAdminBottomBarScreen.Profile.route
+        ) {
+            SuperAdminProfileScreen(navController = navController)
+        }
+        composable(Screen.CreateCitizenScreen.route) {
+            CreateCitizenScreen(
+//                        onNavigationRequested = onNavigationRequested,
+            )
+        }
+        composable(Screen.CreateOfficialScreen.route) {
+            CreateOfficialScreen(
+//                        onNavigationRequested = onNavigationRequested,
+            )
+        }
+        /*
+        composable(
+            Screen.FeesSemester.route,
+            arguments = listOf(
+                navArgument(name = "level") { type = NavType.StringType },
+                navArgument(name = "semester") { type = NavType.StringType }
+            ),
+        ) {
+            val level = it.arguments?.getString("level")
+            val semester = it.arguments?.getString("semester")
+            FeesPaymentScreen(
+                level = level!!, semester = semester!!,
+                onBack = { navController.popBackStack() },
+                //onBackRequested = onBackRequested,
+
+            )
+        }
+        composable(
+            Screen.DuesSemesterScreen.route,
+            arguments = listOf(
+                navArgument(name = "level") { type = NavType.StringType },
+                navArgument(name = "semester") { type = NavType.StringType }
+            ),
+        ) {
+            val level = it.arguments?.getString("level")
+            val semester = it.arguments?.getString("semester")
+            DuesPaymentScreen(
+                level = level!!, semester = semester!!,
+                onBack = { navController.popBackStack() },
+                onPay = {}
+                //onBackRequested = onBackRequested,
+
+            )
+        }*/
+    }
+
+}
