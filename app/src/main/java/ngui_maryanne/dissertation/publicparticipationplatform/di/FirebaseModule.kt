@@ -26,6 +26,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepositoryImpl
 import javax.inject.Singleton
 
 @Module
@@ -123,6 +125,15 @@ object FirebaseModule {
         auth: FirebaseAuth,
     ): CommentRepository {
         return CommentRepositoryImpl(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun providePetitionRepository(
+        firestore: FirebaseFirestore,
+        auth: FirebaseAuth,
+    ): PetitionRepository {
+        return PetitionRepositoryImpl(firestore)
     }
 
 }

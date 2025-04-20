@@ -8,4 +8,6 @@ interface CommentRepository {
         policyId: String,
         onUpdate: (List<Comment>) -> Unit
     ): ListenerRegistration
+    suspend fun addComment(policyId: String, comment: Comment)
+
 }

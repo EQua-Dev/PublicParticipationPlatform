@@ -54,27 +54,32 @@ class MainActivity : ComponentActivity() {
             /** Getting screen size */
             val size = LocalContext.current.getScreenSize()
             PublicParticipationPlatformTheme {
-                CompositionLocalProvider(
+
+                    CompositionLocalProvider(
                     LocalScreenSize provides size,
                     LocalNavHost provides navController
                 ) {
-                    // A surface container using the 'background' color from the theme
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        HolderScreen(
-                            onStatusBarColorChange = {
-                                //** Updating the color of the status bar *//*
-                                //** Updating the color of the status bar *//*
-                                //** Updating the color of the status bar *//*
+                        AppBackground{
+                            // A surface container using the 'background' color from the theme
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+//                                color = MaterialTheme.colorScheme.background
+                            ) {
+                                HolderScreen(
+                                    onStatusBarColorChange = {
+                                        //** Updating the color of the status bar *//*
+                                        //** Updating the color of the status bar *//*
+                                        //** Updating the color of the status bar *//*
 
-                                //** Updating the color of the status bar *//*
-                                statusBarColor = it.toArgb()
+                                        //** Updating the color of the status bar *//*
+                                        statusBarColor = it.toArgb()
+                                    }
+                                )
                             }
-                        )
-                    }
+                        }
+
                 }
+
 
             }
         }

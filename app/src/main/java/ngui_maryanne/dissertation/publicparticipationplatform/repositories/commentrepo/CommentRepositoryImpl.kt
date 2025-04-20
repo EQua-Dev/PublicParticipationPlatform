@@ -24,4 +24,10 @@ class CommentRepositoryImpl @Inject constructor(private val firestore: FirebaseF
                 onUpdate(comments)
             }
     }
+    override suspend fun addComment(policyId: String, comment: Comment) {
+        firestore.collection(POLICIES_REF)
+            .document(policyId)
+            .collection(COMMENTS_REF)
+            .add(comment)
+    }
 }

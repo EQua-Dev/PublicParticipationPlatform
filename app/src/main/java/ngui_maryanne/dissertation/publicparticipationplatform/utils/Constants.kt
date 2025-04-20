@@ -7,12 +7,12 @@ object Constants {
         "History" to "history",
         "English" to "english"
     )
-    val grades = listOf(
-        "Grade 1" to "Grade 1",
-        "Grade 2" to "Grade 2",
-        "Grade 3" to "Grade 3",
-        "Grade 4" to "Grade 4",
-        "Grade 5" to "Grade 5"
+    val sectors = listOf(
+        "Agriculture" to "Agriculture",
+        "Education" to "Education",
+        "Environment" to "Environment",
+        "Health" to "Health",
+        "Economic" to "Economic"
     )
 
     val countiesMap = listOf(
@@ -71,4 +71,5 @@ object Constants {
     const val POLICIES_REF = "Policies"
     const val POLLS_REF = "Polls"
     const val COMMENTS_REF = "Public Comments"
+    const val PETITIONS_REF = "Petitions"
 }

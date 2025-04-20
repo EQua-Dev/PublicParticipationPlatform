@@ -2,6 +2,8 @@ package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -39,12 +41,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citizen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.LoadingDialog
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 
 @Composable
@@ -115,18 +120,25 @@ fun ApprovedCitizenHome(
             items(4) { index ->
                 ActionCard(
                     icon = when (index) {
-                        0 -> Icons.Default.Policy
-                        1 -> Icons.Default.Poll
-                        2 -> Icons.Default.Comment
-                        else -> Icons.Default.Settings
+                        0 -> R.drawable.ic_policies
+                        1 -> R.drawable.ic_polls
+                        2 -> R.drawable.ic_petitions
+                        else -> R.drawable.ic_budget
                     },
                     label = when (index) {
                         0 -> "Policies"
                         1 -> "Polls"
-                        2 -> "Feedback"
-                        else -> "Settings"
+                        2 -> "Petitions"
+                        else -> "Participatory Budget"
                     },
-                    onClick = { /* Handle navigation */ }
+                    onClick = {
+                        when (index) {
+                            0 -> navController.navigate(Screen.CitizenPolicies.route)
+                            1 -> navController.navigate(Screen.CitizenPolls.route)
+                            2 -> navController.navigate(Screen.CitizenPetitions.route)
+                            else -> navController.navigate(Screen.CitizenParticipatoryBudget.route)
+                        }
+                    }
                 )
             }
         }
@@ -134,7 +146,7 @@ fun ApprovedCitizenHome(
 }
 
 @Composable
-fun ActionCard(icon: ImageVector, label: String, onClick: () -> Unit) {
+fun ActionCard(icon: Int, label: String, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -142,13 +154,20 @@ fun ActionCard(icon: ImageVector, label: String, onClick: () -> Unit) {
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(icon, contentDescription = label, modifier = Modifier.size(48.dp))
-            Spacer(Modifier.height(8.dp))
-            Text(label)
+
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    painterResource(id = icon),
+                    contentDescription = label,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(label, textAlign = TextAlign.Center)
+            }
         }
     }
 }
@@ -181,8 +200,8 @@ fun CitizenHomeTopBar(
             Text("Logout", modifier = Modifier.clickable {
                 onLogout()
             })
-           /* DropdownMenu(
-                expanded = false*//* State for menu visibility *//*,
+            /* DropdownMenu(
+                 expanded = false*//* State for menu visibility *//*,
                 onDismissRequest = { *//* Close menu *//* }
             ) {
                 DropdownMenuItem(

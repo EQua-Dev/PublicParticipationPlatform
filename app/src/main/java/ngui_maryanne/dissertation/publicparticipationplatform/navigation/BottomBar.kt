@@ -7,6 +7,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
@@ -53,7 +54,7 @@ fun RowScope.OfficialAddItem(
             Text(text = screen.title)
         },
         onClick = { navController.navigate(screen.route) },
-        icon = { Icon(imageVector = screen.icon, contentDescription = screen.title) })
+        icon = { Icon(painterResource(id = screen.icon), contentDescription = screen.title) })
 }
 
 

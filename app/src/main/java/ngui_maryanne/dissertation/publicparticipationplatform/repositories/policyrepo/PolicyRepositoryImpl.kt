@@ -8,6 +8,9 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -93,4 +96,65 @@ class PolicyRepositoryImpl @Inject constructor(
             throw Exception("Failed to update policy stage: ${e.message}")
         }
     }
+
+    override suspend fun getPublicPolicies(): Flow<List<Policy>> = callbackFlow {
+        val listener = firestore.collection(POLICIES_REF)
+            .whereIn("policyStatus", PolicyStatus.getPublicStages().map { it.name })
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val policies = snapshot?.documents?.mapNotNull { document ->
+                    document.toObject(Policy::class.java)
+                } ?: emptyList()
+
+                trySend(policies)
+            }
+
+        awaitClose { listener.remove() }
+    }
+
+    override suspend fun searchPolicies(query: String): Flow<List<Policy>> = callbackFlow {
+        val listener = firestore.collection(POLICIES_REF)
+            .whereIn("policyStatus", PolicyStatus.getPublicStages().map { it.name })
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val policies = snapshot?.documents?.mapNotNull { document ->
+                    document.toObject(Policy::class.java)
+                }?.filter { policy ->
+                    policy.policyTitle.contains(query, ignoreCase = true) ||
+                            policy.policyDescription.contains(query, ignoreCase = true) ||
+                            policy.policySector.contains(query, ignoreCase = true)
+                } ?: emptyList()
+
+                trySend(policies)
+            }
+
+        awaitClose { listener.remove() }
+
+
+    }
+
+    override suspend fun getPolicy(policyId: String): Flow<Policy?> = callbackFlow {
+        val listener = firestore.collection(POLICIES_REF)
+            .document(policyId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val policy = snapshot?.toObject(Policy::class.java)
+                trySend(policy)
+            }
+
+        awaitClose { listener.remove() }
+    }
+
 }

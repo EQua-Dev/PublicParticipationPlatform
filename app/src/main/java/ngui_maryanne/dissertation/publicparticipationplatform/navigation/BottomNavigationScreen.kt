@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.ui.graphics.vector.ImageVector
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 
 data class BottomNavigationScreen(
     val title: String = "",
@@ -25,19 +26,19 @@ data class BottomNavigationScreen(
 
 sealed class OfficialBottomBarScreen(
     val title: String,
-    val icon: ImageVector,
+    val icon: Int,
     val route: String
 ) {
     object Policies :
-        OfficialBottomBarScreen("Policies", Icons.Default.VideoCall, "official_policies")
+        OfficialBottomBarScreen("Policies", R.drawable.ic_policies, "official_policies")
 
-    object Polls : OfficialBottomBarScreen("Polls", Icons.Default.Payments, "official_polls")
+    object Polls : OfficialBottomBarScreen("Polls", R.drawable.ic_polls, "official_polls")
     object Petitions :
-        OfficialBottomBarScreen("Petitions", Icons.Default.VolunteerActivism, "official_petitions")
+        OfficialBottomBarScreen("Petitions", R.drawable.ic_petitions, "official_petitions")
 
-    object Budget : OfficialBottomBarScreen("Budget", Icons.Default.Gavel, "official_budget")
-    object Profile : OfficialBottomBarScreen("Profile", Icons.Default.Gavel, "official_profile")
-    object Citizens : OfficialBottomBarScreen("Citizens", Icons.Default.Gavel, "official_citizens")
+    object Budget : OfficialBottomBarScreen("Budget", R.drawable.ic_budget, "official_budget")
+    object Citizens : OfficialBottomBarScreen("Citizens", R.drawable.ic_citizens, "official_citizens")
+    object Profile : OfficialBottomBarScreen("Profile", R.drawable.ic_profile, "official_profile")
 
 
 }

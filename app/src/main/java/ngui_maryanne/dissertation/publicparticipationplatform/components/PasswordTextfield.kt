@@ -1,6 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,23 +41,20 @@ fun PasswordTextField(
     onPasswordChange: (String) -> Unit,
     confirmPassword: String? = null,
     onConfirmPasswordChange: ((String) -> Unit)? = null,
-    isConfirmField: Boolean = false
+    isConfirmField: Boolean = false,
+    showCheck: Boolean = false,
 ) {
     var isPasswordVisible by remember { mutableStateOf(false) }
     val passwordStrength = remember(password) { checkPasswordStrength(password) }
     val passwordsMatch = confirmPassword?.let { it == password } ?: true
 
     Column {
-        Card(
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
+
             OutlinedTextField(
                 value = password,
                 onValueChange = onPasswordChange,
                 label = { Text(if (isConfirmField) "Confirm Password" else "Password") },
+                shape = RoundedCornerShape(24.dp),
                 trailingIcon = {
                     IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                         Icon(
@@ -70,11 +68,11 @@ fun PasswordTextField(
                 isError = isConfirmField && !passwordsMatch,
                 modifier = Modifier.fillMaxWidth().padding(8.dp)
             )
-        }
 
-        if (!isConfirmField) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+
+        if (!isConfirmField && showCheck) {
+            Column(
+                verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp)
             ) {
                 PasswordCheckItem("8+ chars", password.length >= 8)

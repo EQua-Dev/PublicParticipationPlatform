@@ -117,81 +117,89 @@ fun ExpandableFloatingActionButton(
             Column {
                 AnimatedVisibility(visible = expanded) {
                     Column {
-                        FloatingActionButton(
-                            onClick = {
-                                expanded = false
-                                onAddCitizen()
-                            },
-                            modifier = Modifier.padding(4.dp),
-                            containerColor = MaterialTheme.colorScheme.primary,
-                        ) {
-                            Row {
-                            Icon(Icons.Default.PersonAdd, contentDescription = "Add Citizen")
-                            Text(text = "Add Citizen")
+                        Row {
+                            FloatingActionButton(
+                                onClick = {
+                                    expanded = false
+                                    onAddCitizen()
+                                },
+                                modifier = Modifier.padding(4.dp),
+                                containerColor = MaterialTheme.colorScheme.primary,
+                            ) {
+
+                                Icon(Icons.Default.PersonAdd, contentDescription = "Add Citizen")
+
+
+                                Text(text = "Add Citizen")
                             }
+
                         }
-                        FloatingActionButton(
-                            onClick = {
-                                expanded = false
-                                onAddOfficial()
-                            },
-                            modifier = Modifier.padding(4.dp),
-                            containerColor = MaterialTheme.colorScheme.primary,
-                        ) {
-                            Row {
-                            Icon(Icons.Default.AccountBox, contentDescription = "Add Official")
+                        Row {
+                            FloatingActionButton(
+                                onClick = {
+                                    expanded = false
+                                    onAddOfficial()
+                                },
+                                modifier = Modifier.padding(4.dp),
+                                containerColor = MaterialTheme.colorScheme.primary,
+                            ) {
+
+                                Icon(Icons.Default.AccountBox, contentDescription = "Add Official")
+
+                            }
                             Text(text = "Add Official")
-                            }
                         }
+
                     }
                 }
             }
         }
+    }
 
-        FloatingActionButton(
-            onClick = {
-                expanded = !expanded
-                onFabClick()
-            },
+    FloatingActionButton(
+        onClick = {
+            expanded = !expanded
+            onFabClick()
+        },
+        modifier = Modifier
+            .width(expandedWidth)
+            .height(expandedHeight),
+        shape = RoundedCornerShape(18.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = null,
             modifier = Modifier
-                .width(expandedWidth)
-                .height(expandedHeight),
-            shape = RoundedCornerShape(18.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp)
-                    .offset(
-                        x = animateDpAsState(
-                            if (expanded) -70.dp else 0.dp,
-                            animationSpec = spring(dampingRatio = 3f)
-                        ).value
-                    )
-            )
+                .size(24.dp)
+                .offset(
+                    x = animateDpAsState(
+                        if (expanded) -70.dp else 0.dp,
+                        animationSpec = spring(dampingRatio = 3f)
+                    ).value
+                )
+        )
 
-            Text(
-                text = "Add",
-                softWrap = false,
-                modifier = Modifier
-                    .offset(
-                        x = animateDpAsState(
-                            if (expanded) 10.dp else 50.dp,
-                            animationSpec = spring(dampingRatio = 3f)
-                        ).value
-                    )
-                    .alpha(
-                        animateFloatAsState(
-                            targetValue = if (expanded) 1f else 0f,
-                            animationSpec = tween(
-                                durationMillis = if (expanded) 350 else 100,
-                                delayMillis = if (expanded) 100 else 0,
-                                easing = EaseIn
-                            )
-                        ).value
-                    )
-            )
-        }
+        Text(
+            text = "Add",
+            softWrap = false,
+            modifier = Modifier
+                .offset(
+                    x = animateDpAsState(
+                        if (expanded) 10.dp else 50.dp,
+                        animationSpec = spring(dampingRatio = 3f)
+                    ).value
+                )
+                .alpha(
+                    animateFloatAsState(
+                        targetValue = if (expanded) 1f else 0f,
+                        animationSpec = tween(
+                            durationMillis = if (expanded) 350 else 100,
+                            delayMillis = if (expanded) 100 else 0,
+                            easing = EaseIn
+                        )
+                    ).value
+                )
+        )
     }
 }
+

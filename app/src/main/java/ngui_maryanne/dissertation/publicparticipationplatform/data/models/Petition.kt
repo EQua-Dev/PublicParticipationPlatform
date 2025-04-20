@@ -23,3 +23,16 @@ data class Signature(
     val isAnonymous: Boolean = false,
 
 )
+
+// Data model extension for UI use
+fun Petition.signaturesProgress(): Float {
+    val signed = signatures.size.toFloat()
+    val target = signatureGoal.toFloatOrNull() ?: return 0f
+    return (signed / target).coerceIn(0f, 1f)
+}
+
+fun Petition.daysToExpiry(): Long {
+    val expiry = expiryDate.toLongOrNull() ?: return 0L
+    val diff = expiry - System.currentTimeMillis()
+    return (diff / (1000 * 60 * 60 * 24)).coerceAtLeast(0)
+}

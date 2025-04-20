@@ -3,6 +3,7 @@ package ngui_maryanne.dissertation.publicparticipationplatform.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,6 +45,7 @@ fun CustomTextField(
             value = value,
             onValueChange = onValueChange,
             label = { Text(label) },
+            shape = RoundedCornerShape(24.dp),
             leadingIcon = leadingIcon?.let {
                 { Icon(imageVector = it, contentDescription = null) }
             },

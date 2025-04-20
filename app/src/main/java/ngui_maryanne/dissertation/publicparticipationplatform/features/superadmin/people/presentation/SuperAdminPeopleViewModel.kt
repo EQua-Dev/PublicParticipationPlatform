@@ -25,4 +25,5 @@ class SuperAdminPeopleViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+
 }

@@ -153,7 +153,7 @@ class CitizenRepositoryImpl(
         try {
             firestore.collection(REGISTERED_CITIZENS_REF)
                 .document(citizenId)
-                .update("isApproved", true)
+                .update("approved", "true")
                 .await()
         } catch (e: Exception) {
             throw Exception("Failed to approve citizen: ${e.message}")

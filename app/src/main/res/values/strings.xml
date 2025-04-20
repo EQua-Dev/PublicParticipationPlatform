@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Public Participation Platform</string>
+    <string name="app_name">Wajibika</string>
     <string name="super_admin_home">Super Admin Home</string>
     <string name="citizen_registration">Citizen Registration</string>
     <string name="login">Login</string>
@@ -34,4 +34,26 @@
     <string name="create_policy_screen">Create Policy</string>
     <string name="create_poll_screen">Create Poll</string>
     <string name="policy_details_screen">Policy Details</string>
+    <string name="citizen_participatory_budget">Citizen Participatory Budget</string>
+    <string name="citizen_petitions">Citizen Petitions</string>
+    <string name="citizen_polls">Citizen Polls</string>
+    <string name="citizen_policies">Citizen Policies</string>
+    <string name="citizen_learn_more">Citizen Learn More</string>
+    <string name="citizen_policy_details_screen">Citizen Policy Screen</string>
+    <string name="super_admin_text">Super Admin</string>
+    <string name="login_title">Login</string>
+    <string name="login_subtitle">Enter your registration details to login</string>
+    <string name="official_text">Government Official</string>
+    <string name="citizen_text">Citizen</string>
+    <string name="first_name_label">First Name</string>
+    <string name="last_name_label">Last Name</string>
+    <string name="email_label">Email</string>
+    <string name="national_id_label">National ID</string>
+    <string name="send_otp">Send OTP</string>
+    <string name="poll_details_screen">Poll Details Screen</string>
+    <string name="sector_label">Select Sector</string>
+    <string name="county_label">County</string>
+    <string name="county_hint">County Affected</string>
+    <string name="sector_hint">Select the sector related to the petition</string>
+    <string name="citizen_petition_details_screen">Citizen Petition Details Screen</string>
 </resources>

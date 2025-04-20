@@ -1,5 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.holder
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateDp
@@ -22,9 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.forgotpassword.ForgotPasswordScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login.LoginScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
@@ -37,7 +41,15 @@ import ngui_maryanne.dissertation.publicparticipationplatform.features.common.au
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.OfficialHomeScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.SuperAdminHomeScreen
 import com.awesomenessstudios.schoolprojects.criticalthinkingappforkids.providers.LocalNavHost
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.participatorybudgets.presentation.CitizenParticipatoryBudgetScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails.PetitionDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.presentation.CitizenPetitionsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.presentation.CitizenPoliciesScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.policydetails.CitizenPolicyDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.polldetails.PollDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation.CitizenPollsScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HolderScreen(
@@ -145,6 +157,7 @@ fun HolderScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScaffoldSection(
@@ -241,6 +254,35 @@ fun ScaffoldSection(
 //                        onNavigationRequested = onNavigationRequested,
                     )
                 }
+
+                composable(Screen.CitizenPolicies.route) {
+                    onStatusBarColorChange(MaterialTheme.colorScheme.background)
+                    CitizenPoliciesScreen(
+                        navController = controller,
+//                        onNavigationRequested = onNavigationRequested,
+                    )
+                }
+                composable(Screen.CitizenPolls.route) {
+                    onStatusBarColorChange(MaterialTheme.colorScheme.background)
+                    CitizenPollsScreen(
+                        navController = controller,
+//                        onNavigationRequested = onNavigationRequested,
+                    )
+                }
+                composable(Screen.CitizenPetitions.route) {
+                    onStatusBarColorChange(MaterialTheme.colorScheme.background)
+                    CitizenPetitionsScreen(
+                        navController = controller,
+//                        onNavigationRequested = onNavigationRequested,
+                    )
+                }
+                composable(Screen.CitizenParticipatoryBudget.route) {
+                    onStatusBarColorChange(MaterialTheme.colorScheme.background)
+                    CitizenParticipatoryBudgetScreen(
+                        navController = controller,
+//                        onNavigationRequested = onNavigationRequested,
+                    )
+                }
                 composable(Screen.OfficialHomeScreen.route) {
                     onStatusBarColorChange(MaterialTheme.colorScheme.background)
                     OfficialHomeScreen(
@@ -252,6 +294,46 @@ fun ScaffoldSection(
                     onStatusBarColorChange(MaterialTheme.colorScheme.background)
                     CitizenRegistrationVerification(
 //                        onNavigationRequested = onNavigationRequested,
+                    )
+                }
+                composable(
+                    Screen.CitizenPolicyDetailsScreen.route,
+                    arguments = listOf(
+                        navArgument(name = "policyId") { type = NavType.StringType }
+                    ),
+                ) {
+                    val policyId = it.arguments?.getString("policyId")
+
+                    CitizenPolicyDetailsScreen(
+                        policyId = policyId!!,
+                        navController = controller
+                    )
+                }
+                composable(
+                    Screen.PollDetailsScreen.route,
+                    arguments = listOf(
+                        navArgument(name = "pollId") { type = NavType.StringType }
+                    ),
+                ) {
+                    val pollId = it.arguments?.getString("pollId")
+
+                    PollDetailsScreen(
+                        pollId = pollId!!,
+                        navController = controller
+                    )
+                }
+
+                composable(
+                    Screen.CitizenPetitionDetailsScreen.route,
+                    arguments = listOf(
+                        navArgument(name = "petitionId") { type = NavType.StringType }
+                    ),
+                ) {
+                    val petitionId = it.arguments?.getString("petitionId")
+
+                    PetitionDetailsScreen(
+                        petitionId = petitionId!!,
+                        navHostController = controller
                     )
                 }
 

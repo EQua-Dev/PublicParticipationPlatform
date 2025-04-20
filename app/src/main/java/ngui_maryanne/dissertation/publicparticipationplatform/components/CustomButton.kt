@@ -3,6 +3,7 @@ package ngui_maryanne.dissertation.publicparticipationplatform.components
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,7 +42,7 @@ fun CustomButton(
         colors = buttonColors,
         shape = shape,
         contentPadding = contentPadding,
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
     ) {
         if (isLoading) {
             CircularProgressIndicator(
@@ -59,11 +61,11 @@ fun CustomButton(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                     }
-                    Text(text)
+                    Text(text, style = MaterialTheme.typography.titleMedium)
                 }
 
                 ButtonIconPosition.END -> Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text)
+                    Text(text, style = MaterialTheme.typography.titleMedium)
                     icon?.let {
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(

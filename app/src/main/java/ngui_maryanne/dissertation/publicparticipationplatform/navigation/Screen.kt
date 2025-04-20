@@ -64,10 +64,43 @@ sealed class Screen(
         route = "policy_details_screen/{policyId}",
         title = R.string.policy_details_screen,
     )
+    object PollDetailsScreen : Screen(
+        route = "poll_details_screen/{pollId}",
+        title = R.string.poll_details_screen,
+    )
     object CreatePollScreen : Screen(
         route = "create_poll_screen",
         title = R.string.create_poll_screen,
     )
+    object CitizenLearnMore : Screen(
+        route = "citizen_learn_more",
+        title = R.string.citizen_learn_more,
+    )
+    object CitizenPolicies : Screen(
+        route = "citizen_policies",
+        title = R.string.citizen_policies,
+    )
+    object CitizenPolls : Screen(
+        route = "citizen_polls",
+        title = R.string.citizen_polls,
+    )
+    object CitizenPetitions : Screen(
+        route = "citizen_petitions",
+        title = R.string.citizen_petitions,
+    )
+    object CitizenParticipatoryBudget : Screen(
+        route = "citizen_participatory_budget",
+        title = R.string.citizen_participatory_budget,
+    )
+    object CitizenPolicyDetailsScreen : Screen(
+        route = "citizen_policy_details_screen/{policyId}",
+        title = R.string.citizen_policy_details_screen,
+    )
+  object CitizenPetitionDetailsScreen : Screen(
+        route = "citizen_petition_details_screen/{petitionId}",
+        title = R.string.citizen_petition_details_screen,
+    )
+
     /*
         object ChildHome : Screen(
             route = "childhome/{childId}",
