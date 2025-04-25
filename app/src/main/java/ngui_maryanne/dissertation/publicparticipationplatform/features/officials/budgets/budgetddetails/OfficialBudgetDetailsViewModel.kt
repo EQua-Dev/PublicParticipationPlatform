@@ -1,14 +1,20 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
+import java.util.Objects.hash
 import java.util.UUID
 import javax.inject.Inject
 
@@ -28,7 +34,7 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
             }
 
             is BudgetDetailsEvent.VoteOption -> {
-                voteForOption(event.optionId)
+//                voteForOption(event.optionId)
             }
 
             is BudgetDetailsEvent.ToggleActivation -> {
@@ -65,25 +71,78 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
     }
 
 
-    private fun voteForOption(optionId: String) {
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun verifyAndVoteOption(
+        activity: FragmentActivity,
+        optionId: String,
+        hashType: String,
+        optionName: String,
+//        answer1: String,
+//        answer2: String,
+//        securityQuestion1: String,
+//        securityQuestion2: String,
+//        storedSecurityHash: String,
+        isAnonymous: Boolean,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        /*       val hash1 = hash(securityQuestion1 + answer1, hashType)
+               val hash2 = hash(securityQuestion2 + answer2, hashType)
+               val combinedHash = hash(hash1 + hash2, hashType)
+
+               if (combinedHash != storedSecurityHash) {
+                   onFailure("Security answers don't match")
+                   return
+               }
+       */
+        HelpMe.promptBiometric(
+            activity = activity,
+            title = "Authorize Voting Budget For $optionName",
+            onSuccess = {
+                voteForOption(optionId, hashType, isAnonymous, onSuccess, onFailure)
+            },
+            onNoHardware = {
+                voteForOption(optionId, hashType, isAnonymous, onSuccess, onFailure)
+            }
+        )
+    }
+
+
+    private fun voteForOption(
+        optionId: String, hashType: String,
+        isAnonymous: Boolean,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         viewModelScope.launch {
             val currentState = _uiState.value
             try {
+                val signatureId = UUID.randomUUID().toString()
+                val answerHash = hash(
+                    auth.currentUser!!.uid + currentState.budget!!.id + optionId + System.currentTimeMillis(),
+                    hashType
+                )
 
                 // Call the repository function to vote for a budget option
                 val voteOption = BudgetResponse(
                     answerId = UUID.randomUUID().toString(),
-                            answerHash = "",
-                            userId = auth.currentUser!!.uid,
-                            optionId = optionId,
+                    answerHash = answerHash.toString(),
+                    userId = auth.currentUser!!.uid,
+                    optionId = optionId,
 //                            isAnonymous =
-                            dateCreated = System.currentTimeMillis().toString()
+                    dateCreated = System.currentTimeMillis().toString()
                 )
-                repository.voteForBudgetOption(currentState.budget!!.id, voteOption)
 
+                val updatedResponses = currentState.budget.responses.toMutableList().apply {
+                    add(voteOption)
+                }
+
+                repository.voteForBudgetOption(currentState.budget!!.id, updatedResponses)
+                onSuccess()
                 // Update the UI state to reflect the voted option
                 _uiState.value = currentState.copy(votedOptionId = optionId)
             } catch (e: Exception) {
+                onFailure(e.message ?: "Signing petition failed")
                 // If an error occurs, update the UI state with the error message
                 _uiState.value = currentState.copy(error = e.message ?: "Vote failed")
             }
@@ -96,13 +155,17 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
             try {
                 val currentState = _uiState.value
                 // Toggle the activation status of the budget
-                repository.toggleBudgetActivation(currentState.budget!!.id, !currentState.budget!!.isActive)
+                repository.toggleBudgetActivation(
+                    currentState.budget!!.id,
+                    !currentState.budget!!.isActive
+                )
 
                 // Update the UI state to reflect the new activation status
 //                _uiState.value = currentState.copy(isActive = !currentState.isActive)
             } catch (e: Exception) {
                 // If there's an error, update the UI state with the error message
-                _uiState.value = _uiState.value.copy(error = e.message ?: "Could not update budget status")
+                _uiState.value =
+                    _uiState.value.copy(error = e.message ?: "Could not update budget status")
             }
         }
     }

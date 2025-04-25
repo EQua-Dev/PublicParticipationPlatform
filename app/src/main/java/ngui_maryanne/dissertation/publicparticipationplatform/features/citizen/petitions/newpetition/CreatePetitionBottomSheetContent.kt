@@ -1,5 +1,8 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.newpetition
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.AssimOutlinedDropdown
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.signup.CitizenRegistrationEvent
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.createpolicy.CreatePolicyEvent
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.createpolicy.PolicyCoverImageSection
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.countiesMap
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.sectors
 
@@ -48,6 +53,17 @@ fun CreatePetitionBottomSheet(
         BannerDisclaimer()
 
         Spacer(Modifier.height(16.dp))
+        val imagePicker = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            uri?.let { onEvent(NewPetitionEvent.CoverImageSelected(it)) }
+        }
+
+        PolicyCoverImageSection(
+            imageUri = state.coverImageUri,
+            onImageClick = { imagePicker.launch("image/*") }
+        )
+
         // County of Residence Dropdown
         AssimOutlinedDropdown(
             label = stringResource(id = R.string.sector_label),

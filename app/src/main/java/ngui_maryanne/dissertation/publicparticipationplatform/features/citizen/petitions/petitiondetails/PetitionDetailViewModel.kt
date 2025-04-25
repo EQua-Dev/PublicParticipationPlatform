@@ -147,7 +147,7 @@ class PetitionDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val signatureId = UUID.randomUUID().toString()
-                val signatureHash = hash(userId + petition.id, hashType)
+                val signatureHash = hash(userId + petition.id + System.currentTimeMillis(), hashType)
 
                 val newSignature = Signature(
                     id = signatureId,

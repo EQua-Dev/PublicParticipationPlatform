@@ -236,7 +236,7 @@ fun CreatePolicyScreen(
 }
 
 @Composable
-private fun PolicyCoverImageSection(
+fun PolicyCoverImageSection(
     imageUri: Uri?,
     onImageClick: () -> Unit
 ) {

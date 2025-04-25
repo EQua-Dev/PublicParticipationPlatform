@@ -5,6 +5,7 @@ data class Petition(
     val hash: String = "",
     val petitionNo: String = "",
     val title: String = "",
+    val coverImage: String = "",
     val description: String = "",
     val county: String = "",
     val requestGoals: List<String> = listOf(),

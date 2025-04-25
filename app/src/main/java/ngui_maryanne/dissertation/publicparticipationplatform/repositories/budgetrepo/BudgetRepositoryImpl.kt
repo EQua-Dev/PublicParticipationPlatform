@@ -78,14 +78,13 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
     }
 
 
-    override suspend fun voteForBudgetOption(budgetId: String, optionVote: BudgetResponse) {
+    override suspend fun voteForBudgetOption(budgetId: String, updatedResponses: MutableList<BudgetResponse>) {
         try {
             // Add vote to Firestore
 //            val voteData = mapOf("optionId" to optionId, "timestamp" to FieldValue.serverTimestamp())
-            firestore.collection("budgets")
+            firestore.collection(BUDGETS_REF)
                 .document(budgetId)
-                .collection("votes")
-                .add(optionVote)
+                .update("responses", updatedResponses)
                 .await()
         } catch (e: Exception) {
             throw Exception("Failed to vote for budget option: ${e.message}")

@@ -1,10 +1,12 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.policydetails
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -20,6 +22,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
@@ -31,6 +34,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -42,13 +46,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import ngui_maryanne.dissertation.publicparticipationplatform.components.PolicyTimelineStepper
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Comment
@@ -166,6 +173,35 @@ fun CitizenPolicyDetailsScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(16f / 9f)
+                                .background(colorScheme.surfaceVariant)
+                                .clip(MaterialTheme.shapes.large)
+                        ) {
+
+                            if (uiState.policy!!.policyCoverImage.isNotEmpty()) {
+                                AsyncImage(
+                                    model = uiState.policy!!.policyCoverImage,
+                                    contentDescription = "Policy cover",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Policy,
+                                    contentDescription = "Policy placeholder",
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .align(Alignment.Center),
+                                    tint = colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                        }
+                    }
                     // Policy description section
                     item {
                         PolicyDescriptionSection(
@@ -199,11 +235,11 @@ fun CitizenPolicyDetailsScreen(
                                             pollId
                                         )
                                     )
-                                   /* viewModel.handleAction(
-                                        PolicyDetailsAction.OnPollClicked(
-                                            pollId
-                                        )
-                                    )*/
+                                    /* viewModel.handleAction(
+                                         PolicyDetailsAction.OnPollClicked(
+                                             pollId
+                                         )
+                                     )*/
                                 }
                             )
                         }

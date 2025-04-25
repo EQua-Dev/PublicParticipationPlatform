@@ -10,23 +10,26 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.presentation.CitizenPetitionsUiState
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.createpolicy.CreatePolicyEvent
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class PetitionViewModel @Inject constructor(
-    private val repository: PetitionRepository
+    private val repository: PetitionRepository,
+    private val storageRepo: StorageRepository
 ) : ViewModel() {
 
     private val _newPetitionState = mutableStateOf(NewPetitionState())
     val newPetitionState: State<NewPetitionState> = _newPetitionState
 
-/*
+    /*
 
-    var newPetitionState by mutableStateOf(NewPetitionState())
-        private set
-*/
+        var newPetitionState by mutableStateOf(NewPetitionState())
+            private set
+    */
 
     fun onNewPetitionEvent(event: NewPetitionEvent) {
         when (event) {
@@ -41,6 +44,10 @@ class PetitionViewModel @Inject constructor(
 
             is NewPetitionEvent.OnCountyChanged ->
                 _newPetitionState.value = _newPetitionState.value.copy(county = event.value)
+
+            is NewPetitionEvent.CoverImageSelected -> {
+                _newPetitionState.value = _newPetitionState.value.copy(coverImageUri = event.uri)
+            }
 
             is NewPetitionEvent.OnRequestGoalChanged -> {
                 val updated = _newPetitionState.value.requestGoals.toMutableList()
@@ -65,7 +72,8 @@ class PetitionViewModel @Inject constructor(
                 )
 
             is NewPetitionEvent.OnTargetSignatureChanged -> {
-                val newCount = (_newPetitionState.value.targetSignatures + event.diff).coerceAtLeast(200)
+                val newCount =
+                    (_newPetitionState.value.targetSignatures + event.diff).coerceAtLeast(200)
                 _newPetitionState.value = _newPetitionState.value.copy(targetSignatures = newCount)
             }
         }
@@ -76,18 +84,24 @@ class PetitionViewModel @Inject constructor(
             try {
                 _newPetitionState.value = _newPetitionState.value.copy(isLoading = true)
 
+                val imageUrl = _newPetitionState.value.coverImageUri?.let {
+                    storageRepo.uploadImage("petitions/${UUID.randomUUID()}.jpg", it)
+                } ?: ""
+
                 val petition = Petition(
                     id = UUID.randomUUID().toString(),
                     hash = UUID.randomUUID().toString(),
                     petitionNo = "PET-${System.currentTimeMillis()}",
                     title = _newPetitionState.value.title,
                     description = _newPetitionState.value.description,
+                    coverImage = imageUrl,
                     county = _newPetitionState.value.county,
                     sector = _newPetitionState.value.sector,
                     requestGoals = _newPetitionState.value.requestGoals,
                     signatureGoal = _newPetitionState.value.targetSignatures.toString(),
                     createdBy = userId,
-                    expiryDate = System.currentTimeMillis().plus(30 * 24 * 60 * 60 * 1000L).toString(), // 30 days
+                    expiryDate = System.currentTimeMillis().plus(30 * 24 * 60 * 60 * 1000L)
+                        .toString(), // 30 days
                     signatures = listOf()
                 )
 

@@ -1,5 +1,8 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -28,13 +32,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails.PetitionDetailsEvent
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetViewModel
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.findActivity
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetDetailsScreen(
@@ -46,7 +54,11 @@ fun BudgetDetailsScreen(
 ) {
     val state = viewModel.uiState.value
     val detailsState = detailsViewModel.uiState.value
+
     val context = LocalContext.current
+    val activity = remember(context) {
+        context.findActivity()?.takeIf { it is FragmentActivity } as? FragmentActivity
+    }
 
     LaunchedEffect(Unit) {
         detailsViewModel.onEvent(BudgetDetailsEvent.LoadBudget(budgetId))
@@ -70,9 +82,18 @@ fun BudgetDetailsScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Text("Total Budget: ₦${detailsState.budget?.amount}", style = MaterialTheme.typography.bodyMedium)
-            Text("Impact: ${detailsState.budget?.impact}", style = MaterialTheme.typography.bodyMedium)
-            Text("Note: ${detailsState.budget?.budgetNote}", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                "Total Budget: ₦${detailsState.budget?.amount}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                "Impact: ${detailsState.budget?.impact}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                "Note: ${detailsState.budget?.budgetNote}",
+                style = MaterialTheme.typography.bodyMedium
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Budget Options", style = MaterialTheme.typography.titleMedium)
@@ -82,9 +103,19 @@ fun BudgetDetailsScreen(
 
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(8.dp)) {
-                        Text("Project: ${option.optionProjectName}", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
-                        Text("Description: ${option.optionDescription}", style = MaterialTheme.typography.bodyMedium)
-                        Text("Amount: ₦${option.optionAmount}", style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            "Project: ${option.optionProjectName}",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(
+                            "Description: ${option.optionDescription}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            "Amount: ₦${option.optionAmount}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                         option.imageUrl.let {
                             AsyncImage(
                                 model = it,
@@ -103,7 +134,26 @@ fun BudgetDetailsScreen(
                                 CustomButton(
                                     text = "Vote This Option",
                                     onClick = {
-                                        detailsViewModel.onEvent(BudgetDetailsEvent.VoteOption(option.optionId))
+                                        activity?.let { fragmentActivity ->
+                                            detailsViewModel.verifyAndVoteOption(
+                                                activity = fragmentActivity,
+                                                optionId = option.optionId,
+                                                optionName = option.optionProjectName,
+                                                hashType = "SHA-256",
+                                                isAnonymous = false,
+                                                onSuccess = {
+                                                    detailsViewModel.onEvent(
+                                                        BudgetDetailsEvent.LoadBudget(budgetId)
+                                                    )
+                                                },
+                                                onFailure = { }
+                                            )
+                                        } ?: run {
+                                            // Handle case where activity isn't available
+                                            // Maybe show error or use alternative authentication
+                                            Log.d("TAG", "PetitionDetailsScreen: no fragment")
+                                        }
+//                                        detailsViewModel.onEvent(BudgetDetailsEvent.VoteOption(option.optionId))
                                     }
                                 )
                             } else if (votedOptionId == option.optionId) {
@@ -120,7 +170,9 @@ fun BudgetDetailsScreen(
                 CustomButton(
                     text = if (detailsState.budget?.isActive == true) "Deactivate Budget" else "Activate Budget",
                     onClick = { detailsViewModel.onEvent(BudgetDetailsEvent.ToggleActivation) },
-                    modifier = Modifier.fillMaxWidth().background(Color.Red)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Red)
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
