@@ -51,7 +51,7 @@ fun LoginScreen(
         LoadingDialog(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
+                .background(Color.Black.copy(alpha = 0.8f))
         ) // 50% opacity)
 //            CircularProgressIndicator()
     }

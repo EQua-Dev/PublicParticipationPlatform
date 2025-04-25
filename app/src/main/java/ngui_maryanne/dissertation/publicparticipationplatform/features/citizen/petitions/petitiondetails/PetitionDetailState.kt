@@ -7,5 +7,6 @@ data class PetitionDetailsState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val hasSigned: Boolean = false,
-    val currentUserId: String = ""
+    val currentUserId: String = "",
+    val currentUserRole: String = ""
 )

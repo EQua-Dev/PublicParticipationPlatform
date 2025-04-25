@@ -23,7 +23,8 @@ class CitizenRepositoryImpl(
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage,
     private val storageRepository: StorageRepository
-) : CitizenRepository {
+) : CitizenRepository
+{
     // Store verification ID for later use
     private var verificationId: String? = null
 

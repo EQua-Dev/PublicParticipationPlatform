@@ -101,6 +101,19 @@ sealed class Screen(
         title = R.string.citizen_petition_details_screen,
     )
 
+    object CreateNewBudgetScreen : Screen(
+        route = "create_new_budget_screen",
+        title = R.string.create_new_budget_screen,
+    )
+    object BudgetDetailsScreen : Screen(
+        route = "budget_details_screen/{budgetId}",
+        title = R.string.budget_details_screen,
+    )
+    object CitizenProfileScreen : Screen(
+        route = "citizen_profile_screen",
+        title = R.string.citizen_profile_screen,
+    )
+
     /*
         object ChildHome : Screen(
             route = "childhome/{childId}",

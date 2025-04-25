@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
+import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomTextField
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.newpetition.CreatePetitionBottomSheet
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.newpetition.PetitionViewModel
@@ -64,8 +66,10 @@ fun CitizenPetitionsScreen(
             TopAppBar(title = { Text("Petitions") })
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.onEvent(PetitionEvent.OnToggleCreatePetition) }) {
-                Icon(Icons.Default.Add, contentDescription = "New Petition")
+            if (uiState.currentUserRole == UserRole.CITIZEN.name) {
+                FloatingActionButton(onClick = { viewModel.onEvent(PetitionEvent.OnToggleCreatePetition) }) {
+                    Icon(Icons.Default.Add, contentDescription = "New Petition")
+                }
             }
         }
     ) { padding ->
@@ -74,7 +78,13 @@ fun CitizenPetitionsScreen(
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            OutlinedTextField(
+            CustomTextField(
+                value = uiState.searchQuery,
+                onValueChange = { viewModel.onEvent(PetitionEvent.OnSearchQueryChanged(it)) },
+                label = "",
+                placeholder = "Search Petitions..."
+            )
+           /* OutlinedTextField(
                 value = uiState.searchQuery,
                 onValueChange = { viewModel.onEvent(PetitionEvent.OnSearchQueryChanged(it)) },
                 modifier = Modifier
@@ -82,7 +92,7 @@ fun CitizenPetitionsScreen(
                     .padding(16.dp),
                 placeholder = { Text("Search Petitions...") },
                 singleLine = true
-            )
+            )*/
 
             if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -113,7 +123,7 @@ fun CitizenPetitionsScreen(
                             )
                         }
                         items(petitions) { petition ->
-                            PetitionCard(petition){
+                            PetitionCard(petition) {
                                 navController.navigate(
                                     Screen.CitizenPetitionDetailsScreen.route.replace(
                                         "{petitionId}",

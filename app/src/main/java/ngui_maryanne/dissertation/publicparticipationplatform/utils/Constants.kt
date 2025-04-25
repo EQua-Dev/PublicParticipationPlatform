@@ -72,4 +72,5 @@ object Constants {
     const val POLLS_REF = "Polls"
     const val COMMENTS_REF = "Public Comments"
     const val PETITIONS_REF = "Petitions"
+    const val BUDGETS_REF = "Budgets"
 }

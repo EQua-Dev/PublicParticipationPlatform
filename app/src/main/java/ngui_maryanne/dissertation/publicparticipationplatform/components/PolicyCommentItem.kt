@@ -42,7 +42,8 @@ fun CommentItem(comment: Comment) {
                         )
                     }",
                     modifier = Modifier.padding(start = 8.dp),
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
@@ -54,7 +55,8 @@ fun CommentItem(comment: Comment) {
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = comment.comment)
+            Text(text = comment.comment,
+                style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

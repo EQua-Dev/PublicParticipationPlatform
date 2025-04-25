@@ -16,6 +16,9 @@ android {
     namespace = "ngui_maryanne.dissertation.publicparticipationplatform"
     compileSdk = 35
 
+    androidResources{
+        generateLocaleConfig = true
+    }
     defaultConfig {
         applicationId = "ngui_maryanne.dissertation.publicparticipationplatform"
         minSdk = 24
@@ -171,5 +174,9 @@ dependencies {
     implementation(libs.coil.compose) // Use the latest version
     implementation(libs.openai.client) // Use the latest version
     implementation("io.ktor:ktor-client-cio:3.0.3")
+
+
+    implementation(libs.androidx.biometric)
+    implementation(libs.biometric)
 
 }

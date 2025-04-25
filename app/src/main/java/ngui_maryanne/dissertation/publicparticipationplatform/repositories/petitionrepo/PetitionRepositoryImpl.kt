@@ -5,12 +5,15 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Signature
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.PETITIONS_REF
 
 class PetitionRepositoryImpl(
     private val firestore: FirebaseFirestore
-) : PetitionRepository {
+) : PetitionRepository
+{
 
     override fun getAllPetitionsListener(onUpdate: (List<Petition>) -> Unit): ListenerRegistration {
         return firestore.collection(PETITIONS_REF)
@@ -44,6 +47,18 @@ class PetitionRepositoryImpl(
             }
 
         awaitClose { listenerRegistration.remove() }
+    }
+
+
+    override suspend fun signPetition(petitionId: String, updatedSignatures: MutableList<Signature>) {
+        try {
+            firestore.collection(PETITIONS_REF)
+                .document(petitionId)
+                .update("signatures", updatedSignatures)
+                .await() // suspends until complete
+        } catch (e: Exception) {
+            throw e // Can be handled in the ViewModel or use Result wrapper if preferred
+        }
     }
 
 }

@@ -70,7 +70,7 @@ fun CitizenHomeScreen(
         topBar = {
             CitizenHomeTopBar(
                 citizen = state.citizen,
-                onProfileClick = { navController.navigate("profile") },
+                onProfileClick = { navController.navigate(Screen.CitizenProfileScreen.route) },
                 onLogout = { viewModel.onEvent(CitizenHomeEvent.Logout) }
             )
         }

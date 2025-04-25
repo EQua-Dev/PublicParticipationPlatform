@@ -188,7 +188,7 @@ private fun CitizenCard(
                 }
             }
 
-            if (canApprove && citizen.approved !== "true") {
+            if (canApprove && citizen.approved != "true") {
                 Button(onClick = onVerifyClick) {
                     Text("Verify")
                 }

@@ -26,6 +26,7 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
+    placeholder: String? = null,
     modifier: Modifier = Modifier,
     supportingText: String? = null,
     isError: Boolean = false,
@@ -56,6 +57,7 @@ fun CustomTextField(
                     }
                 }
             },
+            placeholder = placeholder?.let { { Text(placeholder) } },
             isError = isError,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType),
             singleLine = isSingleLine,

@@ -125,7 +125,7 @@ private fun PolicyDetailsContent(
         if (state.polls.isNotEmpty()) {
             Text(
                 "Public Polls",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.padding(16.dp)
             )
             state.polls.forEach { poll ->
@@ -139,7 +139,7 @@ private fun PolicyDetailsContent(
         // Comments Section
         Text(
             "Public Comments",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(16.dp)
         )
         if (state.comments.isNotEmpty()) {

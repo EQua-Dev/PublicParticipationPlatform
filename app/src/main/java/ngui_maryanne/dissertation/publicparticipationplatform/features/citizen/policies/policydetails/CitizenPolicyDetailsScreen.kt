@@ -54,6 +54,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyS
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Comment
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.StatusChange
+import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -192,11 +193,17 @@ fun CitizenPolicyDetailsScreen(
                             PublicParticipationSection(
                                 polls = uiState.polls,
                                 onPollClicked = { pollId ->
-                                    viewModel.handleAction(
-                                        PolicyDetailsAction.OnPollClicked(
+                                    navController.navigate(
+                                        Screen.PollDetailsScreen.route.replace(
+                                            "{pollId}",
                                             pollId
                                         )
                                     )
+                                   /* viewModel.handleAction(
+                                        PolicyDetailsAction.OnPollClicked(
+                                            pollId
+                                        )
+                                    )*/
                                 }
                             )
                         }

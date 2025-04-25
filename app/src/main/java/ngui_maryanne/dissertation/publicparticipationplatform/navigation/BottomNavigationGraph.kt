@@ -14,7 +14,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails.PetitionDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.presentation.CitizenPetitionsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.CreateBudgetScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails.BudgetDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.citizens.OfficialCitizensScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.petitions.OfficialPetitionsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.OfficialPoliciesScreen
@@ -65,7 +69,7 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
         composable(
             route = OfficialBottomBarScreen.Petitions.route
         ) {
-            OfficialPetitionsScreen(navController = navController)
+            CitizenPetitionsScreen(navController = navController)
         }
         composable(
             route = OfficialBottomBarScreen.Profile.route
@@ -105,6 +109,38 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
         composable(Screen.CreatePollScreen.route) {
             CreatePollScreen(
                 navController = navController
+            )
+        }
+            composable(Screen.CreateNewBudgetScreen.route) {
+                CreateBudgetScreen(
+                    navController = navController
+                )
+
+        }
+        composable(
+            Screen.BudgetDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "budgetId") { type = NavType.StringType }
+            ),
+        ) {
+            val budgetId = it.arguments?.getString("budgetId")
+
+            BudgetDetailsScreen(
+                budgetId = budgetId!!,
+                navController = navController
+            )
+        }
+        composable(
+            Screen.CitizenPetitionDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "petitionId") { type = NavType.StringType }
+            ),
+        ) {
+            val petitionId = it.arguments?.getString("petitionId")
+
+            PetitionDetailsScreen(
+                petitionId = petitionId!!,
+                navHostController = navController
             )
         }
         /*composable(

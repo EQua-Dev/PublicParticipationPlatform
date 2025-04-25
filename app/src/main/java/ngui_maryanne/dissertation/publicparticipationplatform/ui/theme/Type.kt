@@ -26,6 +26,7 @@ val defaultTextStyle = TextStyle(
         alignment = LineHeightStyle.Alignment.Center,
         trim = LineHeightStyle.Trim.None,
     ),
+    fontSize = 14.sp,
 )
 
 

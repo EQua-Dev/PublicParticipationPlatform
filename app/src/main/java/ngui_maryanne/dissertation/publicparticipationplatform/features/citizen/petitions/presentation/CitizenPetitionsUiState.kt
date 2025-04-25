@@ -4,9 +4,11 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petiti
 
 data class CitizenPetitionsUiState(
     val searchQuery: String = "",
+    val currentUserRole: String = "",
     val allPetitions: List<Petition> = emptyList(),
     val petitionsBySector: Map<String, List<Petition>> = emptyMap(),
     val isCreatingNewPetition: Boolean = false,
     val isLoading: Boolean = true,
     val error: String? = null
+
 )

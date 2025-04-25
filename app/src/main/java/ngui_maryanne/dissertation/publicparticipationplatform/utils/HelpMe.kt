@@ -5,13 +5,22 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.OnCompleteListener
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricManager.Authenticators.*
+
 
 
 object HelpMe {
@@ -166,5 +175,54 @@ object HelpMe {
         calendar?.timeInMillis = milliSeconds!!
         return formatter.format(calendar?.time!!)
     }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun promptBiometric(
+        activity: FragmentActivity,
+        title: String = "Authentication Required",
+        subtitle: String = "Use your fingerprint or face to authenticate",
+        onSuccess: () -> Unit,
+        onNoHardware: () -> Unit
+    ) {
+        val biometricManager = BiometricManager.from(activity)
+        when (biometricManager.canAuthenticate(BIOMETRIC_WEAK or BIOMETRIC_STRONG)) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                val executor = ContextCompat.getMainExecutor(activity)
+                val biometricPrompt = BiometricPrompt(
+                    activity,
+                    executor,
+                    object : BiometricPrompt.AuthenticationCallback() {
+                        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                            super.onAuthenticationSucceeded(result)
+                            onSuccess()
+                        }
+
+                        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                            super.onAuthenticationError(errorCode, errString)
+                        }
+
+                        override fun onAuthenticationFailed() {
+                            super.onAuthenticationFailed()
+                        }
+                    })
+
+                val promptInfo = BiometricPrompt.PromptInfo.Builder()
+                    .setTitle(title)
+                    .setSubtitle(subtitle)
+                    .setNegativeButtonText("Cancel")
+                    .build()
+
+                biometricPrompt.authenticate(promptInfo)
+            }
+
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
+            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE,
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                onNoHardware()
+            }
+        }
+    }
+
+
 
 }

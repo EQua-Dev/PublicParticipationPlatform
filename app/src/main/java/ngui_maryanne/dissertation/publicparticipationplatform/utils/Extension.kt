@@ -1,6 +1,8 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.utils
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -81,4 +83,16 @@ fun calculateDaysDifference(startDate: Calendar, endDate: Calendar): Int {
     val differenceInMillis = abs(endTime - startTime)
     val differenceInDays = (differenceInMillis / (1000 * 60 * 60 * 24)).toInt()
     return differenceInDays
+}
+
+// Helper extension function
+fun Context.findActivity(): Activity? {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) {
+            return context
+        }
+        context = context.baseContext
+    }
+    return null
 }

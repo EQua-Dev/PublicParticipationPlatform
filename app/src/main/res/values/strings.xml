@@ -56,4 +56,7 @@
     <string name="county_hint">County Affected</string>
     <string name="sector_hint">Select the sector related to the petition</string>
     <string name="citizen_petition_details_screen">Citizen Petition Details Screen</string>
+    <string name="create_new_budget_screen">Create New Budget Screen</string>
+    <string name="budget_details_screen">Budget Details Screen</string>
+    <string name="citizen_profile_screen">Citizen Profile Screen</string>
 </resources>

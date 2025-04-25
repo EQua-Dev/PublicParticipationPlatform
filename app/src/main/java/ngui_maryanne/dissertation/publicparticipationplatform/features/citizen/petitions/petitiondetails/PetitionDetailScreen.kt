@@ -1,5 +1,8 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,12 +32,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.daysToExpiry
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.signaturesProgress
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.findActivity
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetitionDetailsScreen(
@@ -44,6 +51,11 @@ fun PetitionDetailsScreen(
 ) {
     val state = viewModel.state.value
     val petition = state.petition
+
+    val context = LocalContext.current
+    val activity = remember(context) {
+        context.findActivity()?.takeIf { it is FragmentActivity } as? FragmentActivity
+    }
 
     LaunchedEffect(key1 = petitionId) {
         viewModel.onEvent(PetitionDetailsEvent.LoadPetition(petitionId))
@@ -67,13 +79,19 @@ fun PetitionDetailsScreen(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
                             IconButton(onClick = { navHostController.popBackStack() }) {
                                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                             }
                             Text(text = it.title, style = MaterialTheme.typography.titleMedium)
                         }
-                        Text("${it.signatures.size}/${it.signatureGoal} signatures")
+                        Text(
+                            "${it.signatures.size}/${it.signatureGoal} signatures",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             )
@@ -86,9 +104,31 @@ fun PetitionDetailsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = it.description, modifier = Modifier.weight(1f))
-                if (state.currentUserId != it.createdBy && !state.hasSigned) {
-                    Button(onClick = { viewModel.onEvent(PetitionDetailsEvent.SignPetition) }) {
+                Text(text = it.description, modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium)
+                if (state.currentUserId != it.createdBy && !state.hasSigned && state.currentUserRole == UserRole.CITIZEN.name) {
+                    Button(onClick = { activity?.let { fragmentActivity ->
+                        Log.d("TAG", "PetitionDetailsScreen: yes fragment")
+                        viewModel.verifyAndSignPetition(
+                            activity = fragmentActivity,
+                            userId = state.currentUserId,
+                            petition = state.petition,
+                            hashType = "SHA-256",
+                            isAnonymous = false,
+                            onSuccess = {
+                                viewModel.onEvent(
+                                    PetitionDetailsEvent.LoadPetition(
+                                        petitionId
+                                    )
+                                )
+                            },
+                            onFailure = { error -> viewModel.updateError(error)}
+                        )
+                    } ?: run {
+                        // Handle case where activity isn't available
+                        // Maybe show error or use alternative authentication
+                        Log.d("TAG", "PetitionDetailsScreen: no fragment")
+                    }}) {
                         Text("Sign")
                     }
                 }
@@ -97,7 +137,8 @@ fun PetitionDetailsScreen(
             Spacer(Modifier.height(16.dp))
             Text("Request Goals", style = MaterialTheme.typography.titleSmall)
             it.requestGoals.forEach { goal ->
-                Text("- $goal")
+                Text("- $goal",
+                    style = MaterialTheme.typography.bodyMedium)
             }
 
             /*  Spacer(Modifier.height(16.dp))
@@ -109,7 +150,8 @@ fun PetitionDetailsScreen(
             Spacer(Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Target")
-                Text("${it.daysToExpiry()} days left")
+                Text("${it.daysToExpiry()} days left",
+                    style = MaterialTheme.typography.bodyMedium)
             }
 
             Spacer(Modifier.height(8.dp))

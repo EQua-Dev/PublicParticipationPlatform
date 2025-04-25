@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.AppLanguage
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -16,6 +17,8 @@ class UserPreferences(private val context: Context) {
     companion object {
         val ROLE_KEY = stringPreferencesKey("user_role")
         val USER_ID = stringPreferencesKey("user_id")
+        val PREFERRED_LANGUAGE = stringPreferencesKey("preferred_language")
+
     }
 
     // Save the selected role
@@ -45,4 +48,15 @@ class UserPreferences(private val context: Context) {
         .map { preferences ->
             preferences[USER_ID] ?: "" // Default to UNKNOWN if no role is stored
         }
+
+    val languageFlow: Flow<AppLanguage> = context.dataStore.data
+        .map { preferences ->
+            AppLanguage.fromCode(preferences[PREFERRED_LANGUAGE] ?: "en")
+        }
+
+    suspend fun setLanguage(language: AppLanguage) {
+        context.dataStore.edit { preferences ->
+            preferences[PREFERRED_LANGUAGE] = language.code
+        }
+    }
 }

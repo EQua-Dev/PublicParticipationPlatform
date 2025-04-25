@@ -15,6 +15,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,15 +50,26 @@ import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.p
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.policydetails.CitizenPolicyDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.polldetails.PollDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation.CitizenPollsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.CitizenProfileScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails.BudgetDetailsScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HolderScreen(
+    onLanguageChange: (String) -> Unit,
     onStatusBarColorChange: (color: Color) -> Unit,
     holderViewModel: HolderViewModel = hiltViewModel(),
 ) {
 
+    val state by holderViewModel.state.collectAsState(initial = HolderUiState())
+    LaunchedEffect(state.selectedLanguage) {
+        // Apply language change globally
+//        currentLocale = state.selectedLanguage.code
+//        onLanguageChange(state.selectedLanguage.code)
+
+    }
     val TAG = "HolderScreen"
     /*  val destinations = remember {
           listOf(Screen.Home, Screen.Notifications, Screen.Bookmark, Screen.Profile)
@@ -278,7 +291,7 @@ fun ScaffoldSection(
                 }
                 composable(Screen.CitizenParticipatoryBudget.route) {
                     onStatusBarColorChange(MaterialTheme.colorScheme.background)
-                    CitizenParticipatoryBudgetScreen(
+                    OfficialBudgetsScreen(
                         navController = controller,
 //                        onNavigationRequested = onNavigationRequested,
                     )
@@ -336,37 +349,26 @@ fun ScaffoldSection(
                         navHostController = controller
                     )
                 }
-
-                /*  composable(Screen.CreateWalletScreen.route) {
-                      onStatusBarColorChange(MaterialTheme.colorScheme.background)
-                      CreateWalletScreen(
-                          onWalletCreated = { controller.navigate(Screen.CreateCourseFlowScreen.route) }
-                      )
-                  }
-                  composable(Screen.CreateCourseFlowScreen.route) {
-                      onStatusBarColorChange(MaterialTheme.colorScheme.background)
-                      CreateCourseFlowScreen(
-                          onCourseCreated = { controller.navigate(Screen.TeacherHome.route) }
-                      )
-                  }*/
-                /*composable(
-                    Screen.ChildHome.route,
+                composable(
+                    Screen.BudgetDetailsScreen.route,
                     arguments = listOf(
-                        navArgument(name = "childId") { type = NavType.StringType }
+                        navArgument(name = "budgetId") { type = NavType.StringType }
                     ),
                 ) {
-                    onStatusBarColorChange(MaterialTheme.colorScheme.background)
-                    val childId = it.arguments?.getString("childId")
+                    val budgetId = it.arguments?.getString("budgetId")
 
-                    ChildHomeScreen(
-                        childId = childId!!,
-                        navController = controller,
-                        onNavigationRequested = onNavigationRequested,
-                        onCategorySelected = onCategorySelected,
-                        //onLeaderboardSelected = onLeaderBoardSelected
+                    BudgetDetailsScreen(
+                        budgetId = budgetId!!,
+                        navController = controller
                     )
-                }*/
-
+                }
+                composable(
+                    Screen.CitizenProfileScreen.route,
+                ) {
+                    CitizenProfileScreen(
+                        navController = controller
+                    )
+                }
             }
         }
     }

@@ -3,21 +3,37 @@ package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ListenerRegistration
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import javax.inject.Inject
 
 @HiltViewModel
 class CitizenPetitionsViewModel @Inject constructor(
-    private val repository: PetitionRepository
+    private val repository: PetitionRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val _uiState = mutableStateOf(CitizenPetitionsUiState())
     val uiState: State<CitizenPetitionsUiState> = _uiState
 
     private var listener: ListenerRegistration? = null
+
+    init {
+        viewModelScope.launch {
+            userPreferences.role.collect { role ->
+                if (role != null) {
+                    _uiState.value = _uiState.value.copy(
+                        currentUserRole = role.name
+                    )
+                }
+            }
+        }
+    }
 
     init {
         observePetitions()
@@ -29,6 +45,7 @@ class CitizenPetitionsViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(searchQuery = event.query)
                 applySearch()
             }
+
             is PetitionEvent.OnToggleCreatePetition -> {
                 _uiState.value = _uiState.value.copy(
                     isCreatingNewPetition = !_uiState.value.isCreatingNewPetition
@@ -41,7 +58,12 @@ class CitizenPetitionsViewModel @Inject constructor(
         listener = repository.getAllPetitionsListener { petitions ->
             _uiState.value = _uiState.value.copy(
                 allPetitions = petitions,
-                petitionsBySector = groupBySector(applySearchFilter(petitions, _uiState.value.searchQuery)),
+                petitionsBySector = groupBySector(
+                    applySearchFilter(
+                        petitions,
+                        _uiState.value.searchQuery
+                    )
+                ),
                 isLoading = false
             )
         }
