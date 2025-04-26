@@ -5,17 +5,23 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.BUDGETS_REF
 import javax.inject.Inject
 
-class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFirestore) :
+class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFirestore,
+                                               private val blockChainRepository: BlockChainRepository
+) :
     BudgetRepository {
     override suspend fun createBudget(budget: Budget) {
         firestore.collection(BUDGETS_REF)
             .document(budget.id)
             .set(budget)
+            .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                TransactionTypes.CREATE_BUDGET) }
             .await()
     }
 
@@ -70,6 +76,8 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
             firestore.collection("budgets")
                 .document(budgetId)
                 .update("isActive", isActive)  // Update the 'isActive' field to the new status
+                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                    TransactionTypes.TOGGLE_BUDGET_ACTIVATION) }
                 .await()
         } catch (e: Exception) {
             // Handle the exception
@@ -85,6 +93,8 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
             firestore.collection(BUDGETS_REF)
                 .document(budgetId)
                 .update("responses", updatedResponses)
+                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                    TransactionTypes.VOTE_ON_BUDGET) }
                 .await()
         } catch (e: Exception) {
             throw Exception("Failed to vote for budget option: ${e.message}")

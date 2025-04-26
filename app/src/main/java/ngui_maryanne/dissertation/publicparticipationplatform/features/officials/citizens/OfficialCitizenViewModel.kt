@@ -92,7 +92,7 @@ class OfficialCitizenViewModel @Inject constructor(
                 try {
                     citizenRepository.approveCitizen(citizen.id)
                     // Call blockchain function
-                    blockChainRepository.createBlockchainTransaction(auth.currentUser!!.uid, TransactionTypes.APPROVE_CITIZEN)
+                    blockChainRepository.createBlockchainTransaction(TransactionTypes.APPROVE_CITIZEN)
                     _state.value = _state.value.copy(
                         showBottomSheet = false,
                         isLoading = false

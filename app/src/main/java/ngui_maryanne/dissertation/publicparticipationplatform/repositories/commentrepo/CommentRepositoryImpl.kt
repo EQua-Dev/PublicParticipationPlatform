@@ -6,9 +6,14 @@ import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.PO
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import javax.inject.Inject
 
-class CommentRepositoryImpl @Inject constructor(private val firestore: FirebaseFirestore) :
+class CommentRepositoryImpl @Inject constructor(
+    private val firestore: FirebaseFirestore,
+    private val blockChainRepository: BlockChainRepository
+) :
     CommentRepository {
 
     override fun getCommentsListener(
@@ -24,10 +29,13 @@ class CommentRepositoryImpl @Inject constructor(private val firestore: FirebaseF
                 onUpdate(comments)
             }
     }
+
     override suspend fun addComment(policyId: String, comment: Comment) {
         firestore.collection(POLICIES_REF)
             .document(policyId)
             .collection(COMMENTS_REF)
             .add(comment)
+            .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                TransactionTypes.COMMENT_ON_POLICY) }
     }
 }

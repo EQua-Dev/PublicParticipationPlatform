@@ -101,7 +101,6 @@ class CreatePolicyViewModel @Inject constructor(
                 Log.d("CPVM", "createPolicy: $policy")
                 policyRepository.createPolicy(policy)
                 blockChainRepository.createBlockchainTransaction(
-                    auth.currentUser!!.uid,
                     TransactionTypes.CREATE_POLICY
                 )
                 _state.value = _state.value.copy(

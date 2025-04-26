@@ -4,7 +4,6 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.Transac
 
 interface BlockChainRepository {
     fun createBlockchainTransaction(
-        createdById: String,
         transactionType: TransactionTypes,
 //        blockchainRef: CollectionReference
     )

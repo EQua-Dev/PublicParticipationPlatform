@@ -44,20 +44,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideLocationUtils(@ApplicationContext context: Context): LocationUtils {
-        return LocationUtils(context)
-    }
-
-    @Provides
-    @Singleton
     fun provideGeocoder(@ApplicationContext context: Context): Geocoder {
         return Geocoder(context, Locale.getDefault()) // Initialize Geocoder with the application context
     }
 
- /*   @Provides
+    @Provides
     @Singleton
-    fun provideOpenAIService(): OpenAIService {
-        val apiKey = BuildConfig.OPEN_AI_KEY // Replace with your OpenAI API key
-        return OpenAIService(apiKey)
-    }*/
+    fun provideLocationUtils(@ApplicationContext context: Context, geocoder: Geocoder): LocationUtils {
+        return LocationUtils(context, geocoder)
+    }
+
+    /*   @Provides
+       @Singleton
+       fun provideOpenAIService(): OpenAIService {
+           val apiKey = BuildConfig.OPEN_AI_KEY // Replace with your OpenAI API key
+           return OpenAIService(apiKey)
+       }*/
 }

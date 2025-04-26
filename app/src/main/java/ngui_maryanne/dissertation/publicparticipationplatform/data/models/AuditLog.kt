@@ -8,6 +8,7 @@ data class AuditLog(
     val timestamp: Long = System.currentTimeMillis(),
     val previousHash: String = "",
     val hash: String = "",
+    val location: String = "",
     val createdBy: String = ""
 ) {
     fun computeHash(): String {

@@ -15,6 +15,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import java.util.concurrent.TimeUnit
 
 // CitizenRepositoryImpl.kt
@@ -22,7 +24,8 @@ class CitizenRepositoryImpl(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage,
-    private val storageRepository: StorageRepository
+    private val storageRepository: StorageRepository,
+    private val blockChainRepository: BlockChainRepository
 ) : CitizenRepository
 {
     // Store verification ID for later use
@@ -105,6 +108,8 @@ class CitizenRepositoryImpl(
             firestore.collection(REGISTERED_CITIZENS_REF)
                 .document(uid)
                 .set(citizenWithImage)
+                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                    TransactionTypes.CREATE_ACCOUNT) }
                 .await()
 
             Result.success(Unit)
@@ -121,6 +126,8 @@ class CitizenRepositoryImpl(
             firestore.collection(REGISTERED_CITIZENS_REF)
                 .document(citizenId)
                 .update(details)
+                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                    TransactionTypes.UPDATE_PROFILE) }
                 .await()
             Result.success(Unit)
         } catch (e: Exception) {
@@ -192,6 +199,8 @@ class CitizenRepositoryImpl(
     }
 
     override fun logout() {
+        blockChainRepository.createBlockchainTransaction(
+            TransactionTypes.LOGOUT)
         auth.signOut()
     }
 

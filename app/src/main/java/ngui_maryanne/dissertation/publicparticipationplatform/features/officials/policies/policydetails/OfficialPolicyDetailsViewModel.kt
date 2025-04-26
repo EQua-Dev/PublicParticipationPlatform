@@ -97,7 +97,6 @@ class OfficialPolicyDetailsViewModel @Inject constructor(
                 _state.value.policy?.id?.let { policyId ->
                     policyRepository.updatePolicyStage(policyId, newStage)
                     blockChainRepository.createBlockchainTransaction(
-                        auth.currentUser!!.uid,
                         TransactionTypes.UPDATE_POLICY_STATUS
                     )
                     _state.value = _state.value.copy(

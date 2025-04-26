@@ -139,7 +139,6 @@ class CreatePollViewModel @Inject constructor(
 
                 pollRepository.createPoll(poll)
                 blockChainRepository.createBlockchainTransaction(
-                    auth.currentUser!!.uid,
                     TransactionTypes.CREATE_POLL
                 )
                 _state.value = _state.value.copy(

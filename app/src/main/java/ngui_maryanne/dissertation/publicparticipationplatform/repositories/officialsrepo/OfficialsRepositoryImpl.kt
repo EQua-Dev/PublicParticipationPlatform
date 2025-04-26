@@ -7,12 +7,15 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import javax.inject.Inject
 
 class OfficialsRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
+    private val blockChainRepository: BlockChainRepository
 ) : OfficialsRepository {
 
     override suspend fun createOfficial(
@@ -34,9 +37,11 @@ class OfficialsRepositoryImpl @Inject constructor(
                 imageUrl = imageRef.downloadUrl.await().toString()
             }
 
-            val officialData = official.copy(id = userId, profileImageUrl = imageUrl, initialPassword = password)
+            val officialData =
+                official.copy(id = userId, profileImageUrl = imageUrl, initialPassword = password)
 
-            firestore.collection(OFFICIALS_REF).document(userId).set(officialData).await()
+            firestore.collection(OFFICIALS_REF).document(userId).set(officialData).addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                TransactionTypes.CREATE_OFFICIAL) }.await()
             onResult(true, null)
         } catch (e: Exception) {
             onResult(false, e.message)
@@ -78,6 +83,8 @@ class OfficialsRepositoryImpl @Inject constructor(
             firestore.collection(OFFICIALS_REF)
                 .document(official.id)
                 .set(official)
+                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                    TransactionTypes.UPDATE_PROFILE) }
                 .await()
         } catch (e: Exception) {
             throw Exception("Failed to update official: ${e.message}")

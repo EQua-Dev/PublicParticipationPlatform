@@ -36,7 +36,6 @@ class NationalDBRepositoryImpl @Inject constructor(
                         documentRef.set(updatedCitizen)
                             .addOnSuccessListener {
                                 blockChainRepository.createBlockchainTransaction(
-                                    auth.currentUser!!.uid,
                                     TransactionTypes.CREATE_CITIZEN_RECORD,
                                 )
                                 onResult(true, null)
@@ -49,7 +48,6 @@ class NationalDBRepositoryImpl @Inject constructor(
             documentRef.set(citizenWithId)
                 .addOnSuccessListener {
                     blockChainRepository.createBlockchainTransaction(
-                        auth.currentUser!!.uid,
                         TransactionTypes.CREATE_CITIZEN_RECORD,
                     )
                     onResult(true, null)

@@ -26,10 +26,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.auditlogrepo.AuditLogRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.auditlogrepo.AuditLogRepositoryImpl
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepositoryImpl
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepositoryImpl
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.LocationUtils
 import javax.inject.Singleton
 
 @Module
@@ -59,9 +62,10 @@ object FirebaseModule {
     fun provideOfficialsRepository(
         auth: FirebaseAuth,
         firestore: FirebaseFirestore,
-        storage: FirebaseStorage
+        storage: FirebaseStorage,
+        blockchain: BlockChainRepository
     ): OfficialsRepository {
-        return OfficialsRepositoryImpl(auth, firestore, storage)
+        return OfficialsRepositoryImpl(auth, firestore, storage, blockchain)
     }
 
     @Provides
@@ -70,9 +74,10 @@ object FirebaseModule {
         auth: FirebaseAuth,
         firestore: FirebaseFirestore,
         storage: FirebaseStorage,
-        storageRepository: StorageRepository
+        storageRepository: StorageRepository,
+        blockchain: BlockChainRepository
     ): CitizenRepository {
-        return CitizenRepositoryImpl(auth, firestore, storage, storageRepository)
+        return CitizenRepositoryImpl(auth, firestore, storage, storageRepository, blockchain)
     }
 
     @Provides
@@ -90,8 +95,10 @@ object FirebaseModule {
     @Singleton
     fun provideBlockChainRepository(
         firestore: FirebaseFirestore,
+        auth: FirebaseAuth,
+        locationUtils: LocationUtils
     ): BlockChainRepository {
-        return BlockChainRepositoryImpl(firestore)
+        return BlockChainRepositoryImpl(firestore, auth, locationUtils)
     }
 
     @Provides
@@ -125,8 +132,9 @@ object FirebaseModule {
     fun provideCommentRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
+        blockchain: BlockChainRepository
     ): CommentRepository {
-        return CommentRepositoryImpl(firestore)
+        return CommentRepositoryImpl(firestore, blockchain)
     }
 
     @Provides
@@ -134,8 +142,9 @@ object FirebaseModule {
     fun providePetitionRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
+        blockchain: BlockChainRepository
     ): PetitionRepository {
-        return PetitionRepositoryImpl(firestore)
+        return PetitionRepositoryImpl(firestore, blockchain)
     }
 
     @Provides
@@ -143,8 +152,19 @@ object FirebaseModule {
     fun provideBudgetRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
+        blockchain: BlockChainRepository
     ): BudgetRepository {
-        return BudgetRepositoryImpl(firestore)
+        return BudgetRepositoryImpl(firestore, blockchain)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuditLogsRepository(
+        firestore: FirebaseFirestore,
+        auth: FirebaseAuth,
+        blockchain: BlockChainRepository
+    ): AuditLogRepository {
+        return AuditLogRepositoryImpl(firestore)
     }
 
 }
