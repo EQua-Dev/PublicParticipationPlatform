@@ -10,14 +10,20 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollResponses
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.BUDGETS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.POLICIES_REF
 import java.util.UUID
 import javax.inject.Inject
 
 class PollsRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val blockChainRepository: BlockChainRepository
 ) : PollsRepository {
 
     override suspend fun getAllPolls(): List<Poll> {
@@ -118,5 +124,21 @@ class PollsRepositoryImpl @Inject constructor(
             null
         }
     }
+
+    override suspend fun voteForPollOption(pollId: String, updatedResponses: MutableList<PollResponses>) {
+        try {
+            // Add vote to Firestore
+//            val voteData = mapOf("optionId" to optionId, "timestamp" to FieldValue.serverTimestamp())
+            firestore.collection(POLLS_REF)
+                .document(pollId)
+                .update("responses", updatedResponses)
+                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                    TransactionTypes.VOTE_ON_POLL) }
+                .await()
+        } catch (e: Exception) {
+            throw Exception("Failed to vote for poll option: ${e.message}")
+        }
+    }
+
 
 }

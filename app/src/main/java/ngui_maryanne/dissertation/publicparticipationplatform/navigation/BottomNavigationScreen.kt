@@ -51,12 +51,6 @@ sealed class SuperAdminBottomBarScreen(
     object Dashboard :
         SuperAdminBottomBarScreen("Dashboard", Icons.Default.VideoCall, "super_admin_dashboard")
 
-    object PublicParticipation : SuperAdminBottomBarScreen(
-        "Participation",
-        Icons.Default.MenuBook,
-        "super_admin_public_participation",
-    )
-
     object People :
         SuperAdminBottomBarScreen("People", Icons.Default.Payments, "super_admin_people")
 

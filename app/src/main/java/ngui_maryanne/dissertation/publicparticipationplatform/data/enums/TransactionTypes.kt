@@ -19,5 +19,7 @@ enum class TransactionTypes {
     TOGGLE_BUDGET_ACTIVATION,
     CREATE_ACCOUNT,
     LOGOUT,
-    SIGN_PETITION
+    SIGN_PETITION,
+    UPDATE_POLICY,
+    DELETE_POLICY
 }

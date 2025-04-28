@@ -14,6 +14,8 @@ interface PolicyRepository {
     suspend fun getPublicPolicies(): Flow<List<Policy>>
     suspend fun searchPolicies(query: String): Flow<List<Policy>>
     suspend fun getPolicy(policyId: String): Flow<Policy?>
+    suspend fun updatePolicy(policyId: String, name: String, imageUrl: String, otherDetails: Map<String, Any?>)
+    suspend fun deletePolicy(policyId: String)
 
 
 }

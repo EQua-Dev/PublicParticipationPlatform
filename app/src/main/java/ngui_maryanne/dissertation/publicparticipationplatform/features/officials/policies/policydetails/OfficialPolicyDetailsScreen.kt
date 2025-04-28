@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -22,6 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +37,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.components.ErrorSt
 import ngui_maryanne.dissertation.publicparticipationplatform.components.PolicyStageTracker
 import ngui_maryanne.dissertation.publicparticipationplatform.components.StageUpdateDialog
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.components.EditPolicyBottomSheet
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.components.PolicyDetailsSection
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.components.PollCard
 
@@ -46,6 +51,8 @@ fun OfficialPolicyDetailsScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    var showEditBottomSheet by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(policyId) {
         viewModel.onEvent(OfficialPolicyDetailsEvent.LoadData(policyId))
@@ -63,12 +70,10 @@ fun OfficialPolicyDetailsScreen(
             )
         },
         floatingActionButton = {
-            if (state.canCreatePoll && state.currentStage == PolicyStatus.PUBLIC_CONSULTATION) {
-                FloatingActionButton(
-                    onClick = { navController.navigate("create_poll/${state.policy?.id}") }
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Create Poll")
-                }
+            FloatingActionButton(
+                onClick = { showEditBottomSheet = true }
+            ) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit Policy")
             }
         }
     ) { paddingValues ->
@@ -94,6 +99,21 @@ fun OfficialPolicyDetailsScreen(
                 )
             }
         }
+    }
+
+    if (showEditBottomSheet) {
+        EditPolicyBottomSheet(
+            policy = state.policy,
+            onDismiss = { showEditBottomSheet = false },
+            onSave = { name, imageUrl, otherDetails ->
+                viewModel.onEvent(OfficialPolicyDetailsEvent.UpdatePolicy(name, imageUrl, otherDetails))
+                showEditBottomSheet = false
+            },
+            onDelete = {
+                viewModel.onEvent(OfficialPolicyDetailsEvent.DeletePolicy)
+                showEditBottomSheet = false
+            }
+        )
     }
 }
 

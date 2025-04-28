@@ -106,7 +106,7 @@ fun BudgetItemCard(budget: Budget, onClick : () -> Unit) {
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = "Amount: ₦${budget.amount}",
+                text = "Amount: KSH${budget.amount}",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(

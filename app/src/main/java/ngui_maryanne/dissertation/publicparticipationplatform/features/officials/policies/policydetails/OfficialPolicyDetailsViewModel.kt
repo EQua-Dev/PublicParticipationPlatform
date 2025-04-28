@@ -1,5 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +27,7 @@ class OfficialPolicyDetailsViewModel @Inject constructor(
     private val pollRepository: PollsRepository,
     private val commentRepository: CommentRepository,
     private val officialRepository: OfficialsRepository,
+    private val storageRepository: StorageRepository,
     private val blockChainRepository: BlockChainRepository
 ) : ViewModel() {
 
@@ -43,6 +46,9 @@ class OfficialPolicyDetailsViewModel @Inject constructor(
             OfficialPolicyDetailsEvent.DismissStageDialog -> dismissStageDialog()
             OfficialPolicyDetailsEvent.DismissError -> dismissError()
             is OfficialPolicyDetailsEvent.CreatePoll -> createPoll(event.policyId)
+
+            is OfficialPolicyDetailsEvent.UpdatePolicy -> updatePolicy(event.name, event.imageUrl, event.otherDetails)
+            OfficialPolicyDetailsEvent.DeletePolicy -> deletePolicy()
         }
     }
 
@@ -112,6 +118,44 @@ class OfficialPolicyDetailsViewModel @Inject constructor(
             }
         }
     }
+
+    private fun updatePolicy(name: String, imageUrl: String, otherDetails: Map<String, Any?>) {
+        viewModelScope.launch {
+            try {
+                val policyId = _state.value.policy?.id ?: return@launch
+                val storageImageUrl = imageUrl.let { uri ->
+                    storageRepository.uploadPolicyImage(uri.toUri())
+                } ?: ""
+
+                policyRepository.updatePolicy(policyId, name, storageImageUrl, otherDetails)
+                _state.value = _state.value.copy(
+                    error = null
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    error = "Failed to update policy: ${e.message}"
+                )
+            }
+        }
+    }
+
+    private fun deletePolicy() {
+        viewModelScope.launch {
+            try {
+                val policyId = _state.value.policy?.id ?: return@launch
+                policyRepository.deletePolicy(policyId)
+                _state.value = _state.value.copy(
+                    error = null
+                )
+                // Maybe navigate back after deleting? Trigger a nav action here if you want
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    error = "Failed to delete policy: ${e.message}"
+                )
+            }
+        }
+    }
+
 
     private fun showStageDialog() {
         _state.value = _state.value.copy(showStageUpdateDialog = true)

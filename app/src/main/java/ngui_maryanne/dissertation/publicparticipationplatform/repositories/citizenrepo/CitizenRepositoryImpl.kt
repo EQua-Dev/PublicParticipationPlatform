@@ -26,8 +26,7 @@ class CitizenRepositoryImpl(
     private val storage: FirebaseStorage,
     private val storageRepository: StorageRepository,
     private val blockChainRepository: BlockChainRepository
-) : CitizenRepository
-{
+) : CitizenRepository {
     // Store verification ID for later use
     private var verificationId: String? = null
 
@@ -108,8 +107,11 @@ class CitizenRepositoryImpl(
             firestore.collection(REGISTERED_CITIZENS_REF)
                 .document(uid)
                 .set(citizenWithImage)
-                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
-                    TransactionTypes.CREATE_ACCOUNT) }
+                .addOnSuccessListener {
+                    blockChainRepository.createBlockchainTransaction(
+                        TransactionTypes.CREATE_ACCOUNT
+                    )
+                }
                 .await()
 
             Result.success(Unit)
@@ -126,8 +128,11 @@ class CitizenRepositoryImpl(
             firestore.collection(REGISTERED_CITIZENS_REF)
                 .document(citizenId)
                 .update(details)
-                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
-                    TransactionTypes.UPDATE_PROFILE) }
+                .addOnSuccessListener {
+                    blockChainRepository.createBlockchainTransaction(
+                        TransactionTypes.UPDATE_PROFILE
+                    )
+                }
                 .await()
             Result.success(Unit)
         } catch (e: Exception) {
@@ -198,10 +203,13 @@ class CitizenRepositoryImpl(
         }
     }
 
-    override fun logout() {
-        blockChainRepository.createBlockchainTransaction(
-            TransactionTypes.LOGOUT)
+    override suspend fun logout() {
+//            blockChainRepository.createBlockchainTransaction(TransactionTypes.LOGOUT)
+
+        // Only if it succeeds, proceed to sign out
         auth.signOut()
+
     }
+
 
 }

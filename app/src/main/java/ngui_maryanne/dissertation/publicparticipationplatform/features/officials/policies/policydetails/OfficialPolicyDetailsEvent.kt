@@ -9,4 +9,9 @@ sealed class OfficialPolicyDetailsEvent {
     object DismissStageDialog : OfficialPolicyDetailsEvent()
     object DismissError : OfficialPolicyDetailsEvent()
     data class CreatePoll(val policyId: String) : OfficialPolicyDetailsEvent()
+
+
+    // 🔥 New events
+    data class UpdatePolicy(val name: String, val imageUrl: String, val otherDetails: Map<String, Any?>) : OfficialPolicyDetailsEvent()
+    object DeletePolicy : OfficialPolicyDetailsEvent()
 }

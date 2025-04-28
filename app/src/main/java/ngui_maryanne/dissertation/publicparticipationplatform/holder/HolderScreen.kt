@@ -31,28 +31,28 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
-import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.forgotpassword.ForgotPasswordScreen
-import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login.LoginScreen
-import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
-import ngui_maryanne.dissertation.publicparticipationplatform.utils.Common.mAuth
-import ngui_maryanne.dissertation.publicparticipationplatform.utils.getDp
+import com.awesomenessstudios.schoolprojects.criticalthinkingappforkids.providers.LocalNavHost
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.CitizenHomeScreen
-import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.signup.CitizenRegistrationScreen
-import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.signup.CitizenRegistrationVerification
-import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.OfficialHomeScreen
-import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.SuperAdminHomeScreen
-import com.awesomenessstudios.schoolprojects.criticalthinkingappforkids.providers.LocalNavHost
-import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.participatorybudgets.presentation.CitizenParticipatoryBudgetScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails.PetitionDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.presentation.CitizenPetitionsScreen
-import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.presentation.CitizenPoliciesScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.policydetails.CitizenPolicyDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.presentation.CitizenPoliciesScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.polldetails.PollDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation.CitizenPollsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.CitizenProfileScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.audit.presentation.CitizenAuditScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.forgotpassword.ForgotPasswordScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login.LoginScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.signup.CitizenRegistrationScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.signup.CitizenRegistrationVerification
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.OfficialHomeScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails.BudgetDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.SuperAdminHomeScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Common.mAuth
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.getDp
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -366,6 +366,13 @@ fun ScaffoldSection(
                     Screen.CitizenProfileScreen.route,
                 ) {
                     CitizenProfileScreen(
+                        navController = controller
+                    )
+                }
+                composable(
+                    Screen.AuditLogScreen.route
+                ) {
+                    CitizenAuditScreen(
                         navController = controller
                     )
                 }

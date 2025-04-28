@@ -5,15 +5,18 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -83,7 +87,7 @@ fun BudgetDetailsScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                "Total Budget: ₦${detailsState.budget?.amount}",
+                "Total Budget: KSH${detailsState.budget?.amount}",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
@@ -113,7 +117,7 @@ fun BudgetDetailsScreen(
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            "Amount: ₦${option.optionAmount}",
+                            "Amount: KSH${option.optionAmount}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         option.imageUrl.let {
@@ -157,8 +161,23 @@ fun BudgetDetailsScreen(
                                     }
                                 )
                             } else if (votedOptionId == option.optionId) {
-                                Text("You voted for this option", color = Color.Green)
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Verified, // Choose the icon you want
+                                        contentDescription = "Voted",
+                                        tint = Color.Green
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp)) // Adds some space between the icon and text
+                                    Text(
+                                        text = "You voted for this option",
+                                        color = Color.Green,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
                             }
+
                         }
                     }
                 }
@@ -179,7 +198,7 @@ fun BudgetDetailsScreen(
                 CustomButton(
                     text = "Edit Budget Details",
                     onClick = {
-                        navController.navigate("edit_budget/$budgetId")
+//                        navController.navigate("edit_budget/$budgetId")
                     },
                     modifier = Modifier.fillMaxWidth()
                 )

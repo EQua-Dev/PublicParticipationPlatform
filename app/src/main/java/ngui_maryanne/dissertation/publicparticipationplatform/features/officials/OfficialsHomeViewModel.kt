@@ -45,8 +45,9 @@ class OfficialsHomeViewModel @Inject constructor(
 
             is OfficialsHomeEvent.Logout -> {
                 // Handle logout
-                citizenRepository.logout()
-                _state.update { _state.value.copy(logout = true) }
+                viewModelScope.launch { citizenRepository.logout()
+                    _state.update { _state.value.copy(logout = true) } }
+
             }
 
             OfficialsHomeEvent.LoadCitizenData -> loadCitizenData()

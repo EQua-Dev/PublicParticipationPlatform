@@ -8,10 +8,15 @@ import ngui_maryanne.dissertation.publicparticipationplatform.utils.Common.mAuth
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val userPreferences: UserPreferences): ViewModel() {
+class LoginViewModel @Inject constructor(
+    private val userPreferences: UserPreferences,
+    private val blockChainRepository: BlockChainRepository
+) : ViewModel() {
     private val _state = mutableStateOf(LoginState())
     val state: State<LoginState> = _state
 
@@ -32,9 +37,11 @@ class LoginViewModel @Inject constructor(private val userPreferences: UserPrefer
             is LoginEvent.EmailChanged -> {
                 _state.value = _state.value.copy(email = event.email)
             }
+
             is LoginEvent.PasswordChanged -> {
                 _state.value = _state.value.copy(password = event.password)
             }
+
             LoginEvent.Login -> {
                 loginUser()
             }
@@ -46,20 +53,27 @@ class LoginViewModel @Inject constructor(private val userPreferences: UserPrefer
 
         val email = _state.value.email
         val password = _state.value.password
+            mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        viewModelScope.launch {
+                            blockChainRepository.createBlockchainTransaction(
+                                TransactionTypes.LOGIN
+                            )
+                        }
 
-        mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        isLoginSuccessful = true
-                    )
-                } else {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        errorMessage = task.exception?.message ?: "Login failed"
-                    )
+                        _state.value = _state.value.copy(
+                            isLoading = false,
+                            isLoginSuccessful = true
+                        )
+                    } else {
+                        _state.value = _state.value.copy(
+                            isLoading = false,
+                            errorMessage = task.exception?.message ?: "Login failed"
+                        )
+                    }
                 }
-            }
+
+
     }
 }

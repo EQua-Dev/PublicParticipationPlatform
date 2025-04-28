@@ -12,9 +12,12 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import javax.inject.Inject
 
 class PolicyRepositoryImpl @Inject constructor(
+    private val blockChainRepository: BlockChainRepository,
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth
 ) : PolicyRepository {
@@ -42,6 +45,22 @@ class PolicyRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updatePolicy(policyId: String, name: String, imageUrl: String, otherDetails: Map<String, Any?>) {
+        val updates = mapOf(
+            "policyTitle" to name,
+            "policyCoverImage" to imageUrl,
+        ) + otherDetails
+
+        firestore.collection("policies").document(policyId)
+            .update(updates).addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                TransactionTypes.UPDATE_POLICY) }
+    }
+
+    override suspend fun deletePolicy(policyId: String) {
+        firestore.collection(POLICIES_REF).document(policyId)
+            .delete().addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                TransactionTypes.DELETE_POLICY) }
+    }
 
     override suspend fun getPoliciesBeforePublicOpinion(): List<Policy> {
         return try {

@@ -26,6 +26,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.admindashboardrepo.AdminDashboardRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.admindashboardrepo.AdminDashboardRepositoryImpl
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.auditlogrepo.AuditLogRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.auditlogrepo.AuditLogRepositoryImpl
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
@@ -114,8 +116,9 @@ object FirebaseModule {
     fun providePolicyRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
+        blockchain: BlockChainRepository,
     ): PolicyRepository {
-        return PolicyRepositoryImpl(firestore, auth)
+        return PolicyRepositoryImpl(blockchain, firestore, auth)
     }
 
     @Provides
@@ -123,8 +126,9 @@ object FirebaseModule {
     fun providePollsRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
+        blockchain: BlockChainRepository
     ): PollsRepository {
-        return PollsRepositoryImpl(firestore, auth)
+        return PollsRepositoryImpl(firestore, auth, blockchain)
     }
 
     @Provides
@@ -165,6 +169,14 @@ object FirebaseModule {
         blockchain: BlockChainRepository
     ): AuditLogRepository {
         return AuditLogRepositoryImpl(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAdminDashboardRepository(
+        firestore: FirebaseFirestore,
+    ): AdminDashboardRepository {
+        return AdminDashboardRepositoryImpl(firestore)
     }
 
 }

@@ -16,24 +16,27 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails.PetitionDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.presentation.CitizenPetitionsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.policydetails.CitizenPolicyDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.presentation.CitizenPoliciesScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.polldetails.PollDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation.CitizenPollsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.CreateBudgetScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails.BudgetDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.citizens.OfficialCitizensScreen
-import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.petitions.OfficialPetitionsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.OfficialPoliciesScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.createpolicy.CreatePolicyScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.OfficialPolicyDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls.OfficialPollsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls.createpoll.CreatePollScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.profile.OfficialProfileScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.profile.audit.presentation.OfficialAuditScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.audit.presentation.SuperAdminAuditScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.dashboard.presentation.SuperAdminDashboardScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.citizens.presentation.CreateCitizenScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.officials.presentation.CreateOfficialScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.presentation.SuperAdminPeopleScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.profile.presentation.SuperAdminProfileScreen
-import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.publicparticipation.presentation.SuperAdminPublicParticipationScreen
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -143,6 +146,13 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
                 navHostController = navController
             )
         }
+        composable(
+            Screen.AuditLogScreen.route
+        ) {
+            OfficialAuditScreen(
+                navController = navController
+            )
+        }
         /*composable(
             Screen.FeesSemester.route,
             arguments = listOf(
@@ -180,6 +190,7 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SuperAdminBottomNavigationGraph(navController: NavHostController) {
 
@@ -191,11 +202,6 @@ fun SuperAdminBottomNavigationGraph(navController: NavHostController) {
             route = SuperAdminBottomBarScreen.Dashboard.route
         ) {
             SuperAdminDashboardScreen(navController = navController)
-        }
-        composable(
-            route = SuperAdminBottomBarScreen.PublicParticipation.route
-        ) {
-            SuperAdminPublicParticipationScreen(navController = navController)
         }
         composable(
             route = SuperAdminBottomBarScreen.People.route
@@ -220,6 +226,85 @@ fun SuperAdminBottomNavigationGraph(navController: NavHostController) {
         composable(Screen.CreateOfficialScreen.route) {
             CreateOfficialScreen(
 //                        onNavigationRequested = onNavigationRequested,
+            )
+        }
+        composable(
+            route = Screen.CitizenPolicies.route
+        ) {
+            CitizenPoliciesScreen(navController = navController)
+        }
+
+        composable(Screen.CitizenPolls.route) {
+
+            CitizenPollsScreen(
+                navController = navController,
+//                        onNavigationRequested = onNavigationRequested,
+            )
+        }
+        composable(Screen.CitizenPetitions.route) {
+            CitizenPetitionsScreen(
+                navController = navController,
+//                        onNavigationRequested = onNavigationRequested,
+            )
+        }
+        composable(Screen.CitizenParticipatoryBudget.route) {
+            OfficialBudgetsScreen(
+                navController = navController,
+//                        onNavigationRequested = onNavigationRequested,
+            )
+        }
+
+        composable(
+            Screen.CitizenPolicyDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "policyId") { type = NavType.StringType }
+            ),
+        ) {
+            val policyId = it.arguments?.getString("policyId")
+
+            CitizenPolicyDetailsScreen(
+                policyId = policyId!!,
+                navController = navController
+            )
+        }
+        composable(
+            Screen.PollDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "pollId") { type = NavType.StringType }
+            ),
+        ) {
+            val pollId = it.arguments?.getString("pollId")
+
+            PollDetailsScreen(
+                pollId = pollId!!,
+                navController = navController
+            )
+        }
+
+        composable(
+            Screen.CitizenPetitionDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "petitionId") { type = NavType.StringType }
+            ),
+        ) {
+            val petitionId = it.arguments?.getString("petitionId")
+
+            PetitionDetailsScreen(
+                petitionId = petitionId!!,
+                navHostController = navController
+            )
+        }
+        composable(
+            Screen.BudgetDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "budgetId") { type = NavType.StringType }
+            ),
+        ) {
+            val budgetId = it.arguments?.getString("budgetId")
+
+            BudgetDetailsScreen(
+                budgetId = budgetId!!,
+                navController = navController
             )
         }
         /*

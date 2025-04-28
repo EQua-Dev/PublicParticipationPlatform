@@ -1,33 +1,40 @@
-package ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.audit.presentation
+package ngui_maryanne.dissertation.publicparticipationplatform.features.officials.profile.audit.presentation
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.auditlogrepo.AuditLogRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class SuperAdminAuditLogViewModel @Inject constructor(private val repo: AuditLogRepository) : ViewModel() {
+class OfficialAuditLogViewModel @Inject constructor(
+    private val repo: AuditLogRepository,
+    private val auth: FirebaseAuth
+) : ViewModel() {
 
-    private val _state = mutableStateOf(SuperAdminAuditLogState())
-    val state: State<SuperAdminAuditLogState> = _state
+    private val _state = mutableStateOf(OfficialAuditLogState())
+    val state: State<OfficialAuditLogState> = _state
 
     init {
-        onEvent(SuperAdminAuditLogEvent.LoadLogs)
+        onEvent(OfficialAuditLogEvent.LoadLogs)
     }
 
-    fun onEvent(event: SuperAdminAuditLogEvent) {
+    fun onEvent(event: OfficialAuditLogEvent) {
         when (event) {
-            is SuperAdminAuditLogEvent.LoadLogs -> {
-                repo.getAuditLogsRealtime { logs ->
-                    _state.value = _state.value.copy(logs = logs.map { SuperAdminAuditLogUIModel(it) })
+            is OfficialAuditLogEvent.LoadLogs -> {
+                repo.getMyAuditLogsRealtime(auth.currentUser!!.uid) { logs ->
+                    if (logs.isNotEmpty()) {
+                        _state.value = _state.value.copy(logs = logs.map { OfficialAuditLogUIModel(it) })
+                    }
                 }
+
             }
 
-            is SuperAdminAuditLogEvent.RevealUser -> {
+            is OfficialAuditLogEvent.RevealUser -> {
                 viewModelScope.launch {
                     val (name, type, profileImage) = repo.getUserDetails(event.userId)
                     val updated = _state.value.logs.toMutableList()
@@ -37,7 +44,7 @@ class SuperAdminAuditLogViewModel @Inject constructor(private val repo: AuditLog
                 }
             }
 
-            is SuperAdminAuditLogEvent.RunDiscrepancyCheck -> {
+            is OfficialAuditLogEvent.RunDiscrepancyCheck -> {
                 val logs = _state.value.logs.map { it.log }
                 val issues = mutableListOf<String>()
                 for (i in 1 until logs.size) {
@@ -49,13 +56,12 @@ class SuperAdminAuditLogViewModel @Inject constructor(private val repo: AuditLog
                     }
                 }
                 _state.value = _state.value.copy(
-                    discrepancies = issues,
                     discrepancyFound = issues.isNotEmpty(),
                     showDiscrepancyDialog = true
                 )
             }
 
-            is SuperAdminAuditLogEvent.DismissDiscrepancyDialog -> {
+            is OfficialAuditLogEvent.DismissDiscrepancyDialog -> {
                 _state.value = _state.value.copy(showDiscrepancyDialog = false)
             }
         }

@@ -4,6 +4,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.Flow
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollResponses
 
 interface PollsRepository {
     suspend fun getAllPolls(): List<Poll>
@@ -13,4 +14,5 @@ interface PollsRepository {
     fun getAllPollsListener(onUpdate: (List<Poll>) -> Unit): ListenerRegistration
     suspend fun getPolicySnapshot(policyId: String): Policy?
     suspend fun getPollById(pollId: String): Poll?
+    suspend fun voteForPollOption(pollId: String, updatedResponses: MutableList<PollResponses>)
 }

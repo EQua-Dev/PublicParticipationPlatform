@@ -21,5 +21,5 @@ interface CitizenRepository {
     ): ListenerRegistration // To allow cleanup
 
     suspend fun getCitizen(citizenId: String): Result<Citizen>
-    fun logout()
+    suspend fun logout()
 }

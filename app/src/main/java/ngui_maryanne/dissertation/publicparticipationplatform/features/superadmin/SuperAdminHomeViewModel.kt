@@ -45,8 +45,11 @@ class SuperAdminHomeViewModel @Inject constructor(
 
             is SuperAdminHomeEvent.Logout -> {
                 // Handle logout
-                citizenRepository.logout()
-                _state.update { _state.value.copy(logout = true) }
+                viewModelScope.launch {
+                    citizenRepository.logout()
+                    _state.update { _state.value.copy(logout = true) }
+                }
+
             }
 
             SuperAdminHomeEvent.LoadCitizenData -> loadCitizenData()

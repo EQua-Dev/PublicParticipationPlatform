@@ -24,6 +24,16 @@ class AuditLogRepositoryImpl @Inject constructor(private val firestore: Firebase
             }
     }
 
+    override fun getMyAuditLogsRealtime(userId: String, onResult: (List<AuditLog>) -> Unit) {
+        firestore.collection(AUDIT_LOGS_REF)
+            .whereEqualTo("createdBy", userId)
+            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshot, _ ->
+                val logs = snapshot?.toObjects(AuditLog::class.java).orEmpty()
+                onResult(logs)
+            }
+    }
+
     override suspend fun getUserDetails(userId: String): Triple<String, String, String> {
         val citizenSnap =
             firestore.collection(REGISTERED_CITIZENS_REF).document(userId).get().await()

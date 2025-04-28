@@ -50,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
+import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -91,7 +92,15 @@ fun OfficialProfileScreen(
                 ) {
                     Icon(Icons.Default.Save, contentDescription = "Save")
                 }
-            }
+            }/* else {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(Screen.AuditLogScreen.route)
+                    },
+                ) {
+                    Text(text = "Audit Logs")
+                }
+            }*/
         }
     ) { paddingValues ->
         Box(

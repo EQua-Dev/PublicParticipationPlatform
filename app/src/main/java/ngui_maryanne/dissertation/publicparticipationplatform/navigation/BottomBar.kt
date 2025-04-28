@@ -62,10 +62,10 @@ fun RowScope.OfficialAddItem(
 fun SuperAdminBottomBar(navController: NavHostController) {
     val screens = listOf(
         SuperAdminBottomBarScreen.Dashboard,
-        SuperAdminBottomBarScreen.PublicParticipation,
+//        SuperAdminBottomBarScreen.PublicParticipation,
         SuperAdminBottomBarScreen.People,
         SuperAdminBottomBarScreen.Audit,
-        SuperAdminBottomBarScreen.Profile,
+//        SuperAdminBottomBarScreen.Profile,
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination

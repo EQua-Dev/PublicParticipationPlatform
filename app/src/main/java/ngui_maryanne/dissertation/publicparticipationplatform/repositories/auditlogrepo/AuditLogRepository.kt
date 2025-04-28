@@ -4,5 +4,6 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AuditL
 
 interface AuditLogRepository {
     fun getAuditLogsRealtime(onResult: (List<AuditLog>) -> Unit)
+    fun getMyAuditLogsRealtime(userId: String, onResult: (List<AuditLog>) -> Unit)
     suspend fun getUserDetails(userId: String): Triple<String, String, String> // fullName, userType
 }

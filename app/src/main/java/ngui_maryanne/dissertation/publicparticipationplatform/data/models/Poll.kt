@@ -1,5 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.data.models
 
+import java.util.UUID
+
 data class Poll(
     val id: String = "",
     val hash: String = "",
@@ -14,7 +16,7 @@ data class Poll(
 )
 
 data class PollOption(
-    val optionId: String = "",
+    val optionId: String = UUID.randomUUID().toString(),
     val optionText: String = "",
     val optionExplanation: String = "",
 )

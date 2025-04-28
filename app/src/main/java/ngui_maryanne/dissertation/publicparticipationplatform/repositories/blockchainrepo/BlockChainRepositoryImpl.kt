@@ -6,6 +6,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AuditL
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.AUDIT_LOGS_REF
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.tasks.await
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.LocationUtils
 import javax.inject.Inject
 
@@ -27,12 +28,12 @@ class BlockChainRepositoryImpl @Inject constructor(
             .get()
             .addOnSuccessListener { snapshot ->
                 val previousHash = snapshot.documents.firstOrNull()?.getString("hash") ?: "0"
-               /* val transaction = AuditLog(
-                    createdBy = createdById,
-                    previousHash = previousHash,
-                    transactionType = transactionType.name
-                ).copy(hash = AuditLog().computeHash())
-*/
+                /* val transaction = AuditLog(
+                     createdBy = createdById,
+                     previousHash = previousHash,
+                     transactionType = transactionType.name
+                 ).copy(hash = AuditLog().computeHash())
+ */
 
                 try {
                     // Get the current location
@@ -50,7 +51,7 @@ class BlockChainRepositoryImpl @Inject constructor(
                                 ).copy(hash = AuditLog().computeHash())
 
                                 blockchainRef.add(transaction)
-                            }else{
+                            } else {
 
                                 val transaction = AuditLog(
                                     createdBy = auth.currentUser!!.uid,
@@ -63,7 +64,7 @@ class BlockChainRepositoryImpl @Inject constructor(
                             }
                         }
                         .addOnFailureListener { e ->
-                           throw e
+                            throw e
                         }
                 } catch (e: Exception) {
                     throw e
