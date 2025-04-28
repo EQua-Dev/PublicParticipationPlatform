@@ -109,7 +109,7 @@ class CreatePollViewModel @Inject constructor(
             try {
                 Log.d("CPVM", "createPoll: creating poll...")
                 val currentState = _state.value
-                if (currentState.selectedPolicy?.policyStatus != PolicyStatus.PUBLIC_CONSULTATION
+             /*   if (currentState.selectedPolicy?.policyStatus != PolicyStatus.PUBLIC_CONSULTATION
                     || currentState.selectedPolicy?.policyStatus != PolicyStatus.MINISTERIAL_APPROVAL
                     || currentState.selectedPolicy?.policyStatus != PolicyStatus.INTERNAL_REVIEW
                 ) {
@@ -122,22 +122,24 @@ class CreatePollViewModel @Inject constructor(
                     throw Exception("Polls can only be created for policies in Public Consultation phase")
 
                 }
+*/
+                val poll = currentState.selectedPolicy?.let {
+                    Poll(
+                        id = UUID.randomUUID().toString(),
+                        pollQuestion = currentState.pollQuestion,
+                        policyId = it.id,
+                        pollExpiry = LocalDate.now()
+                            .plusDays(currentState.expiryDays.toLong())
+                            .atStartOfDay(ZoneId.systemDefault())
+                            .toInstant()
+                            .toEpochMilli().toString(),
+                        pollOptions = currentState.options,
+                        createdBy = auth.currentUser?.uid ?: "",
+                        dateCreated = LocalDateTime.now().toString()
+                    )
+                }
 
-                val poll = Poll(
-                    id = UUID.randomUUID().toString(),
-                    pollQuestion = currentState.pollQuestion,
-                    policyId = currentState.selectedPolicy.id,
-                    pollExpiry = LocalDate.now()
-                        .plusDays(currentState.expiryDays.toLong())
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli().toString(),
-                    pollOptions = currentState.options,
-                    createdBy = auth.currentUser?.uid ?: "",
-                    dateCreated = LocalDateTime.now().toString()
-                )
-
-                pollRepository.createPoll(poll)
+                pollRepository.createPoll(poll!!)
                 blockChainRepository.createBlockchainTransaction(
                     TransactionTypes.CREATE_POLL
                 )

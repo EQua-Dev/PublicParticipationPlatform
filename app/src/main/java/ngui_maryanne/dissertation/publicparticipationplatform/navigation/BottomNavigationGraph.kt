@@ -153,6 +153,20 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
                 navController = navController
             )
         }
+        composable(
+            Screen.PollDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "pollId") { type = NavType.StringType }
+            ),
+        ) {
+            val pollId = it.arguments?.getString("pollId")
+
+            PollDetailsScreen(
+                pollId = pollId!!,
+                navController = navController
+            )
+        }
+
         /*composable(
             Screen.FeesSemester.route,
             arguments = listOf(

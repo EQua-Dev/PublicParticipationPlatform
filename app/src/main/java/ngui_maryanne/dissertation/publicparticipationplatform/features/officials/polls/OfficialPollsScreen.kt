@@ -1,5 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,6 +34,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.components.EmptySt
 import ngui_maryanne.dissertation.publicparticipationplatform.components.ErrorState
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.getDate
 
 @Composable
 fun OfficialPollsScreen(
@@ -71,33 +73,46 @@ fun OfficialPollsScreen(
                     title = "No polls available"
                 )
 
-                else -> PollList(state.polls)
+                else -> PollList(state.polls) {
+                    navController.navigate(
+                        Screen.PollDetailsScreen.route.replace(
+                            "{pollId}",
+                            it
+                        )
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun PollList(polls: List<Poll>) {
+private fun PollList(polls: List<Poll>, onPollClick: (pollId: String) -> Unit) {
     LazyColumn(modifier = Modifier.padding(16.dp)) {
         items(polls) { poll ->
-            PollCard(poll = poll)
+            PollCard(poll = poll) {
+                onPollClick(it)
+            }
         }
     }
 }
 
 @Composable
-private fun PollCard(poll: Poll) {
+private fun PollCard(poll: Poll, onClick: (pollId: String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable { onClick(poll.id) },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(poll.pollQuestion, style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Expires: ${poll.pollExpiry}", style = MaterialTheme.typography.bodySmall)
+            Text(
+                "Expires on: ${getDate(poll.pollExpiry.toLong(), "EEE dd MMM yyyy")}",
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
 }

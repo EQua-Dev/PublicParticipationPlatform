@@ -42,10 +42,10 @@ fun PolicyDetailsSection(
         }
 
         // Policy Title & Sector
-        Text(
+       /* Text(
             text = policy.policyTitle,
             style = MaterialTheme.typography.headlineMedium
-        )
+        )*/
         Text(
             text = "Sector: ${policy.policySector}",
             style = MaterialTheme.typography.bodyMedium,
@@ -55,7 +55,7 @@ fun PolicyDetailsSection(
         // Policy Description
         Text(
             text = policy.policyDescription,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(top = 8.dp)
         )
 

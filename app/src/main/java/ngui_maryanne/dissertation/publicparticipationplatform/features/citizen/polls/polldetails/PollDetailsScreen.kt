@@ -98,12 +98,13 @@ fun PollDetailsScreen(
 
                     },
                     onViewPolicyClick = {
-                        navController.navigate(
-                            Screen.CitizenPolicyDetailsScreen.route.replace(
-                                "{policyId}",
-                                state.policy!!.id
+                        if (state.currentUserRole == "citizen")
+                            navController.navigate(
+                                Screen.CitizenPolicyDetailsScreen.route.replace(
+                                    "{policyId}",
+                                    state.policy!!.id
+                                )
                             )
-                        )
                     }
                 )
             }

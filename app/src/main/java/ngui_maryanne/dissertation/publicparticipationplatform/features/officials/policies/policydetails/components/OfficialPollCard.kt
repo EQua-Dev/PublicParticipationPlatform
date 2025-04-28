@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.getDate
 
 @Composable
 fun PollCard(
@@ -61,14 +62,15 @@ fun PollCard(
                     tint = if (isExpired) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = if (isExpired) "Closed" else "Ongoing",
+                    text = if (isExpired) "Inactive" else "Ongoing",
+                    style = MaterialTheme.typography.bodyMedium,
                     color = if (isExpired) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                 )
             }
 
             // Expiry Date
             Text(
-                text = "Closes on ${poll.pollExpiry}",
+                text = "Closes on ${getDate(poll.pollExpiry.toLong(), "EEE, dd MMM yyyy")}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )

@@ -40,6 +40,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyS
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.components.EditPolicyBottomSheet
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.components.PolicyDetailsSection
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.components.PollCard
+import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +62,7 @@ fun OfficialPolicyDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.policy?.policyTitle ?: "Policy Details") },
+                title = { Text(state.policy?.policyTitle ?: "Policy Details", style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -95,7 +96,8 @@ fun OfficialPolicyDetailsScreen(
                 else -> PolicyDetailsContent(
                     state = state,
                     onEvent = viewModel::onEvent,
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(paddingValues),
+                    navController = navController
                 )
             }
         }
@@ -121,6 +123,7 @@ fun OfficialPolicyDetailsScreen(
 private fun PolicyDetailsContent(
     state: OfficialPolicyDetailsState,
     onEvent: (OfficialPolicyDetailsEvent) -> Unit,
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -151,7 +154,12 @@ private fun PolicyDetailsContent(
             state.polls.forEach { poll ->
                 PollCard(
                     poll = poll,
-                    onClick = { /* Navigate to poll details */ }
+                    onClick = { navController.navigate(
+                        Screen.PollDetailsScreen.route.replace(
+                            "{pollId}",
+                            poll.id
+                        )
+                    )/* Navigate to poll details */ }
                 )
             }
         }
