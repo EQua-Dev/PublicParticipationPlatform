@@ -40,6 +40,10 @@ import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
+
+    val languageChangeHelper by lazy {
+        LanguageManager()
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,10 +68,11 @@ class MainActivity : FragmentActivity() {
             val context = LocalContext.current
             /** Getting screen size */
             val size = context.getScreenSize()
+            val currentLanguageCode: String = languageChangeHelper.getLanguageCode(applicationContext)
             var currentLocale by rememberSaveable { mutableStateOf(AppLanguage.ENGLISH.code) }
-            val localizedContext = remember(currentLocale) {
-                LanguageManager.setLocale(this@MainActivity, currentLocale)
-            }
+//            val localizedContext = remember(currentLocale) {
+//                LanguageManager.setLocale(this@MainActivity, currentLocale)
+//            }
             PublicParticipationPlatformTheme {
                 val localizedResources = rememberLocalizedResources(currentLocale)
 

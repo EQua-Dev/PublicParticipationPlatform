@@ -10,7 +10,7 @@ import androidx.core.os.LocaleListCompat
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.AppLanguage
 import java.util.Locale
 
-object LanguageManager {
+class LanguageManager {
 
     fun setLocale(context: Context, languageCode: String): Context {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -28,14 +28,14 @@ object LanguageManager {
     }
 
     fun getLanguageCode(context: Context,): String {
-        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.getSystemService(LocaleManager::class.java)
                 ?.applicationLocales
-                ?.get(0)
+                ?.get(0)?.toLanguageTag()?.split("-")?.first() ?: "en"
         } else {
-            AppCompatDelegate.getApplicationLocales().get(0)
+            AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag()?.split("-")?.first() ?: "en"
         }
-        return locale?.language ?: getDefaultLanguageCode()
+//        return locale?.language ?: getDefaultLanguageCode()
     }
 
     private fun getDefaultLanguageCode(): String {

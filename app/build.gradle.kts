@@ -16,9 +16,7 @@ android {
     namespace = "ngui_maryanne.dissertation.publicparticipationplatform"
     compileSdk = 35
 
-    androidResources{
-        generateLocaleConfig = true
-    }
+
     defaultConfig {
         applicationId = "ngui_maryanne.dissertation.publicparticipationplatform"
         minSdk = 24
@@ -79,6 +77,9 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    androidResources{
+        generateLocaleConfig = true
     }
 }
 

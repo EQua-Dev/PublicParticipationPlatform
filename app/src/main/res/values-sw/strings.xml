@@ -60,4 +60,5 @@
     <string name="create_new_budget_screen">Unda Bajeti Mpya</string>
     <string name="budget_details_screen">Maelezo ya Bajeti</string>
     <string name="citizen_profile_screen">Skrini ya Wasifu wa Raia</string>
+    <string name="my_profile_text">Wasifu Wangu</string>
 </resources>

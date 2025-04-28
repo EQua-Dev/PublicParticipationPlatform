@@ -32,7 +32,7 @@ class CitizenProfileViewModel @Inject constructor(
     private val _state = mutableStateOf(CitizenProfileState())
     val state: State<CitizenProfileState> = _state
 
-    private val appLocaleManager = LanguageManager
+    private val appLocaleManager = LanguageManager()
 
     init {
         onEvent(CitizenProfileEvent.LoadProfile)
