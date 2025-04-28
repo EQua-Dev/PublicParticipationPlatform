@@ -133,11 +133,7 @@ fun RowScope.SuperAdminAddItem(
                     )
                     .padding(8.dp)
             ) {
-                Icon(
-                    imageVector = screen.icon,
-                    contentDescription = screen.title,
-                    tint = animatedIconTint
-                )
+                Icon(painterResource(id = screen.icon), contentDescription = screen.title)
             }
         },
         label = {
