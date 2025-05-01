@@ -15,13 +15,17 @@ fun getTimeLeft(expiryTimeMillis: Long): String {
         if (duration.isNegative) {
             "Expired"
         } else {
-            val hours = duration.toHours()
-            val minutes = duration.toMinutes() % 60
-            val seconds = duration.seconds % 60
+            val totalSeconds = duration.seconds
+
+            val days = totalSeconds / (24 * 3600)
+            val hours = (totalSeconds % (24 * 3600)) / 3600
+            val minutes = (totalSeconds % 3600) / 60
+            val seconds = totalSeconds % 60
 
             when {
+                days > 0 -> "${days}d ${hours}h ${minutes}m"
                 hours > 0 -> "${hours}h ${minutes}m"
-                duration.toMinutes() > 0 -> "${duration.toMinutes()}m"
+                minutes > 0 -> "${minutes}m"
                 else -> "${seconds}s"
             }
         }

@@ -60,9 +60,14 @@ class PollDetailsViewModel @Inject constructor(
                 val pollSnapshot = repository.getPollById(pollId)
                 if (pollSnapshot != null) {
                     val policy = repository.getPolicySnapshot(pollSnapshot.policyId)
+                    val currentUserId = auth.currentUser!!.uid // however you get current user
+                    val userResponse = pollSnapshot.responses.find { it.userId == currentUserId }
+                    val votedOptionId = userResponse?.optionId
+
                     _uiState.value = _uiState.value.copy(
                         poll = pollSnapshot,
                         policy = policy,
+                        votedOptionId = votedOptionId,
                         isLoading = false
                     )
                 } else {

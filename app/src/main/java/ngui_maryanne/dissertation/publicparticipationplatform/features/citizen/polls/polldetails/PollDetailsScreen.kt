@@ -76,6 +76,7 @@ fun PollDetailsScreen(
                 PollDetailsContent(
                     pollData = it,
                     onOptionSelected = { option ->
+                        Log.d("TAG", "PollDetailsScreen: ${option.optionId}")
                         activity?.let { fragmentActivity ->
                             viewModel.verifyAndVoteOption(
                                 activity = fragmentActivity,

@@ -134,6 +134,7 @@ fun PollDetailsContent(
                         Column(horizontalAlignment = Alignment.End) {
                             if (state.currentUserRole.lowercase() == UserRole.CITIZEN.name.lowercase()) {
                                 val votedOptionId = state.votedOptionId
+                                Log.d("TAG", "PollDetailsContent: $votedOptionId")
                                 if (votedOptionId == null) {
                                     Button(onClick = {
                                         onOptionSelected(option)
