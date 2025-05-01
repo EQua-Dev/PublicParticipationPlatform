@@ -28,6 +28,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.admindashboardrepo.AdminDashboardRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.admindashboardrepo.AdminDashboardRepositoryImpl
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.announcementrepo.AnnouncementRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.announcementrepo.AnnouncementRepositoryImpl
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.auditlogrepo.AuditLogRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.auditlogrepo.AuditLogRepositoryImpl
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
@@ -187,6 +189,14 @@ object FirebaseModule {
         firestore: FirebaseFirestore,
     ): NotificationRepository {
         return NotificationRepositoryImpl(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAnnouncementRepository(
+        firestore: FirebaseFirestore,
+    ): AnnouncementRepository {
+        return AnnouncementRepositoryImpl(firestore)
     }
 
 }

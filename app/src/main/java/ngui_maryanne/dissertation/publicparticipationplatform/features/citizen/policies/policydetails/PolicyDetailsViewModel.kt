@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Comment
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.commentrepo.CommentRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.policyrepo.PolicyRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.pollsrepo.PollsRepository
 import javax.inject.Inject
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class PolicyDetailsViewModel @Inject constructor(
     private val policyRepository: PolicyRepository,
     private val commentRepository: CommentRepository,
+    private val notificationRepository: NotificationRepository,
     private val auth: FirebaseAuth,
     private val pollsRepository: PollsRepository
 ) : ViewModel() {
@@ -35,14 +37,14 @@ class PolicyDetailsViewModel @Inject constructor(
 
     private var commentsListener: ListenerRegistration? = null
 
-  /*  init {
-        viewModelScope.launch {
-            commentsListener?.remove()
-            commentsListener = commentRepository.getCommentsListener(policyId) { comments ->
-                _uiState.update { it.copy(comments = comments) }
-            }
-        }
-    }*/
+    /*  init {
+          viewModelScope.launch {
+              commentsListener?.remove()
+              commentsListener = commentRepository.getCommentsListener(policyId) { comments ->
+                  _uiState.update { it.copy(comments = comments) }
+              }
+          }
+      }*/
 
     fun handleAction(action: PolicyDetailsAction) {
         when (action) {
@@ -53,24 +55,31 @@ class PolicyDetailsViewModel @Inject constructor(
                     _events.emit(PolicyDetailsEvent.SetupCommentsListener)
                 }
             }
+
             PolicyDetailsAction.OnBackClicked -> viewModelScope.launch {
                 _events.emit(PolicyDetailsEvent.NavigateBack)
             }
+
             is PolicyDetailsAction.OnPollClicked -> viewModelScope.launch {
                 _events.emit(PolicyDetailsEvent.NavigateToPollDetails(action.pollId))
             }
+
             PolicyDetailsAction.ToggleDescriptionExpanded -> {
                 _uiState.update { it.copy(isDescriptionExpanded = !it.isDescriptionExpanded) }
             }
+
             PolicyDetailsAction.ToggleTimelineExpanded -> {
                 _uiState.update { it.copy(isTimelineExpanded = !it.isTimelineExpanded) }
             }
+
             is PolicyDetailsAction.OnCommentTextChanged -> {
                 _uiState.update { it.copy(newCommentText = action.text) }
             }
+
             is PolicyDetailsAction.OnAnonymousToggled -> {
                 _uiState.update { it.copy(isAnonymous = action.isAnonymous) }
             }
+
             PolicyDetailsAction.SubmitComment -> submitComment()
             PolicyDetailsAction.ToggleCommentsExpanded -> TODO()
             PolicyDetailsAction.TogglePollsExpanded -> TODO()
@@ -140,10 +149,12 @@ class PolicyDetailsViewModel @Inject constructor(
                     comment = commentText,
                     userId = auth.currentUser!!.uid,
                     isAnonymous = _uiState.value.isAnonymous,
-                    dateCreated = System.currentTimeMillis().toString())
+                    dateCreated = System.currentTimeMillis().toString()
+                )
 
 
                 commentRepository.addComment(policy.id, comment)
+                notificationRepository.sendPolicyCommentNotifications(policy.id, comment.userId)
                 _uiState.update {
                     it.copy(
                         newCommentText = "",

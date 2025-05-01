@@ -1,7 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.data.enums
 
 enum class NotificationTypes {
-//    POLICY,
+    POLICY,
     PETITION,
     POLL,
     BUDGET,

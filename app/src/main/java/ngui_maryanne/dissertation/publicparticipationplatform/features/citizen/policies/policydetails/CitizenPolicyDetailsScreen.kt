@@ -63,6 +63,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.StatusChange
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.getDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -527,7 +528,7 @@ private fun CommentsSection(
                                 )
 
                                 Text(
-                                    text = comment.dateCreated,
+                                    text = getDate(comment.dateCreated.toLong(), "dd/MM/yyyy | hh:mm a"),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.outline
                                 )

@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.announcementrepo.AnnouncementRepository
 import java.util.UUID
 import javax.inject.Inject
 
@@ -23,6 +26,7 @@ class CreatePolicyViewModel @Inject constructor(
     private val policyRepository: PolicyRepository,
     private val storageRepository: StorageRepository,
     private val blockChainRepository: BlockChainRepository,
+    private val announcementRepository: AnnouncementRepository,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
@@ -100,6 +104,17 @@ class CreatePolicyViewModel @Inject constructor(
 
                 Log.d("CPVM", "createPolicy: $policy")
                 policyRepository.createPolicy(policy)
+                val announcement = Announcement(
+                    id = UUID.randomUUID().toString(),
+                    createdBy = policy.createdBy,
+                    createdAt = System.currentTimeMillis().toString(),
+                    type = NotificationTypes.POLICY,
+                    typeId = policy.id,
+                    title = "New Policy",
+                    description = "A new policy: ${policy.policyTitle} has been created",
+                )
+
+                announcementRepository.addAnnouncement(announcement, announcement.type)
                 blockChainRepository.createBlockchainTransaction(
                     TransactionTypes.CREATE_POLICY
                 )

@@ -74,4 +74,5 @@ object Constants {
     const val PETITIONS_REF = "Petitions"
     const val BUDGETS_REF = "Budgets"
     const val NOTIFICATIONS_REF = "Notifications"
+    const val ANNOUNCEMENTS_REF = "Announcements"
 }

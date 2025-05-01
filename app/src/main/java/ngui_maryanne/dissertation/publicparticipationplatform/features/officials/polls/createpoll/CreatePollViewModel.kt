@@ -18,6 +18,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.announcementrepo.AnnouncementRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -30,6 +33,7 @@ class CreatePollViewModel @Inject constructor(
     private val pollRepository: PollsRepository,
     private val policyRepository: PolicyRepository,
     private val blockChainRepository: BlockChainRepository,
+    private val announcementRepository: AnnouncementRepository,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
@@ -140,6 +144,17 @@ class CreatePollViewModel @Inject constructor(
                 }
 
                 pollRepository.createPoll(poll!!)
+                val announcement = Announcement(
+                    id = UUID.randomUUID().toString(),
+                    createdBy = poll.createdBy,
+                    createdAt = System.currentTimeMillis().toString(),
+                    type = NotificationTypes.POLL,
+                    typeId = poll.id,
+                    title = "New Poll",
+                    description = "A new poll: ${poll.pollQuestion    } has been created",
+                )
+
+                announcementRepository.addAnnouncement(announcement, announcement.type)
                 blockChainRepository.createBlockchainTransaction(
                     TransactionTypes.CREATE_POLL
                 )

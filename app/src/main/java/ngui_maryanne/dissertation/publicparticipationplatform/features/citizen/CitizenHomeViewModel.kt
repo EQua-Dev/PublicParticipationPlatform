@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.announcementrepo.AnnouncementRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import javax.inject.Inject
 
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class CitizenHomeViewModel @Inject constructor(
     private val citizenRepository: CitizenRepository,
     private val notificationRepository: NotificationRepository,
+    private val announcementRepository: AnnouncementRepository,
     private val auth: FirebaseAuth
 ) : ViewModel() {
     private val _state = MutableStateFlow(CitizenHomeState())
@@ -26,6 +28,7 @@ class CitizenHomeViewModel @Inject constructor(
     init {
         loadCitizenData()
         loadCitizenNotifications()
+        startListeningForAnnouncements()
     }
 
     private fun loadCitizenData() {
@@ -55,7 +58,18 @@ class CitizenHomeViewModel @Inject constructor(
             }
         )
     }
-
+    private fun startListeningForAnnouncements() {
+        announcementRepository.getAllAnnouncementsRealtime(
+            onResult = { announcements ->
+                _state.value = _state.value.copy(
+                    announcements = announcements.toMutableList(),
+                )
+            },
+            onError = { e ->
+                Log.e("AnnouncementViewModel", "Error fetching announcements: ${e.localizedMessage}")
+            }
+        )
+    }
 
     fun onEvent(event: CitizenHomeEvent) {
         when (event) {

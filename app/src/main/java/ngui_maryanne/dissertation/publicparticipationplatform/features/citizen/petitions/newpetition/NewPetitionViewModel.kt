@@ -8,9 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.presentation.CitizenPetitionsUiState
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.createpolicy.CreatePolicyEvent
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.announcementrepo.AnnouncementRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import java.util.UUID
@@ -19,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PetitionViewModel @Inject constructor(
     private val repository: PetitionRepository,
+    private val announcementRepository: AnnouncementRepository,
     private val storageRepo: StorageRepository
 ) : ViewModel() {
 
@@ -106,7 +110,17 @@ class PetitionViewModel @Inject constructor(
                 )
 
                 repository.createPetition(petition)
+                val announcement = Announcement(
+                    id = UUID.randomUUID().toString(),
+                    createdBy = petition.createdBy,
+                    createdAt = System.currentTimeMillis().toString(),
+                    type = NotificationTypes.PETITION,
+                    typeId = petition.id,
+                    title = "New Petition",
+                    description = "A new petition: ${petition.title} has been created",
+                )
 
+                announcementRepository.addAnnouncement(announcement, announcement.type)
                 _newPetitionState.value = NewPetitionState() // reset after success
 
             } catch (e: Exception) {

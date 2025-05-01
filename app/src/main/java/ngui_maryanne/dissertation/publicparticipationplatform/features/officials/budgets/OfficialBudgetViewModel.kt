@@ -7,8 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.announcementrepo.AnnouncementRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
@@ -19,6 +22,7 @@ import javax.inject.Inject
 class OfficialBudgetViewModel @Inject constructor(
     private val budgetRepo: BudgetRepository,
     private val storageRepo: StorageRepository,
+    private val announcementRepository: AnnouncementRepository,
     private val userPreferences: UserPreferences,
     private val auth: FirebaseAuth
 ) : ViewModel()
@@ -136,6 +140,17 @@ class OfficialBudgetViewModel @Inject constructor(
                 )
 
                 budgetRepo.createBudget(budget)
+                val announcement = Announcement(
+                    id = UUID.randomUUID().toString(),
+                    createdBy = budget.createdBy,
+                    createdAt = System.currentTimeMillis().toString(),
+                    type = NotificationTypes.BUDGET,
+                    typeId = budgetId,
+                    title = "New Budget",
+                    description = "A new budget: ${budget.impact} has been created",
+                )
+
+                announcementRepository.addAnnouncement(announcement, announcement.type)
                 _uiState.value = OfficialBudgetUiState() // Reset UI
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)

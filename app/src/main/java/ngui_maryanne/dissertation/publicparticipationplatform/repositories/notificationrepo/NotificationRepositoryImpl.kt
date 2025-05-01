@@ -7,8 +7,11 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.Notific
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AppNotification
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.COMMENTS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.NOTIFICATIONS_REF
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.POLICIES_REF
 
 class NotificationRepositoryImpl(
     private val firestore: FirebaseFirestore
@@ -144,9 +147,41 @@ class NotificationRepositoryImpl(
         batch.commit().await()
     }
 
+    override suspend fun sendPolicyCommentNotifications(policyId: String, newCommenterId: String) {
+        val notificationsRef = firestore.collection(NOTIFICATIONS_REF)
+        val now = System.currentTimeMillis().toString()
 
-  /*  fun removeListener() {
-        listenerRegistration?.remove()
-        listenerRegistration = null
-    }*/
+        val commentsSnapshot = firestore.collection(POLICIES_REF)
+            .document(policyId)
+            .collection(COMMENTS_REF)
+            .get()
+            .await()
+
+        val batch = firestore.batch()
+        val notifiedUserIds = mutableSetOf<String>()
+
+        for (doc in commentsSnapshot.documents) {
+            val userId = doc.getString("userId") ?: continue
+
+            if (userId != newCommenterId && notifiedUserIds.add(userId)) {
+                val notification = AppNotification(
+                    receiverId = userId,
+                    type = NotificationTypes.POLICY,
+                    typeId = policyId,
+                    dateCreated = now,
+                    message = "Someone else also commented on the policy you're participating in."
+                )
+                val docRef = notificationsRef.document()
+                batch.set(docRef, notification)
+            }
+        }
+
+        batch.commit().await()
+    }
+
+
+    /*  fun removeListener() {
+          listenerRegistration?.remove()
+          listenerRegistration = null
+      }*/
 }

@@ -85,6 +85,15 @@ fun NotificationsScreen(
                                 )
                             }
 
+                            NotificationTypes.POLICY -> {
+                                navController.navigate(
+                                    Screen.CitizenPolicyDetailsScreen.route.replace(
+                                        "{policyId}",
+                                        notification.typeId
+                                    )
+                                )
+                            }
+
                             else -> {
 
                             }

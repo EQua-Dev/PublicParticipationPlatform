@@ -180,4 +180,7 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.biometric)
 
+    implementation (libs.androidx.foundation)
+    implementation (libs.accompanist.pager.indicators)
+
 }

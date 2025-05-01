@@ -1,36 +1,36 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Policy
-import androidx.compose.material.icons.filled.Poll
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,19 +48,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citizen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.LoadingDialog
 import coil.compose.AsyncImage
+import kotlinx.coroutines.delay
 import ngui_maryanne.dissertation.publicparticipationplatform.R
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AppNotification
-import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.SuperAdminHomeEvent
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 
 @Composable
 fun CitizenHomeScreen(
@@ -69,7 +72,7 @@ fun CitizenHomeScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val openDialog = remember { mutableStateOf(false) }
-
+    val announcements = state.announcements
 
     LaunchedEffect(key1 = state) {
         if (state.logout) {
@@ -92,12 +95,15 @@ fun CitizenHomeScreen(
             )
         }
     ) { paddingValues ->
+
         when {
+
             state.isLoading -> LoadingDialog()
             !state.isApproved -> AwaitingApprovalScreen()
             else -> ApprovedCitizenHome(
                 paddingValues = paddingValues,
-                navController = navController
+                navController = navController,
+                announcements = announcements
             )
         }
     }
@@ -160,11 +166,34 @@ fun AwaitingApprovalScreen() {
 @Composable
 fun ApprovedCitizenHome(
     paddingValues: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    announcements: MutableList<Announcement>
 ) {
     Column(modifier = Modifier.padding(paddingValues)) {
         // Carousel (Auto-sliding announcements)
 //        AnnouncementCarousel()
+        if (announcements.size > 0){
+            AnnouncementsCarousel(
+                announcements = announcements,
+                onAnnouncementClick = { announcement ->
+                    // Navigate based on announcement type
+                    when (announcement.type) {
+                        NotificationTypes.POLICY -> {
+                            navController.navigate(Screen.CitizenPolicies.route)
+                        }
+                        NotificationTypes.POLL -> {
+                            navController.navigate(Screen.CitizenPolls.route)
+                        }
+                        NotificationTypes.PETITION -> {
+                            navController.navigate(Screen.CitizenPetitions.route)
+                        }
+                        else -> {
+                            navController.navigate(Screen.CitizenParticipatoryBudget.route)
+                        }
+                    }
+                }
+            )
+        }
 
         // 2x2 Grid of Actions
         LazyVerticalGrid(
@@ -291,4 +320,125 @@ fun CitizenHomeTopBar(
             }*/
         }
     )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun AnnouncementsCarousel(
+    announcements: List<Announcement>,
+    onAnnouncementClick: (Announcement) -> Unit
+) {
+    val pagerState = rememberPagerState(pageCount = { announcements.size })
+
+
+    LaunchedEffect(Unit) {
+        // Auto-slide logic: Change page every 3 seconds
+        while (true) {
+            delay(3000)  // Delay for 3 seconds before sliding to next item
+            pagerState.animateScrollToPage((pagerState.currentPage + 1) % announcements.size)
+        }
+    }
+
+    HorizontalPager(
+        state = pagerState,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)  // You can adjust the height to fit your UI
+    ) { pageIndex ->
+        val announcement = announcements[pageIndex]
+        AnnouncementCard(
+            announcement = announcement,
+            onClick = { onAnnouncementClick(announcement) })
+    }
+}
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun AnnouncementCard(
+    announcement: Announcement,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val shape = MaterialTheme.shapes.medium
+
+    val iconRes = when (announcement.type) {
+        NotificationTypes.POLICY -> R.drawable.ic_policies
+        NotificationTypes.POLL -> R.drawable.ic_polls
+        NotificationTypes.PETITION -> R.drawable.ic_petitions
+        else -> R.drawable.ic_budget
+    }
+
+    Card(
+        modifier = modifier
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = { /* Optional: Handle long click */ }
+            ),
+        shape = shape,
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .background(colorScheme.surfaceVariant)
+            ) {
+                Icon(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = "Announcement icon",
+                    modifier = Modifier
+                        .size(64.dp)
+                        .align(Alignment.Center),
+                    tint = colorScheme.onSurfaceVariant
+                )
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(12.dp)
+                        .background(colorScheme.primary.copy(alpha = 0.8f), shape)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = announcement.title,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colorScheme.onPrimary
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Text(
+                    text = announcement.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+//                        text = "By ${announcement.createdBy}",
+                        text = "",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colorScheme.primary
+                    )
+
+                    Text(
+                        text = HelpMe.getDate(announcement.createdAt.toLong(), "EEE dd MMM yyyy"),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
+            }
+        }
+    }
 }
