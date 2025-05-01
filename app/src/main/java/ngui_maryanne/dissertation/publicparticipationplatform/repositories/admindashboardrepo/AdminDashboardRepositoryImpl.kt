@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.flow.Flow
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.BUDGETS_REF
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.OFFICIALS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.PETITIONS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.POLICIES_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.POLLS_REF
@@ -18,6 +19,7 @@ class AdminDashboardRepositoryImpl @Inject constructor(private val firestore: Fi
     AdminDashboardRepository {
 
     override suspend fun getCitizenCount(): Flow<Int> = getCollectionCountRealTime(REGISTERED_CITIZENS_REF)
+    override suspend fun getOfficialCount(): Flow<Int> = getCollectionCountRealTime(OFFICIALS_REF)
     override suspend fun getPoliciesCount(): Flow<Int> = getCollectionCountRealTime(POLICIES_REF)
     override suspend fun getPollsCount(): Flow<Int> = getCollectionCountRealTime(POLLS_REF)
     override suspend fun getBudgetsCount(): Flow<Int> = getCollectionCountRealTime(BUDGETS_REF)

@@ -218,9 +218,13 @@ fun SuperAdminBottomNavigationGraph(navController: NavHostController) {
             SuperAdminDashboardScreen(navController = navController)
         }
         composable(
-            route = SuperAdminBottomBarScreen.People.route
+            route = SuperAdminBottomBarScreen.People.route,
+            arguments = listOf(
+                navArgument(name = "selectedIndex") { type = NavType.IntType }
+            ),
         ) {
-            SuperAdminPeopleScreen(navController = navController)
+            val selectedIndex = it.arguments?.getInt("selectedIndex")
+            SuperAdminPeopleScreen(navController = navController, selectedTab = selectedIndex ?: 0)
         }
         composable(
             route = SuperAdminBottomBarScreen.Audit.route

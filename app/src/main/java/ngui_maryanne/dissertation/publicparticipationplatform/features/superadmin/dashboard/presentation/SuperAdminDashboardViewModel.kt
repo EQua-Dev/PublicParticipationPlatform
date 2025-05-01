@@ -21,31 +21,36 @@ class SuperAdminDashboardViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             repository.getCitizenCount().collect { count ->
-                _state.value =   _state.value.copy(citizensCount = count)
+                _state.value = _state.value.copy(citizensCount = count)
+            }
+        }
+        viewModelScope.launch {
+            repository.getOfficialCount().collect { count ->
+                _state.value = _state.value.copy(officialsCount = count)
             }
         }
 
         viewModelScope.launch {
             repository.getPoliciesCount().collect { count ->
-                _state.value =   _state.value.copy(policiesCount = count)
+                _state.value = _state.value.copy(policiesCount = count)
             }
         }
 
         viewModelScope.launch {
             repository.getPollsCount().collect { count ->
-                _state.value =   _state.value.copy(pollsCount = count)
+                _state.value = _state.value.copy(pollsCount = count)
             }
         }
 
         viewModelScope.launch {
             repository.getBudgetsCount().collect { count ->
-                _state.value =   _state.value.copy(budgetsCount = count)
+                _state.value = _state.value.copy(budgetsCount = count)
             }
         }
 
         viewModelScope.launch {
             repository.getPetitionsCount().collect { count ->
-                _state.value =   _state.value.copy(petitionsCount = count)
+                _state.value = _state.value.copy(petitionsCount = count)
             }
         }
 
@@ -58,6 +63,7 @@ class SuperAdminDashboardViewModel @Inject constructor(
             is SuperAdminDashboardEvent.LoadDashboardData -> {
                 loadDashboardData()
             }
+
             is SuperAdminDashboardEvent.CardClicked -> {
                 // Handle card clicks if needed
             }

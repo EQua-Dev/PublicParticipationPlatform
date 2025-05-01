@@ -6,5 +6,5 @@ sealed class SuperAdminDashboardEvent {
 }
 
 enum class DashboardCardType {
-    Citizens, Policies, Polls, Budgets, Petitions
+    Citizens, Officials, Policies, Polls, Budgets, Petitions
 }

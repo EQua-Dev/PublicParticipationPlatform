@@ -1,17 +1,23 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +37,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.SuperAdminBottomBar
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.SuperAdminBottomNavigationGraph
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SuperAdminHomeScreen(
@@ -48,7 +55,7 @@ fun SuperAdminHomeScreen(
 
     val errorMessage = remember { mutableStateOf("") }
 //    val showLoading by remember { mutableStateOf(studentHomeViewModel.showLoading) }
-//    val openDialog by remember { mutableStateOf(studentHomeViewModel.openDialog) }
+    val openDialog = remember { mutableStateOf(false) }
 
 
     LaunchedEffect(key1 = state) {
@@ -64,10 +71,13 @@ fun SuperAdminHomeScreen(
                     Text("Hello, Admin")
                 },
                 actions = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            openDialog.value = true
 
-                    Text("Logout", modifier = Modifier.clickable {
-                        viewModel.onEvent(SuperAdminHomeEvent.Logout)
-                    })
+                        })
 
                 }
             )
@@ -75,34 +85,6 @@ fun SuperAdminHomeScreen(
         bottomBar = {
             SuperAdminBottomBar(navController = navController)
         },
-        /*topBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Hello, ${studentData?.studentFirstName}",
-                        modifier = Modifier
-                            .weight(0.6f)
-                            .padding(4.dp),
-                        style = Typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = null,
-                        modifier = Modifier.clickable {
-                            studentHomeViewModel.updateDialogStatus()
-                        })
-                }
-            }
-
-        }*/
     ) { innerPadding ->
         Box(
             modifier = Modifier.padding(
@@ -113,7 +95,7 @@ fun SuperAdminHomeScreen(
             SuperAdminBottomNavigationGraph(navController = navController)
         }
     }
-    /*
+
 
         if (openDialog.value) {
             AlertDialog(
@@ -124,7 +106,7 @@ fun SuperAdminHomeScreen(
                     openDialog.value = false
                 },
                 title = {
-                    Text(text = "Logout", style = Typography.titleLarge)
+                    Text(text = "Logout", style = MaterialTheme.typography.titleLarge)
                 },
                 text = {
                     Text(text = "Do you want to logout?")
@@ -132,9 +114,7 @@ fun SuperAdminHomeScreen(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            Common.mAuth.signOut()
-                            baseNavHostController.navigate(Screen.Login.route)
-                            studentHomeViewModel.updateDialogStatus()
+                            viewModel.onEvent(SuperAdminHomeEvent.Logout)
                         }
                     ) {
                         Text("Yes")
@@ -143,7 +123,7 @@ fun SuperAdminHomeScreen(
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            studentHomeViewModel.updateDialogStatus()
+                            openDialog.value = false
                         }
                     ) {
                         Text("No")
@@ -152,6 +132,7 @@ fun SuperAdminHomeScreen(
 
                 )
         }
+    /*
 
         if (showLoading.value) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

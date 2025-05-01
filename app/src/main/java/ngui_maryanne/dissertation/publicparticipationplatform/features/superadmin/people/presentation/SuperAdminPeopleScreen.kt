@@ -9,6 +9,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -22,14 +23,15 @@ import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 fun SuperAdminPeopleScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    selectedTab: Int = 0,
     viewModel: SuperAdminPeopleViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.value
 
+    LaunchedEffect(selectedTab) {
+        viewModel.onEvent(SuperAdminUiEvent.SelectTab(selectedTab))
+    }
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Super Admin Profile") })
-        },
         floatingActionButton = {
             /*   FabMenu(
                    isExpanded = uiState.isFabMenuExpanded,

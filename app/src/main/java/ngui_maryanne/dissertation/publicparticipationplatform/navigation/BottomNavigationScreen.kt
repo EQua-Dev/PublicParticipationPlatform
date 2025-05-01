@@ -52,7 +52,7 @@ sealed class SuperAdminBottomBarScreen(
         SuperAdminBottomBarScreen("Dashboard", R.drawable.ic_dashboard, "super_admin_dashboard")
 
     object People :
-        SuperAdminBottomBarScreen("People", R.drawable.ic_people, "super_admin_people")
+        SuperAdminBottomBarScreen("People", R.drawable.ic_people, "super_admin_people/{selectedIndex}")
 
     object Audit : SuperAdminBottomBarScreen("Audit", R.drawable.ic_audit, "super_admin_audit")
     object Profile :

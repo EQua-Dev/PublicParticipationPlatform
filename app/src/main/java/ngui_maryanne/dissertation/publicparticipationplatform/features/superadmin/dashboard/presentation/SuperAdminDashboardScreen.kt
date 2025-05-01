@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
+import ngui_maryanne.dissertation.publicparticipationplatform.navigation.SuperAdminBottomBarScreen
 
 @Composable
 fun SuperAdminDashboardScreen(
@@ -55,7 +56,38 @@ fun SuperAdminDashboardScreen(
                     title = "Citizens",
                     count = state.citizensCount,
                     onClick = {
-                        viewModel.onEvent(SuperAdminDashboardEvent.CardClicked(DashboardCardType.Citizens))
+                        navController.navigate(
+                            SuperAdminBottomBarScreen.People.route.replace(
+                                "{selectedIndex}",
+                                "0"
+                            )
+                        ) {
+                            launchSingleTop = true
+                            restoreState = true
+                            popUpTo(SuperAdminBottomBarScreen.Dashboard.route) {
+                                saveState = true
+                            }
+                        }
+                    }
+                )
+            }
+            item {
+                DashboardCard(
+                    title = "Officials",
+                    count = state.officialsCount,
+                    onClick = {
+                        navController.navigate(
+                            SuperAdminBottomBarScreen.People.route.replace(
+                                "{selectedIndex}",
+                                "1"
+                            )
+                        ) {
+                            launchSingleTop = true
+                            restoreState = true
+                            popUpTo(SuperAdminBottomBarScreen.Dashboard.route) {
+                                saveState = true
+                            }
+                        }
                     }
                 )
             }
