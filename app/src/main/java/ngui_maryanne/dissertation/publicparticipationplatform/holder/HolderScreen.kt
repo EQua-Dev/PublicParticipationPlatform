@@ -47,8 +47,10 @@ import ngui_maryanne.dissertation.publicparticipationplatform.features.common.au
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.signup.CitizenRegistrationScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.signup.CitizenRegistrationVerification
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.OfficialHomeScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.CreateBudgetScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails.BudgetDetailsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls.createpoll.CreatePollScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.SuperAdminHomeScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Common.mAuth
@@ -375,6 +377,17 @@ fun ScaffoldSection(
                     CitizenAuditScreen(
                         navController = controller
                     )
+                }
+                composable(Screen.CreatePollScreen.route) {
+                    CreatePollScreen(
+                        navController = controller
+                    )
+                }
+                composable(Screen.CreateNewBudgetScreen.route) {
+                    CreateBudgetScreen(
+                        navController = controller
+                    )
+
                 }
             }
         }

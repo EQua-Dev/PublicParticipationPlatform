@@ -62,7 +62,7 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
         composable(
             route = OfficialBottomBarScreen.Polls.route
         ) {
-            OfficialPollsScreen(navController = navController)
+            CitizenPollsScreen(navController = navController)
         }
         composable(
             route = OfficialBottomBarScreen.Budget.route

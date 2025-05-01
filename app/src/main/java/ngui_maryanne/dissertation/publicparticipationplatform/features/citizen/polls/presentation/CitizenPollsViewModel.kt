@@ -14,17 +14,32 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.pollsrepo.PollsRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import javax.inject.Inject
 
 @HiltViewModel
 class CitizenPollsViewModel @Inject constructor(
-    private val repository: PollsRepository
+    private val repository: PollsRepository,
+    private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CitizenPollsUiState())
     val uiState: StateFlow<CitizenPollsUiState> = _uiState.asStateFlow()
 
     private var listenerRegistration: ListenerRegistration? = null
+
+
+    init {
+        viewModelScope.launch {
+            userPreferences.role.collect { role ->
+                if (role != null) {
+                    _uiState.value = _uiState.value.copy(
+                        currentUserRole = role.name
+                    )
+                }
+            }
+        }
+    }
 
     init {
         observePolls()

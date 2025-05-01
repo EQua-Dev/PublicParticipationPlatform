@@ -7,7 +7,8 @@ data class CitizenPollsUiState(
     val allPolls: List<PollWithPolicyName> = emptyList(),
     val searchQuery: String = "",
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val currentUserRole: String = "citizen",
 )
 
 data class PollWithPolicyName(
