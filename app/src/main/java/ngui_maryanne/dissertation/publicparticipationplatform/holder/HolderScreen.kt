@@ -34,6 +34,7 @@ import androidx.navigation.navArgument
 import com.awesomenessstudios.schoolprojects.criticalthinkingappforkids.providers.LocalNavHost
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.CitizenHomeScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.notification.presentation.NotificationsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails.PetitionDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.presentation.CitizenPetitionsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.policydetails.CitizenPolicyDetailsScreen
@@ -385,6 +386,12 @@ fun ScaffoldSection(
                 }
                 composable(Screen.CreateNewBudgetScreen.route) {
                     CreateBudgetScreen(
+                        navController = controller
+                    )
+
+                }
+                composable(Screen.NotificationScreen.route) {
+                    NotificationsScreen(
                         navController = controller
                     )
 

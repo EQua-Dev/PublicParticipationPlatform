@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollResponses
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.pollsrepo.PollsRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PollDetailsViewModel @Inject constructor(
     private val repository: PollsRepository,
+    private val notificationRepository: NotificationRepository,
     private val auth: FirebaseAuth,
     private val userPreferences: UserPreferences,
 ) : ViewModel() {
@@ -153,6 +155,7 @@ class PollDetailsViewModel @Inject constructor(
                 }
 
                 repository.voteForPollOption(currentState.poll.id, updatedResponses)
+                notificationRepository.sendPollVoteNotifications(currentState.poll, auth.currentUser!!.uid)
                 onSuccess()
                 // Update the UI state to reflect the voted option
                 _uiState.value = currentState.copy(votedOptionId = optionId)

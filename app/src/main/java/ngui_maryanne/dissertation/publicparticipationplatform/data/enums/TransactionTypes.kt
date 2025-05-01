@@ -1,8 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.data.enums
 
 enum class TransactionTypes {
-                            LOGIN,
-
+    LOGIN,
     CREATE_CITIZEN_RECORD,
     CREATE_OFFICIAL,
     APPROVE_CITIZEN,

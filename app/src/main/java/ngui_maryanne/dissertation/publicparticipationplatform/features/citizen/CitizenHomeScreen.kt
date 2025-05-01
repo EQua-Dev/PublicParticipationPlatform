@@ -16,11 +16,16 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Comment
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Poll
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,11 +37,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +58,8 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citize
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.LoadingDialog
 import coil.compose.AsyncImage
 import ngui_maryanne.dissertation.publicparticipationplatform.R
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AppNotification
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.SuperAdminHomeEvent
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 
 @Composable
@@ -58,6 +68,7 @@ fun CitizenHomeScreen(
     viewModel: CitizenHomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val openDialog = remember { mutableStateOf(false) }
 
 
     LaunchedEffect(key1 = state) {
@@ -70,8 +81,14 @@ fun CitizenHomeScreen(
         topBar = {
             CitizenHomeTopBar(
                 citizen = state.citizen,
+                notifications = state.notifications,
                 onProfileClick = { navController.navigate(Screen.CitizenProfileScreen.route) },
-                onLogout = { viewModel.onEvent(CitizenHomeEvent.Logout) }
+                onNotificationsClick = {
+                    navController.navigate(Screen.NotificationScreen.route)
+                },
+                onLogout = {
+                    openDialog.value = true
+                }
             )
         }
     ) { paddingValues ->
@@ -84,6 +101,43 @@ fun CitizenHomeScreen(
             )
         }
     }
+
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                // Dismiss the dialog when the user clicks outside the dialog or on the back
+                // button. If you want to disable that functionality, simply use an empty
+                // onDismissRequest.
+                openDialog.value = false
+            },
+            title = {
+                Text(text = "Logout", style = MaterialTheme.typography.titleLarge)
+            },
+            text = {
+                Text(text = "Do you want to logout?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.onEvent(CitizenHomeEvent.Logout)
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+                    }
+                ) {
+                    Text("No")
+                }
+            },
+
+            )
+    }
+
 }
 
 @Composable
@@ -176,7 +230,9 @@ fun ActionCard(icon: Int, label: String, onClick: () -> Unit) {
 @Composable
 fun CitizenHomeTopBar(
     citizen: Citizen?,
+    notifications: MutableList<AppNotification>,
     onProfileClick: () -> Unit,
+    onNotificationsClick: () -> Unit,
     onLogout: () -> Unit
 ) {
     TopAppBar(
@@ -190,16 +246,36 @@ fun CitizenHomeTopBar(
                         model = citizen.profileImage,
                         contentDescription = "Profile",
                         modifier = Modifier
-                            .size(32.dp)
+//                            .size(32.dp)
                             .clip(CircleShape)
                     )
                 } else {
                     Icon(Icons.Default.AccountCircle, contentDescription = "Profile")
                 }
             }
-            Text("Logout", modifier = Modifier.clickable {
-                onLogout()
-            })
+            // Notifications Icon with Badge
+            IconButton(onClick = onNotificationsClick) {
+                BadgedBox(
+                    badge = {
+                        if (notifications.isNotEmpty()) {
+                            Badge {
+                                Text(notifications.size.toString())
+                            }
+                        }
+                    }
+                ) {
+                    Icon(Icons.Default.Notifications, contentDescription = "Notifications")
+                }
+            }
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Logout,
+                contentDescription = null,
+                modifier = Modifier.clickable {
+                    onLogout()
+
+                })
+
             /* DropdownMenu(
                  expanded = false*//* State for menu visibility *//*,
                 onDismissRequest = { *//* Close menu *//* }

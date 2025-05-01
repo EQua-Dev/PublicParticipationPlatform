@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Signature
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PetitionDetailsViewModel @Inject constructor(
     private val repository: PetitionRepository,
+    private val notificationRepository: NotificationRepository,
     private val userPreferences: UserPreferences,
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth,
@@ -162,6 +164,7 @@ class PetitionDetailsViewModel @Inject constructor(
                 }
 
                 repository.signPetition(petition.id, updatedSignatures)
+                notificationRepository.sendPetitionSignNotifications(petition, userId)
                 onSuccess()
             }catch (e: Exception) {
                 onFailure(e.message ?: "Signing petition failed")

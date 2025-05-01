@@ -60,4 +60,5 @@
     <string name="budget_details_screen">Budget Details Screen</string>
     <string name="citizen_profile_screen">Citizen Profile Screen</string>
     <string name="my_profile_text">My Profile</string>
+    <string name="notification_screen">Notification Screen</string>
 </resources>

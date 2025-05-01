@@ -32,6 +32,8 @@ import ngui_maryanne.dissertation.publicparticipationplatform.repositories.audit
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.auditlogrepo.AuditLogRepositoryImpl
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepositoryImpl
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepositoryImpl
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepositoryImpl
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.LocationUtils
@@ -177,6 +179,14 @@ object FirebaseModule {
         firestore: FirebaseFirestore,
     ): AdminDashboardRepository {
         return AdminDashboardRepositoryImpl(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationRepository(
+        firestore: FirebaseFirestore,
+    ): NotificationRepository {
+        return NotificationRepositoryImpl(firestore)
     }
 
 }

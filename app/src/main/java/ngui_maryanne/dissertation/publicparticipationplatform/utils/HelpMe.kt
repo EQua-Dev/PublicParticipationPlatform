@@ -20,7 +20,7 @@ import java.util.Locale
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricManager.Authenticators.*
-
+import java.util.Date
 
 
 object HelpMe {
@@ -222,6 +222,24 @@ object HelpMe {
             }
         }
     }
+    fun getTimeAgo(millisString: String): String {
+        return try {
+            val past = Date(millisString.toLong())
+            val now = Date()
+            val seconds = (now.time - past.time) / 1000
+
+            when {
+                seconds < 60 -> "Just now"
+                seconds < 3600 -> "${seconds / 60} min ago"
+                seconds < 86400 -> "${seconds / 3600} hr ago"
+                seconds < 604800 -> "${seconds / 86400} day(s) ago"
+                else -> SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(past)
+            }
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
 
 
 

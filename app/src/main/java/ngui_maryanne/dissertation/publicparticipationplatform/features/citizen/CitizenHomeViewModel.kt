@@ -11,11 +11,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class CitizenHomeViewModel @Inject constructor(
     private val citizenRepository: CitizenRepository,
+    private val notificationRepository: NotificationRepository,
     private val auth: FirebaseAuth
 ) : ViewModel() {
     private val _state = MutableStateFlow(CitizenHomeState())
@@ -23,6 +25,7 @@ class CitizenHomeViewModel @Inject constructor(
 
     init {
         loadCitizenData()
+        loadCitizenNotifications()
     }
 
     private fun loadCitizenData() {
@@ -36,6 +39,23 @@ class CitizenHomeViewModel @Inject constructor(
             }
         }
     }
+
+    private fun loadCitizenNotifications() {
+        val userId = auth.currentUser?.uid ?: return
+
+        notificationRepository.getUserNotificationsRealtime(
+            userId = userId,
+            onResult = { notifications ->
+                _state.value = _state.value.copy(
+                    notifications = notifications.toMutableList()
+                )
+            },
+            onError = { e ->
+                Log.e("TAG", "Error fetching notifications: ${e.localizedMessage}")
+            }
+        )
+    }
+
 
     fun onEvent(event: CitizenHomeEvent) {
         when (event) {

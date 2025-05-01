@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 import java.util.Objects.hash
 import java.util.UUID
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OfficialBudgetDetailsViewModel @Inject constructor(
     private val repository: BudgetRepository,
+    private val notificationRepository: NotificationRepository,
     private val auth: FirebaseAuth,
 ) : ViewModel() {
 
@@ -138,6 +140,10 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
                 }
 
                 repository.voteForBudgetOption(currentState.budget!!.id, updatedResponses)
+                notificationRepository.sendBudgetVoteNotifications(
+                    currentState.budget,
+                    auth.currentUser!!.uid
+                )
                 onSuccess()
                 // Update the UI state to reflect the voted option
                 _uiState.value = currentState.copy(votedOptionId = optionId)
