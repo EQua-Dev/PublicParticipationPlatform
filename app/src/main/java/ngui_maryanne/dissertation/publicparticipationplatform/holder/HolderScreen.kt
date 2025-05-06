@@ -6,8 +6,10 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,7 +24,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -32,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.awesomenessstudios.schoolprojects.criticalthinkingappforkids.providers.LocalNavHost
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.CitizenHomeScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.notification.presentation.NotificationsScreen
@@ -129,6 +136,15 @@ fun HolderScreen(
         val (cartOffset, setCartOffset) = remember {
             mutableStateOf(IntOffset(0, 0))
         }
+        Image(
+            painter = painterResource(id = R.drawable.wallpaper),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(0.1f), // Adjust opacity here (0f - 1f)
+            contentScale = ContentScale.Crop
+        )
+
         ScaffoldSection(
             controller = controller,
             scaffoldState = scaffoldState,

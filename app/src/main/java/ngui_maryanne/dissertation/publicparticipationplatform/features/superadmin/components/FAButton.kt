@@ -125,40 +125,58 @@ fun ExpandableFloatingActionButton(
             ) {
                 AnimatedVisibility(visible = expanded) {
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalAlignment = Alignment.End
                     ) {
-                        // Add Citizen Button
-                        FloatingActionButton(
-                            onClick = {
-                                expanded = false
-                                onAddCitizen()
-                            },
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(48.dp)
+                        // Add Citizen Row
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.PersonAdd,
-                                contentDescription = "Add Citizen"
+                            FloatingActionButton(
+                                onClick = {
+                                    expanded = false
+                                    onAddCitizen()
+                                },
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.PersonAdd,
+                                    contentDescription = "Add Citizen"
+                                )
+                            }
+                            Text(
+                                text = "Add Citizen",
+                                style = MaterialTheme.typography.labelSmall
                             )
                         }
-                        Text(text = "Add Citizen", style = MaterialTheme.typography.labelSmall)
 
-                        // Add Official Button
-                        FloatingActionButton(
-                            onClick = {
-                                expanded = false
-                                onAddOfficial()
-                            },
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(48.dp)
+                        // Add Official Row
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.AccountBox,
-                                contentDescription = "Add Official"
+                            FloatingActionButton(
+                                onClick = {
+                                    expanded = false
+                                    onAddOfficial()
+                                },
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AccountBox,
+                                    contentDescription = "Add Official"
+                                )
+                            }
+                            Text(
+                                text = "Add Official",
+                                style = MaterialTheme.typography.labelSmall
                             )
                         }
-                        Text(text = "Add Official", style = MaterialTheme.typography.labelSmall)
                     }
+
                 }
             }
         }
