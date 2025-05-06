@@ -124,7 +124,6 @@ class OfficialBudgetViewModel @Inject constructor(
                         imageUrl = imageUrl
                     )
                 }
-
                 val budget = Budget(
                     id = budgetId,
                     hash = hash,
@@ -138,7 +137,6 @@ class OfficialBudgetViewModel @Inject constructor(
                     budgetExpiry = System.currentTimeMillis().plus(30 * 24 * 60 * 60 * 1000L).toString(),
                     impact = _uiState.value.impact
                 )
-
                 budgetRepo.createBudget(budget)
                 val announcement = Announcement(
                     id = UUID.randomUUID().toString(),

@@ -80,18 +80,6 @@ fun InitScreen(
                 holderViewModel.saveRole(UserRole.SUPERADMIN)
                 onRoleSelected(UserRole.SUPERADMIN.name)
             })
-        /*    Button(
-                onClick = {
-                    holderViewModel.saveRole(UserRole.SUPERADMIN)
-                    onRoleSelected(UserRole.SUPERADMIN.name)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text("Super Admin")
-            }*/
-
         Spacer(modifier = Modifier.height(16.dp))
 
         // Student Button
@@ -102,19 +90,6 @@ fun InitScreen(
                 holderViewModel.saveRole(UserRole.OFFICIAL)
                 onRoleSelected(UserRole.OFFICIAL.name)
             })
-    /*    Button(
-            onClick = {
-                holderViewModel.saveRole(UserRole.OFFICIAL)
-                onRoleSelected(UserRole.OFFICIAL.name)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            Text("Official")
-        }
-
-     */
         Spacer(modifier = Modifier.height(16.dp))
 
         // Student Button
@@ -125,16 +100,5 @@ fun InitScreen(
             holderViewModel.saveRole(UserRole.CITIZEN)
             onRoleSelected(UserRole.CITIZEN.name)
         })
-     /*   Button(
-            onClick = {
-                holderViewModel.saveRole(UserRole.CITIZEN)
-                onRoleSelected(UserRole.CITIZEN.name)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            Text("Citizen")
-        }*/
     }
 }

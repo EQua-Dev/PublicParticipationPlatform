@@ -46,16 +46,18 @@ sealed class OfficialBottomBarScreen(
 sealed class SuperAdminBottomBarScreen(
     val title: String,
     val icon: Int,
-    val route: String
+    val route: String,
+    val defaultRoute: String
+
 ) {
     object Dashboard :
-        SuperAdminBottomBarScreen("Dashboard", R.drawable.ic_dashboard, "super_admin_dashboard")
+        SuperAdminBottomBarScreen("Dashboard", R.drawable.ic_dashboard, "super_admin_dashboard", "super_admin_dashboard")
 
     object People :
-        SuperAdminBottomBarScreen("People", R.drawable.ic_people, "super_admin_people/{selectedIndex}")
+        SuperAdminBottomBarScreen("People", R.drawable.ic_people, "super_admin_people/{selectedIndex}", "super_admin_people/0")
 
-    object Audit : SuperAdminBottomBarScreen("Audit", R.drawable.ic_audit, "super_admin_audit")
+    object Audit : SuperAdminBottomBarScreen("Audit", R.drawable.ic_audit, "super_admin_audit", "super_admin_audit")
     object Profile :
-        SuperAdminBottomBarScreen("Profile", R.drawable.ic_profile, "super_admin_profile")
+        SuperAdminBottomBarScreen("Profile", R.drawable.ic_profile, "super_admin_profile", "super_admin_profile")
 
 }

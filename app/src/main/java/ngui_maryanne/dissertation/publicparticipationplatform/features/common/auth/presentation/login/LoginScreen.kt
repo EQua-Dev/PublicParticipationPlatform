@@ -88,13 +88,6 @@ fun LoginScreen(
             label = "Email",
             keyboardType = KeyboardType.Email
         )
-        /* OutlinedTextField(
-             value = state.email,
-             onValueChange = { viewModel.onEvent(LoginEvent.EmailChanged(it)) },
-             label = { Text("Email") },
-             modifier = Modifier.fillMaxWidth(),
-
-         )*/
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -102,13 +95,6 @@ fun LoginScreen(
         PasswordTextField(
             password = state.password,
             onPasswordChange = { viewModel.onEvent(LoginEvent.PasswordChanged(it)) })
-        /*  OutlinedTextField(
-              value = state.password,
-              onValueChange = { viewModel.onEvent(LoginEvent.PasswordChanged(it)) },
-              label = { Text("Password") },
-              modifier = Modifier.fillMaxWidth(),
-              visualTransformation = PasswordVisualTransformation()
-          )*/
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -119,12 +105,6 @@ fun LoginScreen(
             iconPosition = ButtonIconPosition.START,
             icon = Icons.Default.Login,
         )
-        /*   Button(
-               onClick = { viewModel.onEvent(LoginEvent.Login) },
-               modifier = Modifier.fillMaxWidth()
-           ) {
-               Text("Login")
-           }*/
 
         Spacer(modifier = Modifier.height(8.dp))
 

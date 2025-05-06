@@ -23,7 +23,6 @@ class CreateOfficialViewModel @Inject constructor(
     fun onEvent(event: CreateOfficialUiEvent) {
         when (event) {
             is CreateOfficialUiEvent.UpdateFirstName -> {
-                Log.d("COVM", "onEvent: ${event.value}")
                 _state.value =
                     _state.value.copy(firstName = event.value)
             }

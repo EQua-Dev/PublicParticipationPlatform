@@ -40,8 +40,12 @@ class OfficialsRepositoryImpl @Inject constructor(
             val officialData =
                 official.copy(id = userId, profileImageUrl = imageUrl, initialPassword = password)
 
-            firestore.collection(OFFICIALS_REF).document(userId).set(officialData).addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
-                TransactionTypes.CREATE_OFFICIAL) }.await()
+            firestore.collection(OFFICIALS_REF).document(userId).set(officialData)
+                .addOnSuccessListener {
+                    blockChainRepository.createBlockchainTransaction(
+                        TransactionTypes.CREATE_OFFICIAL
+                    )
+                }.await()
             onResult(true, null)
         } catch (e: Exception) {
             onResult(false, e.message)
@@ -83,8 +87,11 @@ class OfficialsRepositoryImpl @Inject constructor(
             firestore.collection(OFFICIALS_REF)
                 .document(official.id)
                 .set(official)
-                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
-                    TransactionTypes.UPDATE_PROFILE) }
+                .addOnSuccessListener {
+                    blockChainRepository.createBlockchainTransaction(
+                        TransactionTypes.UPDATE_PROFILE
+                    )
+                }
                 .await()
         } catch (e: Exception) {
             throw Exception("Failed to update official: ${e.message}")

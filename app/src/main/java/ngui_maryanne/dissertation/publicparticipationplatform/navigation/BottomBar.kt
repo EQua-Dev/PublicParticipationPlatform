@@ -117,7 +117,7 @@ fun RowScope.SuperAdminAddItem(
         selected = selected,
         onClick = {
             if (!selected) {
-                navController.navigate(screen.route) {
+                navController.navigate(screen.defaultRoute) {
                     launchSingleTop = true
                     restoreState = true
                 }

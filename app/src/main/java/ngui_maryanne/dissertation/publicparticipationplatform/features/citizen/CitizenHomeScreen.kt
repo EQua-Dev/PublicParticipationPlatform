@@ -1,6 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -59,6 +60,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.utils.LoadingDialo
 import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 import ngui_maryanne.dissertation.publicparticipationplatform.R
+import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AppNotification
@@ -149,17 +151,28 @@ fun CitizenHomeScreen(
 @Composable
 fun AwaitingApprovalScreen() {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // 🖼️ Add image from drawable
+        Image(
+            painter = painterResource(id = R.drawable.waiting), // Replace with your actual drawable name
+            contentDescription = "Awaiting Approval Illustration",
+            modifier = Modifier
+                .size(150.dp) // Adjust size as needed
+                .padding(bottom = 16.dp)
+        )
+
         Text("Awaiting Approval", style = MaterialTheme.typography.headlineMedium)
-        Button(
+
+        CustomButton(
             onClick = { /* Navigate to app guide */ },
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text("Learn About the App")
-        }
+            text = "Learn About the App",
+            modifier = Modifier.padding(top = 16.dp)
+        )
     }
 }
 

@@ -2,9 +2,12 @@ package ngui_maryanne.dissertation.publicparticipationplatform.features.common.a
 
 import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -22,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
@@ -29,6 +34,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomT
 import ngui_maryanne.dissertation.publicparticipationplatform.components.PasswordTextField
 import ngui_maryanne.dissertation.publicparticipationplatform.components.PhoneNumberInput
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login.LoginEvent
+import ngui_maryanne.dissertation.publicparticipationplatform.ui.theme.PublicParticipationPlatformTheme
 
 @Composable
 fun CitizenRegistrationStepOne(
@@ -116,7 +122,8 @@ fun CitizenRegistrationStepOne(
                 onClick = { onEvent(CitizenRegistrationEvent.SendOtp(activity!!)) },
                 enabled = state.firstName.isNotBlank() &&
                         state.lastName.isNotBlank() &&
-                        state.phoneNumber.isNotBlank()
+                        state.phoneNumber.isNotBlank() &&
+                !state.isLoading
             )
             /*  Button(
                   onClick = { onEvent(CitizenRegistrationEvent.SendOtp(activity!!)) },
@@ -130,21 +137,27 @@ fun CitizenRegistrationStepOne(
         } else if (state.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         } else {
-            OutlinedTextField(
-                value = state.otp,
-                onValueChange = { onEvent(CitizenRegistrationEvent.OtpChanged(it)) },
-                label = { Text("OTP") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                Column {
+                    Text(text = "Enter OTP")
+                    CustomTextField(
+                        value = state.otp,
+                        onValueChange = { onEvent(CitizenRegistrationEvent.OtpChanged(it)) },
+                        label ="OTP",
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardType = KeyboardType.Number,
+                    )
 
-            Button(
-                onClick = { onEvent(CitizenRegistrationEvent.VerifyOtp) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = state.otp.length == 6
-            ) {
-                Text("Verify OTP")
+                    Button(
+                        onClick = { onEvent(CitizenRegistrationEvent.VerifyOtp) },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = state.otp.length == 6
+                    ) {
+                        Text("Verify OTP")
+                    }
+                }
             }
+         
         }
 
         SnackbarHost(
@@ -171,4 +184,34 @@ fun CitizenRegistrationStepOne(
             }
         }
     }
+}
+
+@Preview (showBackground = true, showSystemUi = true)
+@Composable
+private fun OTPScreenPreview() {
+    PublicParticipationPlatformTheme {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp), contentAlignment = Alignment.Center){
+            Column {
+                Text(text = "Enter OTP", textAlign = TextAlign.Center)
+                CustomTextField(
+                    value = "",
+                    onValueChange = {  },
+                    label ="OTP",
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardType = KeyboardType.Number,
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+                CustomButton(
+                    text = "Verify OTP",
+                    onClick = {  },
+                    modifier = Modifier.fillMaxWidth(),
+
+                )
+            }
+        }
+    }
+
 }
