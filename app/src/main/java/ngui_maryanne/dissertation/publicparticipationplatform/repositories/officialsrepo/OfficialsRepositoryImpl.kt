@@ -6,6 +6,8 @@ import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.OF
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
@@ -95,6 +97,26 @@ class OfficialsRepositoryImpl @Inject constructor(
                 .await()
         } catch (e: Exception) {
             throw Exception("Failed to update official: ${e.message}")
+        }
+    }
+
+
+    override fun getOfficialByIdRealtime(officialId: String) = callbackFlow {
+        val registration = FirebaseFirestore.getInstance()
+            .collection(OFFICIALS_REF)
+            .document(officialId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val official = snapshot?.toObject(Official::class.java)?.copy(id = snapshot.id)
+                trySend(official)
+            }
+
+        awaitClose {
+            registration.remove()
         }
     }
 }

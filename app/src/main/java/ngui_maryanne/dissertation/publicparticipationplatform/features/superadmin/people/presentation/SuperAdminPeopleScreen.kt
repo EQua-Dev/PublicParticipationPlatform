@@ -69,7 +69,7 @@ fun SuperAdminPeopleScreen(
 
             when (uiState.selectedTab) {
                 0 -> CitizenListScreen()
-                1 -> OfficialListScreen()
+                1 -> OfficialListScreen(navController)
             }
         }
     }

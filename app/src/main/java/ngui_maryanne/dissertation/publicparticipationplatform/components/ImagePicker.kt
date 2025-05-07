@@ -20,7 +20,9 @@ import coil.compose.rememberImagePainter
 
 @Composable
 fun ImagePicker(
-    onImageSelected: (Uri) -> Unit
+    modifier: Modifier = Modifier,
+    onImageSelected: (Uri) -> Unit,
+    emptyStateText: String = "Select Cover Image"
 ) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -50,7 +52,7 @@ fun ImagePicker(
                 modifier = Modifier.fillMaxSize()
             )
         } else {
-            Text("Select Cover Image")
+            Text(emptyStateText)
         }
     }
 }

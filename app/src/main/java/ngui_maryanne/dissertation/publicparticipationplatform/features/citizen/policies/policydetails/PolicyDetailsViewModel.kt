@@ -14,10 +14,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Comment
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.citizenrepo.CitizenRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.commentrepo.CommentRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.policyrepo.PolicyRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.pollsrepo.PollsRepository
+import java.util.UUID
 import javax.inject.Inject
 
 // PolicyDetailsViewModel.kt
@@ -26,6 +28,7 @@ class PolicyDetailsViewModel @Inject constructor(
     private val policyRepository: PolicyRepository,
     private val commentRepository: CommentRepository,
     private val notificationRepository: NotificationRepository,
+    private val citizenRepository: CitizenRepository,
     private val auth: FirebaseAuth,
     private val pollsRepository: PollsRepository
 ) : ViewModel() {
@@ -136,6 +139,17 @@ class PolicyDetailsViewModel @Inject constructor(
         }
     }
 
+    fun getCitizenNameRealtime(userId: String, onResult: (String) -> Unit): ListenerRegistration {
+        return citizenRepository.getCitizenRealtime(userId) { citizen ->
+            val name = if (citizen != null) {
+                "${citizen.firstName} ${citizen.lastName}"
+            } else {
+                "User ${userId.take(6)}"
+            }
+            onResult(name)
+        }
+    }
+
     private fun submitComment() {
         val commentText = _uiState.value.newCommentText
         if (commentText.isBlank()) return
@@ -148,7 +162,8 @@ class PolicyDetailsViewModel @Inject constructor(
                 val comment = Comment(
                     comment = commentText,
                     userId = auth.currentUser!!.uid,
-                    isAnonymous = _uiState.value.isAnonymous,
+                    anonymous = _uiState.value.isAnonymous,
+                    id = UUID.randomUUID().toString(),
                     dateCreated = System.currentTimeMillis().toString()
                 )
 

@@ -34,7 +34,7 @@ fun Context.toast(message: String) =
 @Composable
 fun LoadingDialog(modifier: Modifier = Modifier) {
 
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.crithink))
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
 
     Box(
         modifier = Modifier

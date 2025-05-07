@@ -142,6 +142,12 @@ sealed class Screen(
         title = R.string.notification_screen,
     )
 
+    object OfficialDetailsScreen : Screen(
+        route = "official_details_screen/{officialId}",
+        title = R.string.official_details_screen,
+    )
+
+
     /*
         object ChildHome : Screen(
             route = "childhome/{childId}",

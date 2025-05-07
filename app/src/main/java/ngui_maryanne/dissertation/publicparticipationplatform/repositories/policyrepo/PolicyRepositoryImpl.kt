@@ -55,7 +55,7 @@ class PolicyRepositoryImpl @Inject constructor(
             "policyCoverImage" to imageUrl,
         ) + otherDetails
 
-        firestore.collection("policies").document(policyId)
+        firestore.collection(POLICIES_REF).document(policyId)
             .update(updates).addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
                 TransactionTypes.UPDATE_POLICY) }
     }

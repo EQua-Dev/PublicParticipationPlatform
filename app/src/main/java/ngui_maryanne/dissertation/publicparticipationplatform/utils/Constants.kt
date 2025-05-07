@@ -16,6 +16,7 @@ object Constants {
     )
 
     val countiesMap = listOf(
+        "All" to "All",
         "Mombasa" to "Mombasa",
         "Kwale" to "Kwale",
         "Kilifi" to "Kilifi",
@@ -63,6 +64,15 @@ object Constants {
         "Kisii" to "Kisii",
         "Nyamira" to "Nyamira",
         "Nairobi City" to "Nairobi City"
+    )
+
+    val permissions = listOf(
+        "create_policy",
+        "create_poll",
+        "create_projects",
+        "update_policy_stage",
+        "add_citizens",
+        "approve_citizens"
     )
     const val OFFICIALS_REF = "Officials"
     const val NATIONAL_DB_REF = "National Database"

@@ -4,6 +4,6 @@ data class Comment(
     val id: String = "",
     val userId: String = "",
     val comment: String = "",
-    val isAnonymous: Boolean = false,
+    val anonymous: Boolean = false,
     val dateCreated: String = ""
 )

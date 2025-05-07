@@ -28,7 +28,7 @@ class OfficialListViewModel @Inject constructor(
             if (error != null) {
                 _errorMessage.value = error
             } else {
-                _uiState.value = officials
+                _uiState.value = officials.filter { it.active }
             }
         }
     }

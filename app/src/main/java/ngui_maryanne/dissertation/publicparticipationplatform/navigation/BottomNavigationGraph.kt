@@ -27,7 +27,6 @@ import ngui_maryanne.dissertation.publicparticipationplatform.features.officials
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.OfficialPoliciesScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.createpolicy.CreatePolicyScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.OfficialPolicyDetailsScreen
-import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls.OfficialPollsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls.createpoll.CreatePollScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.profile.OfficialProfileScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.profile.audit.presentation.OfficialAuditScreen
@@ -35,6 +34,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmi
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.dashboard.presentation.SuperAdminDashboardScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.citizens.presentation.CreateCitizenScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.officials.presentation.CreateOfficialScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.officials.officialdetail.OfficialDetailScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.presentation.SuperAdminPeopleScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.profile.presentation.SuperAdminProfileScreen
 
@@ -322,6 +322,20 @@ fun SuperAdminBottomNavigationGraph(navController: NavHostController) {
 
             BudgetDetailsScreen(
                 budgetId = budgetId!!,
+                navController = navController
+            )
+        }
+
+        composable(
+            Screen.OfficialDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "officialId") { type = NavType.StringType }
+            ),
+        ) {
+            val officialId = it.arguments?.getString("officialId")
+
+            OfficialDetailScreen(
+                officialId = officialId!!,
                 navController = navController
             )
         }

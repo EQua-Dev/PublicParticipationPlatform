@@ -1,5 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.people.officials.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,11 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Official
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 
 @Composable
 fun OfficialListScreen(
+    navController: NavHostController,
     viewModel: OfficialListViewModel = hiltViewModel()
 ) {
     val officials by viewModel.uiState
@@ -55,6 +60,14 @@ fun OfficialListScreen(
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(officials) { official ->
                     OfficialItem(official)
+                    {
+                        navController.navigate(
+                            Screen.OfficialDetailsScreen.route.replace(
+                                "{officialId}",
+                                official.id
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -62,11 +75,12 @@ fun OfficialListScreen(
 }
 
 @Composable
-fun OfficialItem(official: Official) {
+fun OfficialItem(official: Official, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { onClick() },
         elevation = CardDefaults.elevatedCardElevation()
     ) {
         Row(modifier = Modifier.padding(16.dp)) {

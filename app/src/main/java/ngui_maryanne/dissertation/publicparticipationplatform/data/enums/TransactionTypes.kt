@@ -20,5 +20,7 @@ enum class TransactionTypes {
     LOGOUT,
     SIGN_PETITION,
     UPDATE_POLICY,
-    DELETE_POLICY
+    DELETE_POLICY,
+    UPDATE_OFFICIAL,
+    DEACTIVATE_OFFICIAL
 }

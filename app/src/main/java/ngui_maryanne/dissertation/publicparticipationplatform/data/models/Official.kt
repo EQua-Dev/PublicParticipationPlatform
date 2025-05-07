@@ -8,5 +8,6 @@ data class Official(
     val phoneNumber: String = "",
     val permissions: List<String> = emptyList(),
     val profileImageUrl: String? = null,
-    val initialPassword: String? = ""
+    val initialPassword: String? = "",
+    val active: Boolean = true
 )

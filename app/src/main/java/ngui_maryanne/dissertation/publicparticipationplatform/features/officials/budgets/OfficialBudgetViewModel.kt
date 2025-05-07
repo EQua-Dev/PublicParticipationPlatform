@@ -97,7 +97,7 @@ class OfficialBudgetViewModel @Inject constructor(
     private fun fetchBudgets() {
         viewModelScope.launch {
             budgetRepo.getAllBudgets().collect { budgetList ->
-                _uiState.value = _uiState.value.copy(budgets = budgetList)
+                _uiState.value = _uiState.value.copy(budgets = budgetList.filter { it.isActive })
             }
         }
     }

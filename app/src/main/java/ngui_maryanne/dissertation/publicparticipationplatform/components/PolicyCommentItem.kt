@@ -14,15 +14,36 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Comment
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.policydetails.PolicyDetailsViewModel
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 
 @Composable
-fun CommentItem(comment: Comment) {
+fun CommentItem(comment: Comment, viewModel: PolicyDetailsViewModel = hiltViewModel()) {
+    var displayName by remember { mutableStateOf("User ${comment.userId.take(6)}") }
+
+    DisposableEffect(comment.userId) {
+        val listener = if (!comment.anonymous) {
+            viewModel.getCitizenNameRealtime(comment.userId) {
+                displayName = it
+            }
+        } else null
+
+        onDispose {
+            listener?.remove()
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,11 +57,7 @@ fun CommentItem(comment: Comment) {
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
-                    text = if (comment.isAnonymous) "Anonymous User" else "User ${
-                        comment.userId.take(
-                            6
-                        )
-                    }",
+                    text = displayName,
                     modifier = Modifier.padding(start = 8.dp),
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodyMedium

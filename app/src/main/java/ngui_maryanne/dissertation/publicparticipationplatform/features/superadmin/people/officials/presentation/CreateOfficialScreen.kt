@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomTextField
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.permissions
 
 @Composable
 fun CreateOfficialScreen(
@@ -31,14 +32,7 @@ fun CreateOfficialScreen(
     viewModel: CreateOfficialViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.value
-    val permissions = listOf(
-        "create_policy",
-        "create_poll",
-        "create_projects",
-        "update_policy_stage",
-        "add_citizens",
-        "approve_citizens"
-    )
+
 
     Column(
         modifier = modifier

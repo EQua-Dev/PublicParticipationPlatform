@@ -73,7 +73,7 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
 
     override suspend fun toggleBudgetActivation(budgetId: String, isActive: Boolean) {
         try {
-            firestore.collection("budgets")
+            firestore.collection(BUDGETS_REF)
                 .document(budgetId)
                 .update("isActive", isActive)  // Update the 'isActive' field to the new status
                 .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
