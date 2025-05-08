@@ -16,13 +16,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.ProgressIndicatorDefaults
@@ -37,6 +41,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.google.firebase.auth.FirebaseAuth
 import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.daysToExpiry
@@ -63,10 +70,15 @@ fun PetitionDetailsScreen(
     val state = viewModel.state.value
     val petition = state.petition
 
+    val currentUser = FirebaseAuth.getInstance().currentUser!!.uid
+
     val context = LocalContext.current
     val activity = remember(context) {
         context.findActivity()?.takeIf { it is FragmentActivity } as? FragmentActivity
     }
+
+    val showBottomSheet = remember { mutableStateOf(false) }
+
 
     LaunchedEffect(key1 = petitionId) {
         viewModel.onEvent(PetitionDetailsEvent.LoadPetition(petitionId))
@@ -99,44 +111,76 @@ fun PetitionDetailsScreen(
                             }
                             Text(text = it.title, style = MaterialTheme.typography.titleMedium)
                         }
-                        Text(
-                            "${it.signatures.size}/${it.signatureGoal} signatures",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        if (state.currentUserId != it.createdBy
+                            && !state.hasSigned && state.currentUserRole == UserRole.CITIZEN.name) {
+                            Button(onClick = {
+                                activity?.let { fragmentActivity ->
+                                    Log.d("TAG", "PetitionDetailsScreen: yes fragment")
+                                    viewModel.verifyAndSignPetition(
+                                        activity = fragmentActivity,
+                                        userId = state.currentUserId,
+                                        petition = state.petition,
+                                        hashType = "SHA-256",
+                                        isAnonymous = false,
+                                        onSuccess = {
+                                            viewModel.onEvent(
+                                                PetitionDetailsEvent.LoadPetition(
+                                                    petitionId
+                                                )
+                                            )
+                                        },
+                                        onFailure = { error -> viewModel.updateError(error) }
+                                    )
+                                } ?: run {
+                                    // Handle case where activity isn't available
+                                    // Maybe show error or use alternative authentication
+                                    Log.d("TAG", "PetitionDetailsScreen: no fragment")
+                                }
+                            }) {
+                                Text("Sign")
+                            }
+                        } else if (currentUser == it.createdBy) {
+                            FloatingActionButton(
+                                onClick = { showBottomSheet.value = true },
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = "Edit Petition")
+                            }
+                        }
                     }
                 }
             )
 
             Spacer(Modifier.height(16.dp))
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(16f / 9f)
-                        .background(colorScheme.surfaceVariant)
-                        .clip(MaterialTheme.shapes.large)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+                    .background(colorScheme.surfaceVariant)
+                    .clip(MaterialTheme.shapes.large)
 
-                ) {
+            ) {
 
-                    if (it.coverImage.isNotEmpty()) {
-                        AsyncImage(
-                            model = it.coverImage,
-                            contentDescription = "Petition cover",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_petitions),
-                            contentDescription = "Petition placeholder",
-                            modifier = Modifier
-                                .size(64.dp)
-                                .align(Alignment.Center),
-                            tint = colorScheme.onSurfaceVariant
-                        )
-                    }
-
+                if (it.coverImage.isNotEmpty()) {
+                    AsyncImage(
+                        model = it.coverImage,
+                        contentDescription = "Petition cover",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_petitions),
+                        contentDescription = "Petition placeholder",
+                        modifier = Modifier
+                            .size(64.dp)
+                            .align(Alignment.Center),
+                        tint = colorScheme.onSurfaceVariant
+                    )
                 }
+
+            }
 
             Text(text = "County: ${it.county}", style = MaterialTheme.typography.bodyMedium)
 
@@ -145,41 +189,20 @@ fun PetitionDetailsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = it.description, modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium)
-                if (state.currentUserId != it.createdBy && !state.hasSigned && state.currentUserRole == UserRole.CITIZEN.name) {
-                    Button(onClick = { activity?.let { fragmentActivity ->
-                        Log.d("TAG", "PetitionDetailsScreen: yes fragment")
-                        viewModel.verifyAndSignPetition(
-                            activity = fragmentActivity,
-                            userId = state.currentUserId,
-                            petition = state.petition,
-                            hashType = "SHA-256",
-                            isAnonymous = false,
-                            onSuccess = {
-                                viewModel.onEvent(
-                                    PetitionDetailsEvent.LoadPetition(
-                                        petitionId
-                                    )
-                                )
-                            },
-                            onFailure = { error -> viewModel.updateError(error)}
-                        )
-                    } ?: run {
-                        // Handle case where activity isn't available
-                        // Maybe show error or use alternative authentication
-                        Log.d("TAG", "PetitionDetailsScreen: no fragment")
-                    }}) {
-                        Text("Sign")
-                    }
-                }
+                Text(
+                    text = it.description, modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
             }
 
             Spacer(Modifier.height(16.dp))
             Text("Request Goals", style = MaterialTheme.typography.titleSmall)
             it.requestGoals.forEach { goal ->
-                Text("- $goal",
-                    style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "- $goal",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
 
             /*  Spacer(Modifier.height(16.dp))
@@ -191,23 +214,52 @@ fun PetitionDetailsScreen(
             Spacer(Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Target")
-                Text("${it.daysToExpiry()} days left",
-                    style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "${it.daysToExpiry()} days left",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
 
             Spacer(Modifier.height(8.dp))
 
+            LinearProgressIndicator(
+                progress = { progress },
+                trackColor = Color.Gray,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(15.dp),
+                color = Color.Blue,
+                strokeCap = StrokeCap.Round,
+            )
 
-            /*       LinearProgressIndicator(
-                       progress = { 0.5f },
-                       trackColor = Color.Gray,
-                       modifier = Modifier
-                           .width(200.dp)
-                           .height(15.dp),
-                       color = Color.Blue,
-                       strokeCap = StrokeCap.Round,
-                   )
-       */
+            Text(
+                "${it.signatures.size}/${it.signatureGoal} signatures",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        // Show bottom sheet if the user is the creator of the petition
+        if (showBottomSheet.value) {
+            EditPetitionBottomSheet(
+                petition = state.petition,
+                state = state,
+                onDismiss = { showBottomSheet.value = false },
+                onSave = { title, description, otherDetails ->
+                    viewModel.onEvent(
+                        PetitionDetailsEvent.UpdatePetition(
+                            title,
+                            description,
+                            otherDetails
+                        )
+                    )
+                    showBottomSheet.value = false
+                },
+                onDelete = {
+                    viewModel.onEvent(PetitionDetailsEvent.DeletePetition)
+                    showBottomSheet.value = false
+                }
+            )
         }
     }
 }
+

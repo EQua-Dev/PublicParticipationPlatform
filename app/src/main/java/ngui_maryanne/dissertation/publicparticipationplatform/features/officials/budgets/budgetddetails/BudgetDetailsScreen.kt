@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +43,9 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails.EditPetitionBottomSheet
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails.PetitionDetailsEvent
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetViewModel
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.findActivity
@@ -58,6 +62,8 @@ fun BudgetDetailsScreen(
 ) {
     val state = viewModel.uiState.value
     val detailsState = detailsViewModel.uiState.value
+
+    val showBottomSheet = remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val activity = remember(context) {
@@ -198,11 +204,32 @@ fun BudgetDetailsScreen(
                 CustomButton(
                     text = "Edit Budget Details",
                     onClick = {
-//                        navController.navigate("edit_budget/$budgetId")
+                        showBottomSheet.value = true
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+        }
+
+        // Show bottom sheet if the user is the creator of the petition
+        if (showBottomSheet.value) {
+            EditBudgetBottomSheet(
+                budget = detailsState.budget!!,
+                onSave = { amount: String, note: String, impact: String, budgetOptions: MutableList<BudgetOption> ->
+                    detailsViewModel.submitBudgetEdit(
+                        detailsState.budget.id,
+                        amount,
+                        note,
+                        impact,
+                        budgetOptions
+                    )
+                    showBottomSheet.value = false
+                },
+                onClose = {
+                    showBottomSheet.value = false
+                }
+            )
+
         }
     }
 }

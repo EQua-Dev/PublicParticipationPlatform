@@ -1,8 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile
 
 import android.net.Uri
-import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.AppLanguage
-import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citizen
 
 sealed class CitizenProfileEvent {
     object LoadProfile : CitizenProfileEvent()
@@ -16,5 +14,5 @@ sealed class CitizenProfileEvent {
     data class OccupationChanged(val value: String) : CitizenProfileEvent()
     data class CountyOfResidenceChanged(val value: String) : CitizenProfileEvent()
     data class ProfileImageSelected(val uri: Uri) : CitizenProfileEvent()
-    data class LanguageChanged(val language: AppLanguage) : CitizenProfileEvent()
+    data class LanguageChanged(val language: ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage) : CitizenProfileEvent()
 }

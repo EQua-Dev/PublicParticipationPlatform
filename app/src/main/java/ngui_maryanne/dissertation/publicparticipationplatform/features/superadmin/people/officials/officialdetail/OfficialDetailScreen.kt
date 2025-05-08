@@ -19,10 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,7 +28,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,8 +50,8 @@ import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomB
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomTextField
 import ngui_maryanne.dissertation.publicparticipationplatform.components.ImagePicker
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Official
+import ngui_maryanne.dissertation.publicparticipationplatform.ui.components.LoadingDialog
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.permissions
-import ngui_maryanne.dissertation.publicparticipationplatform.utils.LoadingDialog
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable

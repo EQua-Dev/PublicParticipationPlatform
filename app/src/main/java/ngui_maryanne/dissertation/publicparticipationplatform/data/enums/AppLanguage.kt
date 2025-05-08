@@ -1,5 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.data.enums
 
+/*
 enum class AppLanguage(val code: String) {
     ENGLISH("en"),
     SWAHILI("sw");
@@ -10,3 +11,4 @@ enum class AppLanguage(val code: String) {
         }
     }
 }
+*/

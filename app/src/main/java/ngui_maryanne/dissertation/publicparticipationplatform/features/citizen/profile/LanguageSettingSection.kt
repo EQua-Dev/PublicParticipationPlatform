@@ -6,21 +6,90 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.AppLanguage
 
+
+
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.res.Configuration
+import android.os.Build
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import java.util.Locale
+
+
+enum class AppLanguage(val code: String, val locale: Locale) {
+    ENGLISH("en", Locale("en")),
+    SWAHILI("sw", Locale("sw")),
+    // Add more as needed
+
+    ;
+
+    companion object {
+        fun fromCode(code: String): AppLanguage = values().find { it.code == code } ?: ENGLISH
+    }
+}
+
+// Utility class to manage language settings
+object LanguageHelper {
+    // SharedPreferences key
+    private const val PREF_NAME = "app_language_pref"
+    private const val KEY_LANGUAGE = "selected_language"
+
+    // Save selected language
+    fun saveLanguage(context: Context, language: AppLanguage) {
+        val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        sharedPreferences.edit().putString(KEY_LANGUAGE, language.code).apply()
+    }
+    fun getLanguage(context: Context): AppLanguage {
+        val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        val languageCode = sharedPreferences.getString(KEY_LANGUAGE, AppLanguage.ENGLISH.code)
+        return AppLanguage.fromCode(languageCode ?: AppLanguage.ENGLISH.code)
+    }
+
+    // Update locale configuration
+    fun updateLocale(context: Context, language: AppLanguage): ContextWrapper {
+        var newContext = context
+        val locale = language.locale
+        Locale.setDefault(locale)
+
+        val resources = context.resources
+        val configuration = Configuration(resources.configuration)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            configuration.setLocale(locale)
+            newContext = context.createConfigurationContext(configuration)
+        } else {
+            configuration.locale = locale
+            resources.updateConfiguration(configuration, resources.displayMetrics)
+        }
+
+        return ContextWrapper(newContext)
+    }
+
+    // Restart the activity to apply language changes
+    fun restartActivity(activity: Activity?) {
+        activity?.let {
+            val intent = it.intent
+            it.finish()
+            it.startActivity(intent)
+            it.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
+    }
+}
 
 @Composable
 fun LanguageSettingSection(
@@ -28,8 +97,21 @@ fun LanguageSettingSection(
     selectedLanguage: AppLanguage,
     onLanguageSelected: (AppLanguage) -> Unit
 ) {
-    val languages = listOf(AppLanguage.ENGLISH,AppLanguage.SWAHILI)
+    val languages = AppLanguage.values().toList()
     var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    // Get the activity from the context
+    fun findActivity(context: Context): Activity? {
+        var currentContext = context
+        while (currentContext is ContextWrapper) {
+            if (currentContext is Activity) {
+                return currentContext
+            }
+            currentContext = currentContext.baseContext
+        }
+        return null
+    }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -49,7 +131,7 @@ fun LanguageSettingSection(
                     .padding(12.dp)
             ) {
                 Text(
-                    text = selectedLanguage.name.ifEmpty { "Select Language" },
+                    text = selectedLanguage.name.capitalize(),
                     style = MaterialTheme.typography.bodyMedium
                 )
 
@@ -59,9 +141,19 @@ fun LanguageSettingSection(
                 ) {
                     languages.forEach { language ->
                         DropdownMenuItem(
-                            text = { Text(text = language.name) },
+                            text = { Text(text = language.name.capitalize()) },
                             onClick = {
+                                // Update language in preferences
+                                LanguageHelper.saveLanguage(context, language)
+
+                                // Update UI state
                                 onLanguageSelected(language)
+
+                                // Apply language change by updating configuration and restarting
+                                val activity = findActivity(context)
+                                LanguageHelper.updateLocale(context, language)
+                                LanguageHelper.restartActivity(activity)
+
                                 expanded = false
                             }
                         )
@@ -70,7 +162,7 @@ fun LanguageSettingSection(
             }
         } else {
             Text(
-                text = selectedLanguage.name.ifEmpty { "Not Set" },
+                text = selectedLanguage.name.capitalize().ifEmpty { "Not Set" },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -79,5 +171,12 @@ fun LanguageSettingSection(
                     .padding(12.dp)
             )
         }
+    }
+}
+
+// Extension function to capitalize first letter of enum name for display
+private fun String.capitalize(): String {
+    return this.lowercase().replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
     }
 }

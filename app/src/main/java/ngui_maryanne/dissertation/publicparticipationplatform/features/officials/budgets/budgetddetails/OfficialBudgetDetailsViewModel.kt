@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
@@ -175,5 +176,45 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
             }
         }
     }
+
+    fun submitBudgetEdit(
+        budgetId: String,
+        amount: String,
+        note: String,
+        impact: String,
+        budgetOptions: MutableList<BudgetOption>
+    ) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+
+            try {
+                val updatedFields = mapOf(
+                    "amount" to amount,
+                    "budgetNote" to note,
+                    "impact" to impact,
+                    "budgetOptions" to budgetOptions
+                )
+
+                repository.updateBudgetDetails(budgetId, updatedFields)
+                notificationRepository.sendBudgetVoteNotifications(
+                    _uiState.value.budget!!,
+                    auth.currentUser!!.uid
+                )
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    editSuccess = true,
+                    message = "Budget successfully updated"
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    editSuccess = false,
+                    message = e.message ?: "An error occurred while updating the budget"
+                )
+            }
+        }
+    }
+
 
 }

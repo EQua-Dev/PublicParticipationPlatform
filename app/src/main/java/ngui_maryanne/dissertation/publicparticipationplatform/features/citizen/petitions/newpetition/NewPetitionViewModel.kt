@@ -80,6 +80,11 @@ class PetitionViewModel @Inject constructor(
                     (_newPetitionState.value.targetSignatures + event.diff).coerceAtLeast(200)
                 _newPetitionState.value = _newPetitionState.value.copy(targetSignatures = newCount)
             }
+
+            is NewPetitionEvent.OnTargetSignatureManuallyChanged -> {
+                _newPetitionState.value =
+                    _newPetitionState.value.copy(targetSignatures = event.newValue)
+            }
         }
     }
 

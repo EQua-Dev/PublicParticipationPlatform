@@ -6,6 +6,8 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 data class BudgetDetailsState(
     val isLoading: Boolean = false,
     val error: String? = null,
+    val editSuccess: Boolean = false,
+    val message: String? = null,
     val budget: Budget? = null,
     val hasVoted: Boolean = false,
     val userVoteOptionId: String? = null,

@@ -31,28 +31,6 @@ fun Context.toast(message: String) =
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
 
-@Composable
-fun LoadingDialog(modifier: Modifier = Modifier) {
-
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f)), // 50% opacity
-        contentAlignment = Alignment.Center
-    ) {
-
-        LottieAnimation(
-            composition = composition,
-            iterations = LottieConstants.IterateForever, modifier = Modifier
-                .width(150.dp)
-                .height(150.dp)
-        )
-    }
-}
-
-
 fun openWhatsapp(phoneNumber: String, context: Context) {
 
     val pm = context.packageManager

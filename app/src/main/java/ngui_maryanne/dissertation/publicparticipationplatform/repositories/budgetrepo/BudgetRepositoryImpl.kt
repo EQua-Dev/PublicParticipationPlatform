@@ -101,5 +101,20 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
         }
     }
 
+    override suspend fun updateBudgetDetails(budgetId: String, updatedFields: Map<String, Any>) {
+        try {
+            firestore.collection(BUDGETS_REF)
+                .document(budgetId)
+                .update(updatedFields)
+                .addOnSuccessListener {
+                    blockChainRepository.createBlockchainTransaction(TransactionTypes.EDIT_BUDGET)
+                }
+                .await()
+        } catch (e: Exception) {
+            throw Exception("Failed to update budget details: ${e.message}")
+        }
+    }
+
+
 
 }

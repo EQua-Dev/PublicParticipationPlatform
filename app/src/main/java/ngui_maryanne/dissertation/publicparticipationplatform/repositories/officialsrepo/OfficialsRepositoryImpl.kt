@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Common.mAuth
 import javax.inject.Inject
 
 class OfficialsRepositoryImpl @Inject constructor(
@@ -47,6 +48,14 @@ class OfficialsRepositoryImpl @Inject constructor(
                     blockChainRepository.createBlockchainTransaction(
                         TransactionTypes.CREATE_OFFICIAL
                     )
+                    auth.sendPasswordResetEmail(official.email)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+
+                            } else {
+
+                            }
+                        }
                 }.await()
             onResult(true, null)
         } catch (e: Exception) {

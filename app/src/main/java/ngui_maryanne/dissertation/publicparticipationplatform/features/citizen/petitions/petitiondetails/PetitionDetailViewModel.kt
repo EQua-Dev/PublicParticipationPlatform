@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,8 +14,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Signature
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.OfficialPolicyDetailsEvent
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import java.util.Objects.hash
@@ -25,6 +28,7 @@ import javax.inject.Inject
 class PetitionDetailsViewModel @Inject constructor(
     private val repository: PetitionRepository,
     private val notificationRepository: NotificationRepository,
+    private val storageRepository: StorageRepository,
     private val userPreferences: UserPreferences,
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth,
@@ -84,6 +88,10 @@ class PetitionDetailsViewModel @Inject constructor(
                     }
                 }*/
             }
+
+            is PetitionDetailsEvent.UpdatePetition -> updatePetition(event.name, event.imageUrl, event.otherDetails)
+            PetitionDetailsEvent.DeletePetition -> deletePolicy()
+
         }
     }
 
@@ -168,6 +176,44 @@ class PetitionDetailsViewModel @Inject constructor(
                 onSuccess()
             }catch (e: Exception) {
                 onFailure(e.message ?: "Signing petition failed")
+            }
+        }
+    }
+
+
+    private fun updatePetition(name: String, imageUrl: String, otherDetails: Map<String, Any?>) {
+        viewModelScope.launch {
+            try {
+                val petitionId = _state.value.petition?.id ?: return@launch
+                val storageImageUrl = imageUrl.let { uri ->
+                    storageRepository.uploadPolicyImage(uri.toUri())
+                } ?: ""
+
+                repository.updatePetition(petitionId, name, storageImageUrl, otherDetails)
+                _state.value = _state.value.copy(
+                    error = null
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    error = "Failed to update policy: ${e.message}"
+                )
+            }
+        }
+    }
+
+    private fun deletePolicy() {
+        viewModelScope.launch {
+            try {
+                val petitionId = _state.value.petition?.id ?: return@launch
+                repository.deletePetition(petitionId)
+                _state.value = _state.value.copy(
+                    error = null
+                )
+                // Maybe navigate back after deleting? Trigger a nav action here if you want
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    error = "Failed to delete petition: ${e.message}"
+                )
             }
         }
     }

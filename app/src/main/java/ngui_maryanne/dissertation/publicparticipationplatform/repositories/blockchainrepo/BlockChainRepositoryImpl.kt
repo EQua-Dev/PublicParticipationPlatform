@@ -28,12 +28,6 @@ class BlockChainRepositoryImpl @Inject constructor(
             .get()
             .addOnSuccessListener { snapshot ->
                 val previousHash = snapshot.documents.firstOrNull()?.getString("hash") ?: "0"
-                /* val transaction = AuditLog(
-                     createdBy = createdById,
-                     previousHash = previousHash,
-                     transactionType = transactionType.name
-                 ).copy(hash = AuditLog().computeHash())
- */
 
                 try {
                     // Get the current location

@@ -2,6 +2,7 @@ package ngui_maryanne.dissertation.publicparticipationplatform.holder
 
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.CitizenProfileState
 import javax.inject.Inject
 
@@ -23,16 +25,22 @@ class HolderViewModel @Inject constructor(
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
-    private val _state = MutableSharedFlow<HolderUiState>(replay = 1)
-    val state = _state.asSharedFlow()
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
 
     init {
         viewModelScope.launch {
             userPreferences.languageFlow
+                .distinctUntilChanged()
                 .collect { lang ->
-                    val newState = HolderUiState(selectedLanguage = lang)
-                    _state.emit(newState)
+                    _selectedLanguage.value = lang
                 }
+        }
+    }
+
+    fun saveLanguage(language: AppLanguage) {
+        viewModelScope.launch {
+            userPreferences.saveLanguage(language)
         }
     }
 
@@ -41,5 +49,4 @@ class HolderViewModel @Inject constructor(
             userPreferences.saveRole(role)
         }
     }
-
 }

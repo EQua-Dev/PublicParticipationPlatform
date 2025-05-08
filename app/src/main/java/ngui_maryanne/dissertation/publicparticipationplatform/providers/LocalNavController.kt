@@ -1,4 +1,4 @@
-package com.awesomenessstudios.schoolprojects.criticalthinkingappforkids.providers
+package ngui_maryanne.dissertation.publicparticipationplatform.providers
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavHostController

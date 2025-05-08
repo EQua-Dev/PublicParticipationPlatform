@@ -14,4 +14,6 @@ sealed class NewPetitionEvent {
     data class OnSupportingReasonChanged(val index: Int, val value: String) : NewPetitionEvent()
     object OnAddSupportingReason : NewPetitionEvent()
     data class OnTargetSignatureChanged(val diff: Int) : NewPetitionEvent()
+    data class OnTargetSignatureManuallyChanged(val newValue: Int) : NewPetitionEvent()
+
 }

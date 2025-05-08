@@ -3,13 +3,17 @@ package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -25,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.AssimOutlinedDropdown
@@ -64,7 +69,7 @@ fun CreatePetitionBottomSheet(
             onImageClick = { imagePicker.launch("image/*") }
         )
 
-        // County of Residence Dropdown
+        Spacer(Modifier.height(8.dp))
         AssimOutlinedDropdown(
             label = stringResource(id = R.string.sector_label),
             hint = stringResource(id = R.string.sector_hint),
@@ -72,10 +77,8 @@ fun CreatePetitionBottomSheet(
             selectedValue = state.sector,
             onValueSelected = { onEvent(NewPetitionEvent.OnSectorChanged(it.toString())) },
             isCompulsory = true,
-//            error = state.genderError?.let { stringResource(id = it) },
             isSearchable = true // Enable search functionality
         )
-
 
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
@@ -98,53 +101,76 @@ fun CreatePetitionBottomSheet(
         AssimOutlinedDropdown(
             label = stringResource(id = R.string.county_label),
             hint = stringResource(id = R.string.county_hint),
-            options = countiesMap,
+            options = countiesMap.sortedBy { it.first },
             selectedValue = state.county,
             onValueSelected = { onEvent(NewPetitionEvent.OnCountyChanged(it.toString())) },
             isCompulsory = true,
-//            error = state.genderError?.let { stringResource(id = it) },
             isSearchable = true // Enable search functionality
         )
-       /* DropdownField("Select County", value = state.county, options = COUNTIES) {
-            onEvent(NewPetitionEvent.OnCountyChanged(it))
-        }*/
 
         Spacer(Modifier.height(16.dp))
-        Text("Request Goal (what the petition is to achieve)")
-        state.requestGoals.forEachIndexed { index, goal ->
-            OutlinedTextField(
-                value = goal,
-                onValueChange = { onEvent(NewPetitionEvent.OnRequestGoalChanged(index, it)) },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-            )
-        }
-        TextButton(onClick = { onEvent(NewPetitionEvent.OnAddRequestGoal) }) {
-            Text("Add Goal")
-        }
-
-        Spacer(Modifier.height(16.dp))
-        Text("Target Signatures")
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { onEvent(NewPetitionEvent.OnTargetSignatureChanged(-1)) }) {
-                Icon(Icons.Default.Remove, contentDescription = "Decrease")
+        Column(horizontalAlignment = Alignment.Start) {
+            Text("Request Goal (what the petition is to achieve)")
+            state.requestGoals.forEachIndexed { index, goal ->
+                OutlinedTextField(
+                    value = goal,
+                    onValueChange = { onEvent(NewPetitionEvent.OnRequestGoalChanged(index, it)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                )
             }
-            Text("${state.targetSignatures}", modifier = Modifier.padding(horizontal = 16.dp))
-            IconButton(onClick = { onEvent(NewPetitionEvent.OnTargetSignatureChanged(1)) }) {
-                Icon(Icons.Default.Add, contentDescription = "Increase")
+            TextButton(onClick = { onEvent(NewPetitionEvent.OnAddRequestGoal) }) {
+                Text("Add Goal")
             }
         }
 
         Spacer(Modifier.height(16.dp))
-        Text("Supporting Reason (backing your petition)")
-        state.supportingReasons.forEachIndexed { index, reason ->
-            OutlinedTextField(
-                value = reason,
-                onValueChange = { onEvent(NewPetitionEvent.OnSupportingReasonChanged(index, it)) },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-            )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Target Signatures")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { onEvent(NewPetitionEvent.OnTargetSignatureChanged(-1)) }) {
+                    Icon(Icons.Default.Remove, contentDescription = "Decrease")
+                }
+                OutlinedTextField(
+                    value = state.targetSignatures.toString(),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+                    ,
+                    onValueChange = {
+                        val newValue = it.filter { char -> char.isDigit() }
+                        if (newValue.isNotEmpty()) {
+                            onEvent(NewPetitionEvent.OnTargetSignatureManuallyChanged(newValue.toInt()))
+                        } else {
+                            onEvent(NewPetitionEvent.OnTargetSignatureManuallyChanged(0))
+                        }
+                    },
+                    modifier = Modifier.width(80.dp).padding(horizontal = 8.dp),
+                    label = { Text("") } // Remove label to save space
+                    , singleLine = true
+                )
+                IconButton(onClick = { onEvent(NewPetitionEvent.OnTargetSignatureChanged(1)) }) {
+                    Icon(Icons.Default.Add, contentDescription = "Increase")
+                }
+            }
         }
-        TextButton(onClick = { onEvent(NewPetitionEvent.OnAddSupportingReason) }) {
-            Text("Add Reason")
+
+        Spacer(Modifier.height(16.dp))
+        Column(horizontalAlignment = Alignment.Start) {
+            Text("Supporting Reason (backing your petition)")
+            state.supportingReasons.forEachIndexed { index, reason ->
+                OutlinedTextField(
+                    value = reason,
+                    onValueChange = { onEvent(NewPetitionEvent.OnSupportingReasonChanged(index, it)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                )
+            }
+            TextButton(onClick = { onEvent(NewPetitionEvent.OnAddSupportingReason) }) {
+                Text("Add Reason")
+            }
         }
 
         Spacer(Modifier.height(16.dp))

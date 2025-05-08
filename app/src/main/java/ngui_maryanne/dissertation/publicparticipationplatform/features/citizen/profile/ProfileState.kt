@@ -1,7 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile
 
 import android.net.Uri
-import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citizen
 
 data class CitizenProfileState(

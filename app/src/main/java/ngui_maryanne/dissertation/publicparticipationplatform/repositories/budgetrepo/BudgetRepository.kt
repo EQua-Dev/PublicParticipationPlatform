@@ -12,5 +12,6 @@ interface BudgetRepository {
     suspend fun submitBudgetResponse(response: BudgetResponse)
     suspend fun voteForBudgetOption(budgetId: String, updatedResponses: MutableList<BudgetResponse>)
     suspend fun toggleBudgetActivation(budgetId: String, isActive: Boolean)
+    suspend fun updateBudgetDetails(budgetId: String, updatedFields: Map<String, Any>)
 
 }

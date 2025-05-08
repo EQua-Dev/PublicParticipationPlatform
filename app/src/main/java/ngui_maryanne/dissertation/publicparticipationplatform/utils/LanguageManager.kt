@@ -7,7 +7,7 @@ import android.os.Build
 import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.AppLanguage
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import java.util.Locale
 
 class LanguageManager {

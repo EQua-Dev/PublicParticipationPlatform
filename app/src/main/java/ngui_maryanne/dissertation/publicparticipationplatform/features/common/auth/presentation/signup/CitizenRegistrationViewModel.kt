@@ -69,7 +69,39 @@ class CitizenRegistrationViewModel @Inject constructor(
 
             // OTP Handling
             is CitizenRegistrationEvent.SendOtp -> {
-                sendOtp(event.activity)
+                val password = _state.value.password
+
+                when {
+                    password.isBlank() -> {
+                        _state.value = _state.value.copy(errorMessage = "Password cannot be empty")
+                    }
+
+                    password.length < 8 -> {
+                        _state.value =
+                            _state.value.copy(errorMessage = "Password must be at least 8 characters long")
+                    }
+
+                    !password.any { it.isUpperCase() } -> {
+                        _state.value =
+                            _state.value.copy(errorMessage = "Password must contain at least one uppercase letter")
+                    }
+
+                    !password.any { it.isLowerCase() } -> {
+                        _state.value =
+                            _state.value.copy(errorMessage = "Password must contain at least one lowercase letter")
+                    }
+
+                    !password.any { it.isDigit() } -> {
+                        _state.value =
+                            _state.value.copy(errorMessage = "Password must contain at least one digit")
+                    }
+
+                    else -> {
+                        _state.value =
+                            _state.value.copy(errorMessage = null)  // Clear previous error
+                        sendOtp(event.activity)
+                    }
+                }
             }
 
             is CitizenRegistrationEvent.OtpChanged -> {

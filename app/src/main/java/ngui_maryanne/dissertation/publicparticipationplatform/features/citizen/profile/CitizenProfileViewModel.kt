@@ -2,9 +2,7 @@ package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.
 
 import android.content.Context
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -12,7 +10,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.citizenrepo.CitizenRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.LanguageManager
@@ -98,13 +95,13 @@ class CitizenProfileViewModel @Inject constructor(
         _state.value = _state.value.copy(isEditing = !_state.value.isEditing, updateSuccess = false)
     }
 
-    private fun changeLanguage(lang: AppLanguage) {
-        viewModelScope.launch {
-            appLocaleManager.setLocale(context, lang.code)
+    private fun changeLanguage(lang: ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage) {
+     /*   viewModelScope.launch {
+            appLocaleManager.setLocale(context, lang.locale.language)
 
             preferencesRepo.setLanguage(lang)
             _state.value = _state.value.copy(selectedLanguage = lang)
-        }
+        }*/
     }
 
     private fun saveProfile() {

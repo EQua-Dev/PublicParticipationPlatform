@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +37,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +54,9 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import ngui_maryanne.dissertation.publicparticipationplatform.R
+import ngui_maryanne.dissertation.publicparticipationplatform.holder.HolderViewModel
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.getSavedLanguagePreference
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -60,10 +64,14 @@ import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 fun CitizenProfileScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: CitizenProfileViewModel = hiltViewModel()
+    viewModel: CitizenProfileViewModel = hiltViewModel(),
+    holderViewModel: HolderViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.value
     val context = LocalContext.current
+    var selectedLanguage by remember { mutableStateOf(holderViewModel.selectedLanguage) }
+
+
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -248,8 +256,10 @@ fun CitizenProfileScreen(
 
                         LanguageSettingSection(
                             isEditing = state.isEditing,
-                            selectedLanguage = state.selectedLanguage,
-                            onLanguageSelected = { viewModel.onEvent(CitizenProfileEvent.LanguageChanged(it)) }
+                            selectedLanguage = selectedLanguage.value,
+                            onLanguageSelected = {
+                                holderViewModel.saveLanguage(it)
+                                viewModel.onEvent(CitizenProfileEvent.LanguageChanged(it)) },
                         )
 
                     }

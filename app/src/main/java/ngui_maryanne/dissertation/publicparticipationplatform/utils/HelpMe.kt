@@ -1,6 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
@@ -8,19 +9,20 @@ import android.location.Location
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.OnCompleteListener
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
-
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
-import androidx.biometric.BiometricManager.Authenticators.*
 import java.util.Date
+import java.util.Locale
 
 
 object HelpMe {
@@ -241,6 +243,42 @@ object HelpMe {
     }
 
 
+    fun updateAppLanguage(context: Context, language: AppLanguage) {
+        val currentLocale = context.resources.configuration.locales[0]
+        val newLocale = when (language) {
+            AppLanguage.ENGLISH -> Locale("en")
+            AppLanguage.SWAHILI -> Locale("sw")
+            // Add other languages as needed
+        }
+
+        // Only update if language actually changed
+        if (currentLocale != newLocale) {
+            // Save language preference first
+            saveLanguagePreference(context, language)
+
+            // Update app language
+            val resources = context.resources
+            val configuration = resources.configuration
+            configuration.setLocale(newLocale)
+            resources.updateConfiguration(configuration, resources.displayMetrics)
+
+            // Restart activity to apply changes
+            (context as? Activity)?.recreate()
+        }
+    }
+    fun saveLanguagePreference(context: Context, language: AppLanguage) {
+        val sharedPref = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("app_language", language.name)
+            apply()
+        }
+    }
+
+    fun getSavedLanguagePreference(context: Context): AppLanguage {
+        val sharedPref = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val languageName = sharedPref.getString("app_language", AppLanguage.ENGLISH.name)
+        return AppLanguage.valueOf(languageName ?: AppLanguage.ENGLISH.name)
+    }
 
 
 }

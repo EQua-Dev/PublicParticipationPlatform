@@ -11,6 +11,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petiti
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Signature
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.PETITIONS_REF
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.POLICIES_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.LocationUtils
 
 class PetitionRepositoryImpl(
@@ -56,6 +57,23 @@ class PetitionRepositoryImpl(
         awaitClose { listenerRegistration.remove() }
     }
 
+
+    override suspend fun updatePetition(petitionId: String, name: String, imageUrl: String, otherDetails: Map<String, Any?>) {
+        val updates = mapOf(
+            "title" to name,
+            "coverImage" to imageUrl,
+        ) + otherDetails
+
+        firestore.collection(PETITIONS_REF).document(petitionId)
+            .update(updates).addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                TransactionTypes.UPDATE_PETITION) }
+    }
+
+    override suspend fun deletePetition(petitionId: String) {
+        firestore.collection(PETITIONS_REF).document(petitionId)
+            .delete().addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
+                TransactionTypes.DELETE_POLICY) }
+    }
 
     override suspend fun signPetition(petitionId: String, updatedSignatures: MutableList<Signature>) {
         try {
