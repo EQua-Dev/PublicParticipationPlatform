@@ -98,7 +98,7 @@ fun InitScreen(
                 )
             ) {
                 Card(
-//                    colors = CardColors(Color.White),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(4.dp),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
