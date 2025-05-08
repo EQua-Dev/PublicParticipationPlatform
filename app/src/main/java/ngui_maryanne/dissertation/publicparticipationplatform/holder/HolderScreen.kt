@@ -307,7 +307,10 @@ fun ScaffoldSection(
                             composable(Screen.ForgotPassword.route) {
                                 onStatusBarColorChange(MaterialTheme.colorScheme.background)
                                 ForgotPasswordScreen(
-                                    onPasswordResetSuccess = { controller.navigate(Screen.Login.route) }
+                                    onPasswordResetSuccess = { controller.navigate(Screen.Login.route) },
+                                    onBackClicked = {
+                                        controller.popBackStack()
+                                    }
                                 )
                             }
                             composable(Screen.SuperAdminHome.route) {

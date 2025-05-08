@@ -15,8 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -93,14 +97,24 @@ fun InitScreen(
                     animationSpec = tween(1000)
                 )
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.app_logo), // <-- replace with your drawable name
-                    contentDescription = "App Logo",
+                Card(
+//                    colors = CardColors(Color.White),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
-                        .size(150.dp)
-                        .padding(bottom = 32.dp)
-                        .clip(shape = RoundedCornerShape(12.dp))
-                )
+                        .padding(16.dp)
+                        .wrapContentSize()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.app_logo), // replace with your drawable
+                        contentDescription = "App Logo",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .padding(16.dp) // inner padding inside the card
+                            .clip(shape = RoundedCornerShape(12.dp))
+                    )
+                }
+
             }
 
             // Teacher Button
