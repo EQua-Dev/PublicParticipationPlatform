@@ -10,6 +10,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollResponses
@@ -27,10 +30,11 @@ class PollDetailsViewModel @Inject constructor(
     private val notificationRepository: NotificationRepository,
     private val auth: FirebaseAuth,
     private val userPreferences: UserPreferences,
-) : ViewModel() {
+) : ViewModel()
+{
 
-    private val _uiState = mutableStateOf(PollDetailsUiState())
-    val uiState: State<PollDetailsUiState> = _uiState
+    private val _uiState = MutableStateFlow(PollDetailsUiState())
+    val uiState: StateFlow<PollDetailsUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {

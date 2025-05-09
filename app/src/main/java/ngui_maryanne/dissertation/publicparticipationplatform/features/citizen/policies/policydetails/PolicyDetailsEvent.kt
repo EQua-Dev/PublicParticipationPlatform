@@ -19,4 +19,18 @@ sealed class PolicyDetailsEvent {
     object SetupCommentsListener : PolicyDetailsEvent()
     object NavigateBack : PolicyDetailsEvent()
     data class NavigateToPollDetails(val pollId: String) : PolicyDetailsEvent()
+    object SetupPollsListener : PolicyDetailsEvent()
+
+    // User interaction events
+    object SubmitCommentSuccess : PolicyDetailsEvent()
+    data class SubmitCommentError(val message: String) : PolicyDetailsEvent()
+    data class ShowSnackbar(val message: String) : PolicyDetailsEvent()
+
+    // Policy status events
+    object PolicyStatusUpdated : PolicyDetailsEvent()
+    data class PolicyStatusUpdateError(val message: String) : PolicyDetailsEvent()
+
+    // UI state events
+    object DescriptionExpanded : PolicyDetailsEvent()
+    object TimelineExpanded : PolicyDetailsEvent()
 }

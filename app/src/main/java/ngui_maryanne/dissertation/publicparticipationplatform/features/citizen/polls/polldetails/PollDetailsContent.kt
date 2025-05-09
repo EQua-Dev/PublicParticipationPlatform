@@ -1,192 +1,276 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.polldetails
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
-import androidx.hilt.navigation.compose.hiltViewModel
 import ngui_maryanne.dissertation.publicparticipationplatform.components.getTimeLeft
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollOption
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollResponses
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollWithPolicyNameAndDescription
-import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails.BudgetDetailsEvent
-import ngui_maryanne.dissertation.publicparticipationplatform.utils.findActivity
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation.PollStatus
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PollDetailsContent(
     pollData: PollWithPolicyNameAndDescription,
+    currentUserRole: String,
+    votedOptionId: String?,
     onOptionSelected: (PollOption) -> Unit,
     onViewPolicyClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: PollDetailsViewModel = hiltViewModel()
+    modifier: Modifier = Modifier
 ) {
-
-    val state = viewModel.uiState.value
     val poll = pollData.poll
-    val policyName = pollData.policyName
-    val policyDescription = pollData.policyDescription
-
-    val totalResponses = poll.responses.size
+    val pollStatus = pollData.pollStatus
     val timeLeft = remember { getTimeLeft(poll.pollExpiry.toLong()) }
-
-
-    val context = LocalContext.current
-    val activity = remember(context) {
-        context.findActivity()?.takeIf { it is FragmentActivity } as? FragmentActivity
-    }
+    val totalResponses = poll.responses.size
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-
-        // Top Bar
+        // Poll Status and Time Left
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Poll #${poll.pollNo}",
-                style = MaterialTheme.typography.titleMedium
-            )
-
+            PolicyStatusBadge(status = pollStatus)
             Text(
                 text = "Expires in: $timeLeft",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
+                color = if (pollStatus == PollStatus.ACTIVE) MaterialTheme.colorScheme.error
+                else MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.labelLarge
             )
         }
 
-        // Policy Name & Description
-        Column {
-            Text(
-                text = policyName,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = policyDescription,
-                style = MaterialTheme.typography.bodySmall
-            )
+        // Policy Info
+        Card(
+            onClick = onViewPolicyClick,
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(2.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Related Policy",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = pollData.policyName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = pollData.policyDescription,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
 
         // Poll Question
-        Column {
-            Text(
-                text = poll.pollQuestion,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
+        Text(
+            text = poll.pollQuestion,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Poll Options
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            poll.pollOptions.forEach { option ->
+                PollOptionItem(
+                    option = option,
+                    totalVotes = totalResponses,
+                    isSelected = votedOptionId == option.optionId,
+                    canVote = currentUserRole.equals(UserRole.CITIZEN.name, ignoreCase = true) &&
+                            pollStatus == PollStatus.ACTIVE &&
+                            votedOptionId == null,
+                    onVote = { onOptionSelected(option) },
+                    allThisVotes = poll.responses.filter { it.optionId == option.optionId }
+
+                )
+            }
         }
 
-        // Options Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(4.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                poll.pollOptions.forEach { option ->
-                    val votes = poll.responses.count { it.optionId == option.optionId }
-                    val percentage = if (totalResponses == 0) 0 else (votes * 100 / totalResponses)
+        // Poll Stats
+        if (totalResponses > 0) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Poll Statistics",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text("Total votes: $totalResponses")
+                }
+            }
+        }
+    }
+}
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+@Composable
+fun PollOptionItem(
+    option: PollOption,
+    allThisVotes: List<PollResponses>,
+    totalVotes: Int,
+    isSelected: Boolean,
+    canVote: Boolean,
+    onVote: () -> Unit
+) {
+    val votes = allThisVotes.size
+    val percentage = if (totalVotes > 0) votes * 100f / totalVotes else 0f
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(1.dp),
+        border = if (isSelected) BorderStroke(
+            2.dp,
+            MaterialTheme.colorScheme.primary
+        ) else null
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Option Text
+            Text(
+                text = option.optionText,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            // Option Explanation
+            if (option.optionExplanation.isNotBlank()) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = option.optionExplanation,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+
+            // Progress Bar
+            Spacer(Modifier.height(8.dp))
+
+            LinearProgressIndicator(
+                progress = percentage / 100f,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp),
+                color = if (isSelected) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+
+            // Vote Info and Button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (totalVotes > 0) "${percentage.toInt()}% ($votes votes)"
+                    else "No votes yet",
+                    style = MaterialTheme.typography.labelSmall
+                )
+
+                if (canVote) {
+                    Button(
+                        onClick = onVote,
+                        modifier = Modifier.height(36.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(text = option.optionText, fontWeight = FontWeight.SemiBold)
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(text = option.optionExplanation, style = MaterialTheme.typography.bodySmall)
-                        }
-
-                        Column(horizontalAlignment = Alignment.End) {
-                            if (state.currentUserRole.lowercase() == UserRole.CITIZEN.name.lowercase()) {
-                                val votedOptionId = state.votedOptionId
-                                Log.d("TAG", "PollDetailsContent: $votedOptionId")
-                                if (votedOptionId == null) {
-                                    Button(onClick = {
-                                        onOptionSelected(option)
-
-//                                        detailsViewModel.onEvent(BudgetDetailsEvent.VoteOption(option.optionId))
-                                    }) {
-                                        Text("Choose")
-                                    }
-                                } else if (votedOptionId == option.optionId) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Verified, // Choose the icon you want
-                                            contentDescription = "Voted",
-                                            tint = Color.Green
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp)) // Adds some space between the icon and text
-                                        Text(
-                                            text = "Voted",
-                                            color = Color.Green,
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
-                                    }
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text("$percentage%", style = MaterialTheme.typography.labelSmall)
-                        }
+                        Text("Vote")
+                    }
+                } else if (isSelected) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Voted",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Your vote",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
         }
+    }
+}
 
-        // Policy Button
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(
-                text = "Policy: $policyName",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold
+@Composable
+fun PolicyStatusBadge(status: PollStatus) {
+    Box(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.small)
+            .background(
+                when (status) {
+                    PollStatus.ACTIVE -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                    PollStatus.CLOSED -> MaterialTheme.colorScheme.error.copy(alpha = 0.2f)
+                    PollStatus.DRAFT -> MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                }
             )
-            Text(
-                text = policyDescription,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        Text(
+            text = status.displayName,
+            style = MaterialTheme.typography.labelSmall.copy(
+                color = when (status) {
+                    PollStatus.ACTIVE -> MaterialTheme.colorScheme.primary
+                    PollStatus.CLOSED -> MaterialTheme.colorScheme.error
+                    PollStatus.DRAFT -> MaterialTheme.colorScheme.outline
+                }
             )
-            Button(
-                onClick = onViewPolicyClick,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text("View Policy Details")
-            }
-        }
+        )
     }
 }

@@ -9,26 +9,33 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,10 +43,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -65,6 +77,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyS
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Comment
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.StatusChange
+import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login.KenyanBackgroundPattern
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.getDate
@@ -78,7 +91,7 @@ fun CitizenPolicyDetailsScreen(
     viewModel: PolicyDetailsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
 
     LaunchedEffect(policyId) {
@@ -88,109 +101,186 @@ fun CitizenPolicyDetailsScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                PolicyDetailsEvent.SetupCommentsListener -> {
-                    // The ViewModel will handle the actual setup
-                }
-
+                PolicyDetailsEvent.SetupCommentsListener -> Unit // Handled by ViewModel
                 PolicyDetailsEvent.NavigateBack -> navController.popBackStack()
                 is PolicyDetailsEvent.NavigateToPollDetails -> {
-                    navController.navigate("poll_details/${event.pollId}")
+                    navController.navigate(
+                        Screen.PollDetailsScreen.route.replace(
+                            "{pollId}",
+                            event.pollId
+                        )
+                    )
                 }
+
+                is PolicyDetailsEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+
+                PolicyDetailsEvent.DescriptionExpanded -> TODO()
+                is PolicyDetailsEvent.PolicyStatusUpdateError -> TODO()
+                PolicyDetailsEvent.PolicyStatusUpdated -> TODO()
+                PolicyDetailsEvent.SetupPollsListener -> TODO()
+                is PolicyDetailsEvent.SubmitCommentError -> TODO()
+                PolicyDetailsEvent.SubmitCommentSuccess -> TODO()
+                PolicyDetailsEvent.TimelineExpanded -> TODO()
             }
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        uiState.policy?.policyTitle ?: "Loading...",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { viewModel.handleAction(PolicyDetailsAction.OnBackClicked) }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    uiState.policy?.let { policy ->
-                        AssistChip(
-                            colors = AssistChipDefaults.assistChipColors(
-                                containerColor = when (policy.policyStatus) {
-                                    PolicyStatus.PUBLIC_CONSULTATION -> Color(0xFF2196F3)
-                                    PolicyStatus.APPROVED -> Color(0xFF4CAF50)
-                                    PolicyStatus.REJECTED -> Color(0xFFF44336)
-                                    else -> MaterialTheme.colorScheme.surfaceVariant
-                                }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // Kenyan-themed background
+        KenyanBackgroundPattern()
+
+        Scaffold(
+            modifier = modifier,
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            uiState.policy?.policyTitle ?: "Policy Details",
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
                             ),
-                            border = null,
-                            shape = MaterialTheme.shapes.small,
-                            onClick = {},
-                            label = { Text(policy.policyStatus.displayName) },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { viewModel.handleAction(PolicyDetailsAction.OnBackClicked) }
+                        ) {
+                            Icon(
+                                Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                    ),
+                    actions = {
+                        uiState.policy?.let { policy ->
+                            PolicyStatusBadge(status = policy.policyStatus)
+                        }
+                    }
+                )
+            },
+            containerColor = Color.Transparent,
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.padding(16.dp)
+                ) { data ->
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        snackbarData = data
+                    )
+                }
+            }
+        ) { paddingValues ->
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
-            )
-        }
-    ) { paddingValues ->
-        when {
-            uiState.isLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
 
-            uiState.error != null -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Error: ${uiState.error}", color = MaterialTheme.colorScheme.error)
+                uiState.error != null -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ErrorOutline,
+                                contentDescription = null,
+                                modifier = Modifier.size(48.dp),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                            Text(
+                                text = "Failed to load policy details",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = uiState.error ?: "Unknown error",
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
+                            Button(
+                                onClick = {
+                                    viewModel.handleAction(
+                                        PolicyDetailsAction.LoadPolicy(
+                                            policyId
+                                        )
+                                    )
+                                }
+                            ) {
+                                Text("Retry")
+                            }
+                        }
+                    }
                 }
-            }
 
-            uiState.policy == null -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Policy not found")
+                uiState.policy == null -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Policy,
+                                contentDescription = null,
+                                modifier = Modifier.size(48.dp),
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            )
+                            Text("Policy not found")
+                        }
+                    }
                 }
-            }
 
-            else -> {
-                LazyColumn(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                    item {
+                else -> {
+                    val policy = uiState.policy!!
+
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(scrollState)
+                            .padding(paddingValues)
+                    ) {
+                        // Policy cover image
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(16f / 9f)
-                                .background(colorScheme.surfaceVariant)
-                                .clip(MaterialTheme.shapes.large)
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
                         ) {
-
-                            if (uiState.policy!!.policyCoverImage.isNotEmpty()) {
+                            if (policy.policyCoverImage.isNotEmpty()) {
                                 AsyncImage(
-                                    model = uiState.policy!!.policyCoverImage,
-                                    contentDescription = "Policy cover",
+                                    model = policy.policyCoverImage,
+                                    contentDescription = "Policy cover image",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.fillMaxSize()
                                 )
@@ -201,77 +291,111 @@ fun CitizenPolicyDetailsScreen(
                                     modifier = Modifier
                                         .size(64.dp)
                                         .align(Alignment.Center),
-                                    tint = colorScheme.onSurfaceVariant
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
 
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(16.dp)
+                            ) {
+                                PolicyStatusBadge(status = policy.policyStatus)
+                            }
                         }
-                    }
-                    // Policy description section
-                    item {
-                        PolicyDescriptionSection(
-                            description = uiState.policy!!.policyDescription,
-                            isExpanded = uiState.isDescriptionExpanded,
-                            onToggleExpand = { viewModel.handleAction(PolicyDetailsAction.ToggleDescriptionExpanded) }
-                        )
-                    }
 
-                    // Policy timeline section
-                    uiState.policy?.let { policy ->
-                        item {
-                            PolicyTimelineSection(
-                                statusHistory = policy.statusHistory,
-                                currentStatus = policy.policyStatus,
+                        // Policy content
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(24.dp)
+                        ) {
+                            // Basic info row
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = policy.policySector,
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                )
+
+                                Text(
+                                    text = "Published: ${
+                                        getDate(
+                                            policy.dateCreated.toLong(),
+                                            "dd MMM yyyy"
+                                        )
+                                    }",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                            }
+
+                            // Description section
+                            ExpandableSection(
+                                title = "Description",
+                                content = policy.policyDescription,
+                                isExpanded = uiState.isDescriptionExpanded,
+                                onToggleExpand = { viewModel.handleAction(PolicyDetailsAction.ToggleDescriptionExpanded) }
+                            )
+
+                            // Timeline section
+                            ExpandableSection(
+                                title = "Policy Timeline",
                                 isExpanded = uiState.isTimelineExpanded,
                                 onToggleExpand = { viewModel.handleAction(PolicyDetailsAction.ToggleTimelineExpanded) }
-                            )
-                        }
-                    }
+                            ) {
+                                PolicyTimeline(
+                                    statusHistory = policy.statusHistory,
+                                    currentStatus = policy.policyStatus
+                                )
+                            }
 
-                    // Public participation (polls) section
-                    if (uiState.polls.isNotEmpty()) {
-                        item {
-                            PublicParticipationSection(
-                                polls = uiState.polls,
-                                onPollClicked = { pollId ->
-                                    navController.navigate(
-                                        Screen.PollDetailsScreen.route.replace(
-                                            "{pollId}",
-                                            pollId
+                            // Public participation section
+                            if (uiState.polls.isNotEmpty()) {
+                                SectionTitle("Public Participation")
+                                LazyColumn(
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.heightIn(max = 300.dp)
+                                ) {
+                                    items(uiState.polls) { poll ->
+                                        PollCard(
+                                            poll = poll,
+                                            onClick = {
+                                                viewModel.handleAction(
+                                                    PolicyDetailsAction.OnPollClicked(poll.id)
+                                                )
+                                            }
                                         )
-                                    )
-                                    /* viewModel.handleAction(
-                                         PolicyDetailsAction.OnPollClicked(
-                                             pollId
-                                         )
-                                     )*/
+                                    }
                                 }
+                            }
+
+                            // Comments section
+                            CommentsSection(
+                                comments = uiState.comments,
+                                newCommentText = uiState.newCommentText,
+                                isAnonymous = uiState.isAnonymous,
+                                canComment = policy.policyStatus == PolicyStatus.PUBLIC_CONSULTATION,
+                                onCommentTextChanged = { text ->
+                                    viewModel.handleAction(
+                                        PolicyDetailsAction.OnCommentTextChanged(text)
+                                    )
+                                },
+                                onAnonymousToggled = { isAnonymous ->
+                                    viewModel.handleAction(
+                                        PolicyDetailsAction.OnAnonymousToggled(isAnonymous)
+                                    )
+                                },
+                                onSubmitComment = {
+                                    viewModel.handleAction(PolicyDetailsAction.SubmitComment)
+                                },
+                                viewModel = viewModel
                             )
                         }
-                    }
-                    // Comments section
-                    item {
-                        CommentsSection(
-                            comments = uiState.comments,
-                            newCommentText = uiState.newCommentText,
-                            isAnonymous = uiState.isAnonymous,
-                            canComment = uiState.policy!!.policyStatus == PolicyStatus.PUBLIC_CONSULTATION,
-                            onCommentTextChanged = { text ->
-                                viewModel.handleAction(
-                                    PolicyDetailsAction.OnCommentTextChanged(
-                                        text
-                                    )
-                                )
-                            },
-                            onAnonymousToggled = { isAnonymous ->
-                                viewModel.handleAction(
-                                    PolicyDetailsAction.OnAnonymousToggled(
-                                        isAnonymous
-                                    )
-                                )
-                            },
-                            onSubmitComment = { viewModel.handleAction(PolicyDetailsAction.SubmitComment) }
-                        )
                     }
                 }
             }
@@ -280,39 +404,40 @@ fun CitizenPolicyDetailsScreen(
 }
 
 @Composable
-private fun PolicyDescriptionSection(
-    description: String,
-    isExpanded: Boolean,
-    onToggleExpand: () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+private fun PolicyStatusBadge(status: PolicyStatus) {
+    Box(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.small)
+            .background(
+                when (status) {
+                    PolicyStatus.PUBLIC_CONSULTATION -> Color(0xFF2196F3).copy(alpha = 0.2f)
+                    PolicyStatus.APPROVED -> Color(0xFF4CAF50).copy(alpha = 0.2f)
+                    PolicyStatus.REJECTED -> Color(0xFFF44336).copy(alpha = 0.2f)
+                    else -> MaterialTheme.colorScheme.surfaceVariant
+                }
+            )
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
         Text(
-            text = "Description",
-            style = MaterialTheme.typography.titleMedium
+            text = status.displayName,
+            style = MaterialTheme.typography.labelSmall.copy(
+                color = when (status) {
+                    PolicyStatus.PUBLIC_CONSULTATION -> Color(0xFF2196F3)
+                    PolicyStatus.APPROVED -> Color(0xFF4CAF50)
+                    PolicyStatus.REJECTED -> Color(0xFFF44336)
+                    else -> MaterialTheme.colorScheme.onSurface
+                }
+            )
         )
-
-        Text(
-            text = if (isExpanded) description else description.take(200) + if (description.length > 200) "..." else "",
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        if (description.length > 200) {
-            TextButton(
-                onClick = onToggleExpand,
-                modifier = Modifier.padding(top = 4.dp)
-            ) {
-                Text(if (isExpanded) "See less" else "See more")
-            }
-        }
     }
 }
 
 @Composable
-private fun PolicyTimelineSection(
-    statusHistory: List<StatusChange>,
-    currentStatus: PolicyStatus,
+private fun ExpandableSection(
+    title: String,
     isExpanded: Boolean,
-    onToggleExpand: () -> Unit
+    onToggleExpand: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
@@ -321,11 +446,14 @@ private fun PolicyTimelineSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Policy Timeline",
+                text = title,
                 style = MaterialTheme.typography.titleMedium
             )
 
-            IconButton(onClick = onToggleExpand) {
+            IconButton(
+                onClick = onToggleExpand,
+                modifier = Modifier.size(24.dp)
+            ) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = if (isExpanded) "Collapse" else "Expand"
@@ -334,116 +462,163 @@ private fun PolicyTimelineSection(
         }
 
         if (isExpanded) {
-            val allStatuses = PolicyStatus.entries
-            val completedStatuses = statusHistory.map { it.status }
-
-            PolicyTimelineStepper(
-                steps = allStatuses.size,
-                currentStep = allStatuses.indexOf(currentStatus),
-                content = { step, isCurrent ->
-                    val status = allStatuses[step]
-                    val isCompleted = completedStatuses.contains(status)
-                    val statusChange = statusHistory.find { it.status == status }
-
-                    Column(
-                        modifier = Modifier.padding(start = 16.dp, bottom = 24.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            if (isCompleted) {
-                                Icon(
-                                    imageVector = Icons.Default.CheckCircle,
-                                    contentDescription = "Completed",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .border(
-                                            width = 2.dp,
-                                            color = if (isCurrent) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.outline,
-                                            shape = CircleShape
-                                        )
-                                )
-                            }
-
-                            Text(
-                                text = status.displayName,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal
-                            )
-                        }
-
-                        statusChange?.let {
-                            Text(
-                                text = "Completed on ${
-                                    HelpMe.getDate(
-                                        it.changedAt.toLong(),
-                                        "EEE dd MMM yyyy | hh:mm a"
-                                    )
-                                }",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.outline
-                            )
-                        }
-
-                        Text(
-                            text = status.description,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(start = 32.dp)
-                        )
-                    }
-                }
-            )
+            content()
         }
     }
 }
 
 @Composable
-private fun PublicParticipationSection(
-    polls: List<Poll>,
-    onPollClicked: (String) -> Unit
+private fun ExpandableSection(
+    title: String,
+    content: String,
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.heightIn(max = 400.dp)
+    ExpandableSection(
+        title = title,
+        isExpanded = isExpanded,
+        onToggleExpand = onToggleExpand
     ) {
         Text(
-            text = "Public Participation",
-            style = MaterialTheme.typography.titleMedium
+            text = content,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
+    }
+}
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(polls) { poll ->
-                Card(
-                    onClick = { onPollClicked(poll.id) },
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+@Composable
+private fun SectionTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
+}
+
+@Composable
+private fun PolicyTimeline(
+    statusHistory: List<StatusChange>,
+    currentStatus: PolicyStatus
+) {
+    val allStatuses = PolicyStatus.entries
+    val completedStatuses = statusHistory.map { it.status }
+    val currentStep = allStatuses.indexOf(currentStatus)
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        allStatuses.forEachIndexed { index, status ->
+            val isCompleted = completedStatuses.contains(status)
+            val isCurrent = index == currentStep
+            val statusChange = statusHistory.find { it.status == status }
+
+            Row(
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Timeline indicator
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.width(24.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = poll.pollQuestion,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
+                    if (isCompleted) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Completed",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
                         )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .border(
+                                    width = 2.dp,
+                                    color = if (isCurrent) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.outline,
+                                    shape = CircleShape
+                                )
+                        )
+                    }
 
+                    if (index < allStatuses.lastIndex) {
+                        Divider(
+                            modifier = Modifier
+                                .height(24.dp)
+                                .width(2.dp),
+                            color = if (isCompleted) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                        )
+                    }
+                }
+
+                // Timeline content
+                Column(
+                    modifier = Modifier.padding(start = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = status.displayName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal
+                    )
+
+                    statusChange?.let {
                         Text(
-                            text = "Poll #${poll.pollNo} • Expires: ${poll.pollExpiry}",
+                            text = "Completed on ${getDate(it.changedAt.toLong(), "dd MMM yyyy")}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.outline
                         )
                     }
+
+                    Text(
+                        text = status.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PollCard(
+    poll: Poll,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = poll.pollQuestion,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Poll #${poll.pollNo}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+
+                Text(
+                    text = "Expires: ${poll.pollExpiry}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
             }
         }
     }
@@ -458,106 +633,149 @@ private fun CommentsSection(
     onCommentTextChanged: (String) -> Unit,
     onAnonymousToggled: (Boolean) -> Unit,
     onSubmitComment: () -> Unit,
-    viewModel: PolicyDetailsViewModel = hiltViewModel()
+    viewModel: PolicyDetailsViewModel
 ) {
-
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = "Comments (${comments.size})",
-            style = MaterialTheme.typography.titleMedium
-        )
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        SectionTitle("Comments (${comments.size})")
 
         if (canComment) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
-                OutlinedTextField(
-                    value = newCommentText,
-                    onValueChange = onCommentTextChanged,
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Add your comment") },
-                    maxLines = 3
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = isAnonymous,
-                            onCheckedChange = onAnonymousToggled
-                        )
-                        Text("Post anonymously")
-                    }
-
-                    Button(
-                        onClick = onSubmitComment,
-                        enabled = newCommentText.isNotBlank()
-                    ) {
-                        Text("Submit")
-                    }
-                }
-            }
-        }
-        Column(
-            modifier = Modifier.heightIn(max = 400.dp) // or some other appropriate max height
-        ) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(comments) { comment ->
-                    Card(
+                    OutlinedTextField(
+                        value = newCommentText,
+                        onValueChange = onCommentTextChanged,
                         modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                        label = { Text("Add your comment") },
+                        shape = MaterialTheme.shapes.small,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                        ),
+                        maxLines = 3
+                    )
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                var displayName by remember { mutableStateOf("User ${comment.userId.take(6)}") }
-
-                                DisposableEffect(comment.userId) {
-                                    val listener = if (!comment.anonymous) {
-                                        viewModel.getCitizenNameRealtime(comment.userId) {
-                                            displayName = it
-                                        }
-                                    } else null
-
-                                    onDispose {
-                                        listener?.remove()
-                                    }
-                                }
-                                Text(
-                                    text = displayName
-                                    ,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = isAnonymous,
+                                onCheckedChange = onAnonymousToggled,
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = MaterialTheme.colorScheme.primary
                                 )
-
-                                Text(
-                                    text = getDate(comment.dateCreated.toLong(), "dd/MM/yyyy | hh:mm a"),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.outline
-                                )
-                            }
-
-                            Text(
-                                text = comment.comment,
-                                style = MaterialTheme.typography.bodyMedium
                             )
+                            Text(
+                                "Post anonymously",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+                        Button(
+                            onClick = onSubmitComment,
+                            enabled = newCommentText.isNotBlank(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ),
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Text("Submit")
                         }
                     }
                 }
             }
+        }
+
+        if (comments.isNotEmpty()) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.heightIn(max = 400.dp)
+            ) {
+                items(comments) { comment ->
+                    CommentCard(comment = comment, viewModel = viewModel)
+                }
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (canComment) "No comments yet. Be the first to comment!"
+                    else "No comments available",
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CommentCard(
+    comment: Comment,
+    viewModel: PolicyDetailsViewModel
+) {
+    var displayName by remember { mutableStateOf("User ${comment.userId.take(6)}") }
+
+    DisposableEffect(comment.userId) {
+        val listener = if (!comment.anonymous) {
+            viewModel.getCitizenNameRealtime(comment.userId) {
+                displayName = it
+            }
+        } else null
+
+        onDispose {
+            listener?.remove()
+        }
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (comment.anonymous) "Anonymous" else displayName,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = getDate(comment.dateCreated.toLong(), "dd MMM yyyy | hh:mm a"),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+
+            Text(
+                text = comment.comment,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+            )
         }
     }
 }

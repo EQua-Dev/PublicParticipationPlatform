@@ -74,7 +74,7 @@ fun CreateOfficialScreen(
             value = uiState.phoneNumber,
             onValueChange = { viewModel.onEvent(CreateOfficialUiEvent.UpdatePhoneNumber(it)) },
             label = "Phone Number",
-            placeholder = "+353 788 233",
+            placeholder = "eg: +234123456789",
             keyboardType = KeyboardType.Phone,
             modifier = Modifier.fillMaxWidth()
         )

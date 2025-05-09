@@ -53,6 +53,14 @@ class CitizenPoliciesViewModel @Inject constructor(
                     _events.emit(CitizenPoliciesEvent.NavigateToPolicyDetails(action.policyId))
                 }
             }
+
+            CitizenPoliciesAction.LoadPolicies ->  {
+                loadPolicies()
+            }
+            is CitizenPoliciesAction.OnStatusFilterChanged -> {
+                _uiState.value = _uiState.value.copy(selectedStatus = action.status)
+                loadPolicies()
+            }
         }
     }
 
@@ -65,7 +73,8 @@ class CitizenPoliciesViewModel @Inject constructor(
                         it.copy(
                             policies = policies,
                             isLoading = false,
-                            error = null
+                            error = null,
+                            isEmptyState = policies.isEmpty()
                         )
                     }
                 }
@@ -76,6 +85,9 @@ class CitizenPoliciesViewModel @Inject constructor(
                         error = e.message ?: "Error loading policies"
                     )
                 }
+                _events.emit(CitizenPoliciesEvent.ShowError(
+                    _uiState.value.error ?: "An error occurred"
+                ))
             }
         }
     }
