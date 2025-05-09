@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
@@ -28,8 +31,8 @@ class OfficialBudgetViewModel @Inject constructor(
 ) : ViewModel()
 {
 
-    private val _uiState = mutableStateOf(OfficialBudgetUiState())
-    val uiState: State<OfficialBudgetUiState> = _uiState
+    private val _uiState = MutableStateFlow(OfficialBudgetUiState())
+    val uiState: StateFlow<OfficialBudgetUiState> = _uiState.asStateFlow()
 
     init {
         fetchBudgets()

@@ -238,18 +238,12 @@ fun ScaffoldSection(
                 scaffoldState.snackbarHostState
             },
         ) { paddingValues ->
-            Box(/*modifier = Modifier
-                .fillMaxSize()
-            .padding()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E)
-                    )
-                )
-            ),
-        contentAlignment = Alignment.Center*/
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(),
             ) {
                 BackgroundAnimations()
                 AppBackground {
@@ -412,7 +406,7 @@ fun ScaffoldSection(
 
                                 PetitionDetailsScreen(
                                     petitionId = petitionId!!,
-                                    navHostController = controller
+                                    navController = controller
                                 )
                             }
                             composable(

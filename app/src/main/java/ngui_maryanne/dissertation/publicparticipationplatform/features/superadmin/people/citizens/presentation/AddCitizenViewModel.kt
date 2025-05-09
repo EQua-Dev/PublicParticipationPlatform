@@ -8,6 +8,9 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Nation
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.nationaldbrepo.NationalDBRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citizen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.citizens.CitizenEvent
@@ -21,8 +24,8 @@ class CreateCitizenViewModel @Inject constructor(
     private val citizenRepository: CitizenRepository,
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(AddCitizenUiState())
-    val state: State<AddCitizenUiState> = _state
+    private val _state = MutableStateFlow(AddCitizenUiState())
+    val state: StateFlow<AddCitizenUiState> = _state.asStateFlow()
 
 
     init {

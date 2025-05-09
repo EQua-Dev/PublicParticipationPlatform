@@ -5,8 +5,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,7 +58,7 @@ fun EditBudgetBottomSheet(
     var impact by remember { mutableStateOf(budget.impact) }
 
     // Options as editable mutable list
-    var budgetOptions by remember { mutableStateOf(budget.budgetOptions.toMutableList()) }
+    val budgetOptions = remember { mutableStateListOf<BudgetOption>().apply { addAll(budget.budgetOptions) } }
 
 
     val context = LocalContext.current
@@ -73,7 +78,10 @@ fun EditBudgetBottomSheet(
                     .fillMaxWidth()
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState())
-            ) {
+                    .navigationBarsPadding()
+                    .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
+
+                ) {
                 Text("Edit Budget", style = MaterialTheme.typography.titleLarge)
 
                 CustomTextField(
@@ -107,8 +115,12 @@ fun EditBudgetBottomSheet(
 
                 budgetOptions.forEachIndexed { index, option ->
                     Spacer(modifier = Modifier.height(12.dp))
+                    var projectName by remember { mutableStateOf(option.optionProjectName) }
+                    var description by remember { mutableStateOf(option.optionDescription) }
+                    var optionAmount by remember { mutableStateOf(option.optionAmount) }
+                    val imageUri = remember { mutableStateOf(option.imageUrl?.let { Uri.parse(it) }) }
 
-                    val imageUri = remember { mutableStateOf<Uri?>(null) }
+//                    val imageUri = remember { mutableStateOf<Uri?>(null) }
                     val launcher = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.GetContent()
                     ) { uri ->
@@ -120,8 +132,9 @@ fun EditBudgetBottomSheet(
                     }
 
                     CustomTextField(
-                        value = option.optionProjectName,
+                        value = projectName,
                         onValueChange = {
+                            projectName = it
                             budgetOptions[index] = option.copy(optionProjectName = it)
                         },
                         label = "Project Name"
@@ -130,8 +143,9 @@ fun EditBudgetBottomSheet(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     CustomTextField(
-                        value = option.optionDescription,
+                        value = description,
                         onValueChange = {
+                            description = it
                             budgetOptions[index] = option.copy(optionDescription = it)
                         },
                         label = "Description"
@@ -140,8 +154,9 @@ fun EditBudgetBottomSheet(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     CustomTextField(
-                        value = option.optionAmount,
+                        value = optionAmount,
                         onValueChange = {
+                            optionAmount = it
                             budgetOptions[index] = option.copy(optionAmount = it)
                         },
                         label = "Amount",
@@ -150,7 +165,7 @@ fun EditBudgetBottomSheet(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    option.imageUrl?.let {
+                    imageUri.value?.let {
                         AsyncImage(
                             model = it,
                             contentDescription = null,
@@ -163,7 +178,7 @@ fun EditBudgetBottomSheet(
                     }
 
                     TextButton(onClick = { launcher.launch("image/*") }) {
-                        Text("Change Image")
+                        Text(if (imageUri.value == null) "Add Image" else "Change Image")
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))

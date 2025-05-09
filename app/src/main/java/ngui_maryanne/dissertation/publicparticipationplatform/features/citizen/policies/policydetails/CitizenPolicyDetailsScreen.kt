@@ -130,10 +130,7 @@ fun CitizenPolicyDetailsScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
     ) {
-        // Kenyan-themed background
-        KenyanBackgroundPattern()
 
         Scaffold(
             modifier = modifier,

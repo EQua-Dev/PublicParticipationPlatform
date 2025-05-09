@@ -10,6 +10,6 @@ interface PetitionRepository {
     suspend fun createPetition(petition: Petition)
     fun getPetitionById(id: String): Flow<Petition?>
     suspend fun signPetition(petitionId: String,  updatedSignatures: MutableList<Signature>)
-    suspend fun updatePetition(petitionId: String, name: String, imageUrl: String, otherDetails: Map<String, Any?>)
+    suspend fun updatePetition(petitionId: String, name: String, imageUrl: String? = null, otherDetails: Map<String, Any?>)
     suspend fun deletePetition(petitionId: String)
 }

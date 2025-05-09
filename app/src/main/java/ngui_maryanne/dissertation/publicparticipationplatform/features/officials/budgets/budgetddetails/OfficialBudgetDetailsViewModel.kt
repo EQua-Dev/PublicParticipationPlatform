@@ -4,17 +4,22 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 import java.util.Objects.hash
 import java.util.UUID
@@ -24,11 +29,12 @@ import javax.inject.Inject
 class OfficialBudgetDetailsViewModel @Inject constructor(
     private val repository: BudgetRepository,
     private val notificationRepository: NotificationRepository,
+    private val storageRepository: StorageRepository,
     private val auth: FirebaseAuth,
 ) : ViewModel() {
 
-    private val _uiState = mutableStateOf(BudgetDetailsState())
-    val uiState: State<BudgetDetailsState> = _uiState
+    private val _uiState = MutableStateFlow(BudgetDetailsState())
+    val uiState: StateFlow<BudgetDetailsState> = _uiState.asStateFlow()
 
     fun onEvent(event: BudgetDetailsEvent) {
         when (event) {
@@ -188,13 +194,18 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
 
             try {
+                val updatedBudgetOptions = budgetOptions.map {
+                    val optionImage =
+                        storageRepository.uploadImage("budget_images/", it.imageUrl.toUri())
+                    it.copy(imageUrl = optionImage)
+                }
+
                 val updatedFields = mapOf(
                     "amount" to amount,
                     "budgetNote" to note,
                     "impact" to impact,
-                    "budgetOptions" to budgetOptions
+                    "budgetOptions" to updatedBudgetOptions
                 )
-
                 repository.updateBudgetDetails(budgetId, updatedFields)
                 notificationRepository.sendBudgetVoteNotifications(
                     _uiState.value.budget!!,

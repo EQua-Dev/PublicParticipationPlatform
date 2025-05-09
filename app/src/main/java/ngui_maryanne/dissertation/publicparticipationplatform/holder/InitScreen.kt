@@ -38,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ngui_maryanne.dissertation.publicparticipationplatform.AppBackground
 import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
@@ -53,7 +54,7 @@ fun InitScreen(
 ) {
 
     val context = LocalContext.current
-    val selectedLocale = Locale("sw")
+    val selectedLocale = Locale("en")
     val localizedContext = remember(selectedLocale) {
         context.wrapInLocale(selectedLocale)
     }
@@ -68,84 +69,72 @@ fun InitScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E)
-                    )
-                )
-            ),
+
+
+        ,
         contentAlignment = Alignment.Center
     ) {
         // Background animated circles
-        BackgroundAnimations()
-
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            // Logo with animation
-            AnimatedVisibility(
-                visible = logoVisible,
-                enter = fadeIn(animationSpec = tween(1000)) + scaleIn(
-                    initialScale = 0.5f,
-                    animationSpec = tween(1000)
-                )
+//        BackgroundAnimations()
+        AppBackground {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(4.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .wrapContentSize()
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.app_logo), // replace with your drawable
-                        contentDescription = "App Logo",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .padding(16.dp) // inner padding inside the card
-                            .clip(shape = RoundedCornerShape(12.dp))
+
+                // Logo with animation
+                AnimatedVisibility(
+                    visible = logoVisible,
+                    enter = fadeIn(animationSpec = tween(1000)) + scaleIn(
+                        initialScale = 0.5f,
+                        animationSpec = tween(1000)
                     )
+                ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.app_logo), // replace with your drawable
+                            contentDescription = "App Logo",
+                            modifier = Modifier
+                                .size(250.dp)
+                                .padding(16.dp) // inner padding inside the card
+                                .clip(shape = RoundedCornerShape(12.dp))
+                        )
                 }
 
+                // Super Admin Button
+                CustomButton(
+                    text = localizedContext.getString(R.string.super_admin_text),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        holderViewModel.saveRole(UserRole.SUPERADMIN)
+                        onRoleSelected(UserRole.SUPERADMIN.name)
+                    })
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Government Official Button
+                CustomButton(
+                    text = stringResource(id = R.string.official_text),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        holderViewModel.saveRole(UserRole.OFFICIAL)
+                        onRoleSelected(UserRole.OFFICIAL.name)
+                    })
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Citizen Button
+                CustomButton(
+                    text = stringResource(id = R.string.citizen_text),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        holderViewModel.saveRole(UserRole.CITIZEN)
+                        onRoleSelected(UserRole.CITIZEN.name)
+                    })
             }
-
-            // Teacher Button
-            CustomButton(
-                text = localizedContext.getString(R.string.super_admin_text),
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    holderViewModel.saveRole(UserRole.SUPERADMIN)
-                    onRoleSelected(UserRole.SUPERADMIN.name)
-                })
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Student Button
-            CustomButton(
-                text = stringResource(id = R.string.official_text),
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    holderViewModel.saveRole(UserRole.OFFICIAL)
-                    onRoleSelected(UserRole.OFFICIAL.name)
-                })
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Student Button
-            CustomButton(
-                text = stringResource(id = R.string.citizen_text),
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    holderViewModel.saveRole(UserRole.CITIZEN)
-                    onRoleSelected(UserRole.CITIZEN.name)
-                })
         }
+
+
     }
 
 }

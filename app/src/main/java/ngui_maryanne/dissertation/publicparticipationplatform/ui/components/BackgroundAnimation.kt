@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -311,6 +312,7 @@ fun BackgroundAnimations() {
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Subtle Savannah wave pattern - bottom
+/*
         Canvas(modifier = Modifier.fillMaxSize()) {
             val canvasWidth = size.width
             val canvasHeight = size.height
@@ -346,9 +348,10 @@ fun BackgroundAnimations() {
                 )
             )
         }
+*/
 
         // Single red accent streak (simplified from multiple)
-        Canvas(modifier = Modifier.fillMaxSize()) {
+       /* Canvas(modifier = Modifier.fillMaxSize().alpha(0.1f)) {
             val canvasWidth = size.width
             val canvasHeight = size.height
 
@@ -378,7 +381,7 @@ fun BackgroundAnimations() {
                     )
                 )
             )
-        }
+        }*/
 
         // Simplified sun/shield element
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -429,7 +432,7 @@ fun BackgroundAnimations() {
         }
 
         // Simplified black accent line
-        Canvas(modifier = Modifier.fillMaxSize()) {
+        /*Canvas(modifier = Modifier.fillMaxSize()) {
             val canvasWidth = size.width
             val canvasHeight = size.height
 
@@ -446,6 +449,6 @@ fun BackgroundAnimations() {
                 strokeWidth = 8f,
                 alpha = 0.3f
             )
-        }
+        }*/
     }
 }

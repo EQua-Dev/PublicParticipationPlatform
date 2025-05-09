@@ -8,5 +8,5 @@ data class SuperAdminDashboardState(
     val budgetsCount: Int = 0,
     val petitionsCount: Int = 0,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val error: String? = null
 )

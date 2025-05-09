@@ -16,7 +16,7 @@ fun AppBackground(content: @Composable () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         BackgroundAnimations()
         Image(
-            painter = painterResource(id = R.drawable.wallpaper),
+            painter = painterResource(id = R.drawable.ankara),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxSize()

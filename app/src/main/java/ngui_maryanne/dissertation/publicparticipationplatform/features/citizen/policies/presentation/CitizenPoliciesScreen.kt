@@ -96,7 +96,7 @@ fun CitizenPoliciesScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         // Kenyan-themed background
-        KenyanBackgroundPattern()
+//        KenyanBackgroundPattern()
 
         Scaffold(
             modifier = modifier,

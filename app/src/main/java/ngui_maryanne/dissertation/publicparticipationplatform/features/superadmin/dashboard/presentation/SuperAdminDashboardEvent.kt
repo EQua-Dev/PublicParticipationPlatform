@@ -2,9 +2,11 @@ package ngui_maryanne.dissertation.publicparticipationplatform.features.superadm
 
 sealed class SuperAdminDashboardEvent {
     object LoadDashboardData : SuperAdminDashboardEvent()
+    object ErrorShown : SuperAdminDashboardEvent()
     data class CardClicked(val cardType: DashboardCardType) : SuperAdminDashboardEvent()
 }
 
+
 enum class DashboardCardType {
-    Citizens, Officials, Policies, Polls, Budgets, Petitions
+    CITIZENS, OFFICIALS, POLICIES, POLLS, BUDGETS, PETITIONS
 }

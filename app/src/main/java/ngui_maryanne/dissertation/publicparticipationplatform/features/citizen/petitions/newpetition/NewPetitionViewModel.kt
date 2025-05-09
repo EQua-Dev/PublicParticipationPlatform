@@ -7,6 +7,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
@@ -26,8 +29,8 @@ class PetitionViewModel @Inject constructor(
     private val storageRepo: StorageRepository
 ) : ViewModel() {
 
-    private val _newPetitionState = mutableStateOf(NewPetitionState())
-    val newPetitionState: State<NewPetitionState> = _newPetitionState
+    private val _newPetitionState = MutableStateFlow(NewPetitionState())
+    val newPetitionState: StateFlow<NewPetitionState> = _newPetitionState.asStateFlow()
 
     /*
 

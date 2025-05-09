@@ -56,7 +56,9 @@ import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Officia
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.OfficialBottomNavigationGraph
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.AppBackground
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
+import ngui_maryanne.dissertation.publicparticipationplatform.ui.components.BackgroundAnimations
 import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -188,7 +190,10 @@ fun OfficialHomeScreen(
                     bottom = innerPadding.calculateBottomPadding()
                 )
             ) {
-                OfficialBottomNavigationGraph(navController = navController)
+                BackgroundAnimations()
+                AppBackground {
+                    OfficialBottomNavigationGraph(navController = navController)
+                }
             }
         }
     }

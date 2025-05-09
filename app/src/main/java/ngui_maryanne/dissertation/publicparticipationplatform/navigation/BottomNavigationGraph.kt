@@ -143,7 +143,7 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
 
             PetitionDetailsScreen(
                 petitionId = petitionId!!,
-                navHostController = navController
+                navController = navController
             )
         }
         composable(
@@ -309,7 +309,7 @@ fun SuperAdminBottomNavigationGraph(navController: NavHostController) {
 
             PetitionDetailsScreen(
                 petitionId = petitionId!!,
-                navHostController = navController
+                navController = navController
             )
         }
         composable(

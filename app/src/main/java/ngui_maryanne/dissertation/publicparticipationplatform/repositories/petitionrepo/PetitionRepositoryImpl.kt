@@ -58,7 +58,7 @@ class PetitionRepositoryImpl(
     }
 
 
-    override suspend fun updatePetition(petitionId: String, name: String, imageUrl: String, otherDetails: Map<String, Any?>) {
+    override suspend fun updatePetition(petitionId: String, name: String, imageUrl: String?, otherDetails: Map<String, Any?>) {
         val updates = mapOf(
             "title" to name,
             "coverImage" to imageUrl,

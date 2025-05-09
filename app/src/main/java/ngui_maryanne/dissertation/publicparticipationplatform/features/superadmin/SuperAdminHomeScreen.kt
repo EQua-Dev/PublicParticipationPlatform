@@ -32,10 +32,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.AppBackground
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.CitizenHomeEvent
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.SuperAdminBottomBar
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.SuperAdminBottomNavigationGraph
+import ngui_maryanne.dissertation.publicparticipationplatform.ui.components.BackgroundAnimations
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,13 +88,17 @@ fun SuperAdminHomeScreen(
             SuperAdminBottomBar(navController = navController)
         },
     ) { innerPadding ->
+
         Box(
             modifier = Modifier.padding(
                 top = innerPadding.calculateTopPadding(),
                 bottom = innerPadding.calculateBottomPadding()
             )
         ) {
-            SuperAdminBottomNavigationGraph(navController = navController)
+            BackgroundAnimations()
+            AppBackground {
+                SuperAdminBottomNavigationGraph(navController = navController)
+            }
         }
     }
 

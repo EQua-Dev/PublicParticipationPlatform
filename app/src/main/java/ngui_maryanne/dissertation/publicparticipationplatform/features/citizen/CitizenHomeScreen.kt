@@ -1,6 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.EaseOutQuad
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
@@ -16,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,12 +25,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.pager.HorizontalPager
@@ -39,8 +43,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -52,6 +58,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -100,16 +107,22 @@ fun CitizenHomeScreen(
     navController: NavHostController,
     viewModel: CitizenHomeViewModel = hiltViewModel()
 ) {
-    // Define Kenyan theme colors
-    val kenyaGreen = Color(0xFF006600)
-    val kenyaRed = Color(0xFFBF0000)
-    val kenyaBlack = Color(0xFF000000)
-    val kenyaWhite = Color(0xFFF5F5F5)
-    val kenyaGold = Color(0xFFFFD700)
-
     val state by viewModel.state.collectAsState()
     val openDialog = remember { mutableStateOf(false) }
     val announcements = state.announcements
+
+    // Define color palette with sophisticated hierarchy
+    val backgroundColor = Color(0xFFF8F9FA) // Light neutral background
+    val surfaceColor = Color(0xFFFFFFFF) // Pure white for surfaces
+    val primaryText = Color(0xFF2C3E50) // Deep blue-gray for primary text
+    val secondaryText = Color(0xFF5D6D7E) // Lighter blue-gray for secondary text
+    val accentPrimary = MaterialTheme.colorScheme.primary
+
+    // Service-specific subtle accent colors
+    val policyColor = Color(0xFF5E81AC) // Soft blue for policies
+    val pollsColor = Color(0xFF5E9C76) // Soft green for polls
+    val petitionsColor = Color(0xFF8C6D62) // Warm brown for petitions
+    val budgetColor = Color(0xFF7D6B91) // Soft purple for budget
 
     LaunchedEffect(key1 = state) {
         if (state.logout) {
@@ -118,100 +131,97 @@ fun CitizenHomeScreen(
     }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = backgroundColor,
         topBar = {
             CitizenHomeTopBar(
                 citizen = state.citizen,
                 notifications = state.notifications,
                 onProfileClick = { navController.navigate(Screen.CitizenProfileScreen.route) },
                 onNotificationsClick = { navController.navigate(Screen.NotificationScreen.route) },
-                onLogout = { openDialog.value = true }
+                onLogout = { openDialog.value = true },
+                topBarBackgroundColor = surfaceColor,
+                topBarContentColor = primaryText,
+                topBarAccentColor = accentPrimary
             )
         }
     ) { paddingValues ->
-        // Main background with animated elements
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            kenyaBlack,
-                            kenyaBlack.copy(alpha = 0.85f)
-                        )
-                    )
-                ),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            // Background animations
-            BackgroundAnimations()
-
             // Content based on state
             when {
                 state.isLoading -> LoadingDialog(loadingText = "Loading your dashboard...")
-                !state.isApproved -> AwaitingApprovalScreen()
+                !state.isApproved -> AwaitingApprovalScreen(
+                    contentColor = primaryText,
+                    accentColor = accentPrimary
+                )
+
                 else -> ApprovedCitizenHome(
                     paddingValues = paddingValues,
                     navController = navController,
-                    announcements = announcements
+                    announcements = announcements,
+                    contentColor = primaryText,
+                    secondaryText = secondaryText,
+                    backgroundColor = backgroundColor,
+                    surfaceColor = surfaceColor,
+                    policyColor = policyColor,
+                    pollsColor = pollsColor,
+                    petitionsColor = petitionsColor,
+                    budgetColor = budgetColor
                 )
             }
         }
     }
 
     if (openDialog.value) {
-        KenyanAlertDialog(
+        ElegantAlertDialog(
             onDismissRequest = { openDialog.value = false },
             title = "Logout",
             message = "Do you want to logout?",
             onConfirm = { viewModel.onEvent(CitizenHomeEvent.Logout) },
-            onDismiss = { openDialog.value = false }
+            onDismiss = { openDialog.value = false },
+            dialogBackgroundColor = surfaceColor,
+            dialogContentColor = primaryText,
+            dialogAccentColor = accentPrimary
         )
     }
 }
 
 @Composable
-fun KenyanAlertDialog(
+fun ElegantAlertDialog(
     onDismissRequest: () -> Unit,
     title: String,
     message: String,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    dialogBackgroundColor: Color,
+    dialogContentColor: Color,
+    dialogAccentColor: Color
 ) {
-    val kenyaGreen = Color(0xFF006600)
-    val kenyaRed = Color(0xFFBF0000)
-    val kenyaBlack = Color(0xFF000000)
-    val kenyaWhite = Color(0xFFF5F5F5)
-    val kenyaGold = Color(0xFFFFD700)
-
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = kenyaBlack.copy(alpha = 0.9f),
-            border = BorderStroke(
-                width = 2.dp,
-                brush = Brush.horizontalGradient(
-                    colors = listOf(kenyaRed, kenyaGreen)
-                )
-            )
+            shape = RoundedCornerShape(12.dp),
+            color = dialogBackgroundColor,
+            tonalElevation = 6.dp,
+            shadowElevation = 8.dp
         ) {
             Column(
-                modifier = Modifier
-                    .padding(24.dp),
+                modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = title,
-                    color = kenyaWhite,
+                    color = dialogContentColor,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Medium
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = message,
-                    color = kenyaWhite.copy(alpha = 0.9f),
+                    color = dialogContentColor.copy(alpha = 0.8f),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center
                 )
@@ -220,26 +230,26 @@ fun KenyanAlertDialog(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End)
                 ) {
-                    Button(
+                    TextButton(
                         onClick = onDismiss,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = kenyaRed
-                        ),
-                        shape = RoundedCornerShape(8.dp)
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = dialogContentColor.copy(alpha = 0.8f)
+                        )
                     ) {
-                        Text("No", color = kenyaWhite)
+                        Text("Cancel")
                     }
 
                     Button(
                         onClick = onConfirm,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = kenyaGreen
+                            containerColor = dialogAccentColor,
+                            contentColor = Color.White
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Yes", color = kenyaWhite)
+                        Text("Logout")
                     }
                 }
             }
@@ -248,12 +258,10 @@ fun KenyanAlertDialog(
 }
 
 @Composable
-fun AwaitingApprovalScreen() {
-    val kenyaGreen = Color(0xFF006600)
-    val kenyaRed = Color(0xFFBF0000)
-    val kenyaWhite = Color(0xFFF5F5F5)
-    val kenyaGold = Color(0xFFFFD700)
-
+fun AwaitingApprovalScreen(
+    contentColor: Color,
+    accentColor: Color
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -261,14 +269,13 @@ fun AwaitingApprovalScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Shield container with animation
         Box(
             modifier = Modifier
-                .size(180.dp)
+                .size(160.dp)
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            kenyaGold.copy(alpha = 0.2f),
+                            accentColor.copy(alpha = 0.1f),
                             Color.Transparent
                         )
                     ),
@@ -276,12 +283,11 @@ fun AwaitingApprovalScreen() {
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.waiting),
-                contentDescription = "Awaiting Approval Illustration",
-                modifier = Modifier
-                    .size(150.dp)
-                    .padding(bottom = 8.dp)
+            Icon(
+                imageVector = Icons.Default.HourglassEmpty,
+                contentDescription = "Awaiting Approval",
+                modifier = Modifier.size(80.dp),
+                tint = accentColor
             )
         }
 
@@ -290,11 +296,11 @@ fun AwaitingApprovalScreen() {
         Text(
             "Awaiting Approval",
             style = TextStyle(
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
-                color = kenyaWhite,
-                letterSpacing = 0.5.sp
+                color = contentColor,
+                letterSpacing = 0.25.sp
             )
         )
 
@@ -305,22 +311,24 @@ fun AwaitingApprovalScreen() {
             style = TextStyle(
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
-                color = kenyaWhite.copy(alpha = 0.8f)
+                color = contentColor.copy(alpha = 0.7f)
             ),
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(36.dp))
 
-        Button(
+        OutlinedButton(
             onClick = { /* Navigate to app guide */ },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = kenyaGreen
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = accentColor
             ),
-            shape = RoundedCornerShape(30.dp),
+            border = BorderStroke(1.dp, accentColor),
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier
                 .fillMaxWidth(0.7f)
-                .height(50.dp)
+                .height(48.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -329,12 +337,11 @@ fun AwaitingApprovalScreen() {
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = null,
-                    tint = kenyaWhite
+                    tint = accentColor
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "Learn About the App",
-                    color = kenyaWhite,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -346,26 +353,32 @@ fun AwaitingApprovalScreen() {
 fun ApprovedCitizenHome(
     paddingValues: PaddingValues,
     navController: NavHostController,
-    announcements: MutableList<Announcement>
+    announcements: MutableList<Announcement>,
+    contentColor: Color,
+    secondaryText: Color,
+    backgroundColor: Color,
+    surfaceColor: Color,
+    policyColor: Color,
+    pollsColor: Color,
+    petitionsColor: Color,
+    budgetColor: Color
 ) {
-    val contentColor = Color(0xFFF5F5F5) // Light color for content on dark background
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        // Carousel section
+        // Announcements section
         if (announcements.isNotEmpty()) {
             Text(
                 text = "ANNOUNCEMENTS",
                 style = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = contentColor.copy(alpha = 0.7f),
-                    letterSpacing = 1.5.sp
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = secondaryText,
+                    letterSpacing = 1.2.sp
                 ),
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
             )
 
             AnnouncementsCarousel(
@@ -377,7 +390,13 @@ fun ApprovedCitizenHome(
                         NotificationTypes.PETITION -> navController.navigate(Screen.CitizenPetitions.route)
                         else -> navController.navigate(Screen.CitizenParticipatoryBudget.route)
                     }
-                }
+                },
+                carouselBackgroundColor = surfaceColor,
+                carouselContentColor = contentColor,
+                policyColor = policyColor,
+                pollsColor = pollsColor,
+                petitionsColor = petitionsColor,
+                budgetColor = budgetColor
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -387,31 +406,31 @@ fun ApprovedCitizenHome(
         Text(
             text = "SERVICES",
             style = TextStyle(
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = contentColor.copy(alpha = 0.7f),
-                letterSpacing = 1.5.sp
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = secondaryText,
+                letterSpacing = 1.2.sp
             ),
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
 
         // Service cards grid
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            modifier = Modifier.padding(8.dp),
-            contentPadding = PaddingValues(bottom = 80.dp) // Add bottom padding for better UX
+            modifier = Modifier.padding(horizontal = 8.dp),
+            contentPadding = PaddingValues(bottom = 80.dp)
         ) {
             val services = listOf(
-                ServiceItem(R.drawable.ic_policies, "Policies", KenyaGreen) {
+                ServiceItem(R.drawable.ic_policies, "Policies", policyColor) {
                     navController.navigate(Screen.CitizenPolicies.route)
                 },
-                ServiceItem(R.drawable.ic_polls, "Polls", Color(0xFFBF0000)) {
+                ServiceItem(R.drawable.ic_polls, "Polls", pollsColor) {
                     navController.navigate(Screen.CitizenPolls.route)
                 },
-                ServiceItem(R.drawable.ic_petitions, "Petitions", Color(0xFFFFD700)) {
+                ServiceItem(R.drawable.ic_petitions, "Petitions", petitionsColor) {
                     navController.navigate(Screen.CitizenPetitions.route)
                 },
-                ServiceItem(R.drawable.ic_budget, "Budget", Color(0xFF006600)) {
+                ServiceItem(R.drawable.ic_budget, "Budget", budgetColor) {
                     navController.navigate(Screen.CitizenParticipatoryBudget.route)
                 }
             )
@@ -421,7 +440,9 @@ fun ApprovedCitizenHome(
                     icon = services[index].icon,
                     label = services[index].label,
                     accentColor = services[index].color,
-                    onClick = services[index].onClick
+                    onClick = services[index].onClick,
+                    cardBackgroundColor = surfaceColor,
+                    cardContentColor = contentColor
                 )
             }
         }
@@ -436,20 +457,26 @@ data class ServiceItem(
 )
 
 @Composable
-fun ActionCard(icon: Int, label: String, accentColor: Color, onClick: () -> Unit) {
-    val kenyaBlack = Color(0xFF000000)
-    val kenyaWhite = Color(0xFFF5F5F5)
-
+fun ActionCard(
+    icon: Int,
+    label: String,
+    accentColor: Color,
+    onClick: () -> Unit,
+    cardBackgroundColor: Color,
+    cardContentColor: Color
+) {
     val infiniteTransition = rememberInfiniteTransition(label = "card_animation")
     val scale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.05f,
+        targetValue = 1.03f,  // More subtle animation
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = FastOutSlowInEasing),
+            animation = tween(2000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "card_scale"
     )
+    val isDark = isSystemInDarkTheme()
+
 
     Card(
         modifier = Modifier
@@ -457,22 +484,13 @@ fun ActionCard(icon: Int, label: String, accentColor: Color, onClick: () -> Unit
             .aspectRatio(1f)
             .clickable { onClick() }
             .graphicsLayer {
-                scaleX = if (isHovering) scale else 1f
-                scaleY = if (isHovering) scale else 1f
+                scaleX = if (isDark) scale else 1f
+                scaleY = if (isDark) scale else 1f
             },
-        elevation = CardDefaults.cardElevation(8.dp),
-        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
-            containerColor = kenyaBlack.copy(alpha = 0.7f)
-        ),
-        border = BorderStroke(
-            width = 2.dp,
-            brush = Brush.linearGradient(
-                colors = listOf(
-                    accentColor.copy(alpha = 0.7f),
-                    accentColor
-                )
-            )
+            containerColor = cardBackgroundColor
         )
     ) {
         Box(
@@ -481,11 +499,10 @@ fun ActionCard(icon: Int, label: String, accentColor: Color, onClick: () -> Unit
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            accentColor.copy(alpha = 0.2f),
+                            accentColor.copy(alpha = 0.05f),
                             Color.Transparent
                         ),
-                        center = Offset.Infinite,
-                        radius = 300f
+                        radius = 250f
                     )
                 ),
             contentAlignment = Alignment.Center
@@ -495,12 +512,22 @@ fun ActionCard(icon: Int, label: String, accentColor: Color, onClick: () -> Unit
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(16.dp)
             ) {
-                Icon(
-                    painterResource(id = icon),
-                    contentDescription = label,
-                    modifier = Modifier.size(56.dp),
-                    tint = accentColor
-                )
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .background(
+                            color = accentColor.copy(alpha = 0.1f),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painterResource(id = icon),
+                        contentDescription = label,
+                        modifier = Modifier.size(28.dp),
+                        tint = accentColor
+                    )
+                }
 
                 Spacer(Modifier.height(12.dp))
 
@@ -508,18 +535,15 @@ fun ActionCard(icon: Int, label: String, accentColor: Color, onClick: () -> Unit
                     text = label,
                     textAlign = TextAlign.Center,
                     style = TextStyle(
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
-                        color = kenyaWhite
+                        color = cardContentColor
                     )
                 )
             }
         }
     }
 }
-
-// Hover state simulation for demo
-val isHovering = false
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -528,49 +552,79 @@ fun CitizenHomeTopBar(
     notifications: MutableList<AppNotification>,
     onProfileClick: () -> Unit,
     onNotificationsClick: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    topBarBackgroundColor: Color,
+    topBarContentColor: Color,
+    topBarAccentColor: Color
 ) {
-    val kenyaGreen = Color(0xFF006600)
-    val kenyaRed = Color(0xFFBF0000)
-    val kenyaBlack = Color(0xFF000000)
-    val kenyaWhite = Color(0xFFF5F5F5)
-    val kenyaGold = Color(0xFFFFD700)
-
     TopAppBar(
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Small Kenya flag icon
-                Image(
-                    painter = painterResource(id = R.drawable.ic_people), // Add Kenya flag icon
-                    contentDescription = "Kenya Flag",
-                    modifier = Modifier.size(24.dp)
-                )
+                // Profile image or icon
+                IconButton(onClick = onProfileClick) {
+                    if (citizen?.profileImage?.isNotEmpty() == true) {
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .border(
+                                    width = 1.dp,
+                                    color = topBarAccentColor.copy(alpha = 0.3f),
+                                    shape = CircleShape
+                                )
+                                .padding(1.dp)
+                        ) {
+                            AsyncImage(
+                                model = citizen.profileImage,
+                                contentDescription = "Profile",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape)
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .background(
+                                    color = topBarAccentColor.copy(alpha = 0.1f),
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.AccountCircle,
+                                contentDescription = "Profile",
+                                tint = topBarAccentColor
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column {
                     Text(
-                        "Hello,",
+                        "Wajibika Welcomes You,",
                         style = TextStyle(
                             fontSize = 12.sp,
-                            color = kenyaWhite.copy(alpha = 0.7f)
+                            color = topBarContentColor.copy(alpha = 0.7f)
                         )
                     )
                     Text(
                         text = citizen?.firstName ?: "Citizen",
                         style = TextStyle(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = kenyaWhite
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = topBarContentColor
                         )
                     )
                 }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = kenyaBlack.copy(alpha = 0.7f)
+            containerColor = topBarBackgroundColor
         ),
         actions = {
             // Notifications Icon with Badge
@@ -579,11 +633,12 @@ fun CitizenHomeTopBar(
                     badge = {
                         if (notifications.isNotEmpty()) {
                             Badge(
-                                containerColor = kenyaRed
+                                containerColor = topBarAccentColor
                             ) {
                                 Text(
                                     notifications.size.toString(),
-                                    color = kenyaWhite
+                                    color = Color.White,
+                                    fontSize = 10.sp
                                 )
                             }
                         }
@@ -592,54 +647,8 @@ fun CitizenHomeTopBar(
                     Icon(
                         Icons.Default.Notifications,
                         contentDescription = "Notifications",
-                        tint = kenyaGold
+                        tint = topBarAccentColor
                     )
-                }
-            }
-
-            // Profile button
-            IconButton(onClick = onProfileClick) {
-                if (citizen?.profileImage?.isNotEmpty() == true) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .border(
-                                width = 2.dp,
-                                brush = Brush.sweepGradient(
-                                    listOf(kenyaGreen, kenyaRed, kenyaGold)
-                                ),
-                                shape = CircleShape
-                            )
-                            .padding(2.dp)
-                    ) {
-                        AsyncImage(
-                            model = citizen.profileImage,
-                            contentDescription = "Profile",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                        )
-                    }
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .border(
-                                width = 2.dp,
-                                brush = Brush.sweepGradient(
-                                    listOf(kenyaGreen, kenyaRed, kenyaGold)
-                                ),
-                                shape = CircleShape
-                            )
-                            .padding(2.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.AccountCircle,
-                            contentDescription = "Profile",
-                            modifier = Modifier.fillMaxSize(),
-                            tint = kenyaWhite
-                        )
-                    }
                 }
             }
 
@@ -648,7 +657,7 @@ fun CitizenHomeTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Logout,
                     contentDescription = "Logout",
-                    tint = kenyaRed
+                    tint = topBarAccentColor
                 )
             }
         }
@@ -659,21 +668,24 @@ fun CitizenHomeTopBar(
 @Composable
 fun AnnouncementsCarousel(
     announcements: List<Announcement>,
-    onAnnouncementClick: (Announcement) -> Unit
+    onAnnouncementClick: (Announcement) -> Unit,
+    carouselBackgroundColor: Color,
+    carouselContentColor: Color,
+    policyColor: Color,
+    pollsColor: Color,
+    petitionsColor: Color,
+    budgetColor: Color
 ) {
     val pagerState = rememberPagerState(pageCount = { announcements.size })
-    val kenyaWhite = Color(0xFFF5F5F5)
 
     LaunchedEffect(Unit) {
-        // Auto-slide logic
+        // Auto-slide logic with longer delay
         while (true) {
-            delay(4000)
+            delay(5000)
+            val nextPage = (pagerState.currentPage + 1) % announcements.size
             pagerState.animateScrollToPage(
-                (pagerState.currentPage + 1) % announcements.size,
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                )
+                nextPage,
+                animationSpec = tween(600, easing = EaseOutQuad)
             )
         }
     }
@@ -684,14 +696,24 @@ fun AnnouncementsCarousel(
             state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(220.dp),
+                .height(180.dp),
             contentPadding = PaddingValues(horizontal = 32.dp),
             pageSpacing = 16.dp
         ) { pageIndex ->
             val announcement = announcements[pageIndex]
+            val announcementColor = when (announcement.type) {
+                NotificationTypes.POLICY -> policyColor
+                NotificationTypes.POLL -> pollsColor
+                NotificationTypes.PETITION -> petitionsColor
+                else -> budgetColor
+            }
+
             AnnouncementCard(
                 announcement = announcement,
-                onClick = { onAnnouncementClick(announcement) }
+                onClick = { onAnnouncementClick(announcement) },
+                cardBackgroundColor = carouselBackgroundColor,
+                cardContentColor = carouselContentColor,
+                cardAccentColor = announcementColor
             )
         }
 
@@ -699,31 +721,41 @@ fun AnnouncementsCarousel(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(top = 12.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             repeat(announcements.size) { iteration ->
-                val color = if (pagerState.currentPage == iteration) {
-                    when (announcements[iteration].type) {
-                        NotificationTypes.POLICY -> Color(0xFF006600)
-                        NotificationTypes.POLL -> Color(0xFFBF0000)
-                        NotificationTypes.PETITION -> Color(0xFFFFD700)
-                        else -> Color(0xFF006600)
-                    }
-                } else {
-                    kenyaWhite.copy(alpha = 0.3f)
+                val announcement = announcements[iteration]
+                val dotColor = when (announcement.type) {
+                    NotificationTypes.POLICY -> policyColor
+                    NotificationTypes.POLL -> pollsColor
+                    NotificationTypes.PETITION -> petitionsColor
+                    else -> budgetColor
                 }
+
+                val color = if (pagerState.currentPage == iteration) {
+                    dotColor
+                } else {
+                    carouselContentColor.copy(alpha = 0.2f)
+                }
+
+                val width = if (pagerState.currentPage == iteration) 24.dp else 8.dp
 
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
                         .size(
-                            width = if (pagerState.currentPage == iteration) 24.dp else 8.dp,
-                            height = 8.dp
+                            width = width,
+                            height = 4.dp
                         )
-                        .clip(RoundedCornerShape(4.dp))
+                        .clip(RoundedCornerShape(2.dp))
                         .background(color)
-                        .animateContentSize()
+                        .animateContentSize(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
                 )
             }
         }
@@ -735,22 +767,11 @@ fun AnnouncementsCarousel(
 fun AnnouncementCard(
     announcement: Announcement,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    cardBackgroundColor: Color,
+    cardContentColor: Color,
+    cardAccentColor: Color
 ) {
-    val kenyaGreen = Color(0xFF006600)
-    val kenyaRed = Color(0xFFBF0000)
-    val kenyaBlack = Color(0xFF000000)
-    val kenyaWhite = Color(0xFFF5F5F5)
-    val kenyaGold = Color(0xFFFFD700)
-
-    // Determine color based on announcement type
-    val accentColor = when (announcement.type) {
-        NotificationTypes.POLICY -> kenyaGreen
-        NotificationTypes.POLL -> kenyaRed
-        NotificationTypes.PETITION -> kenyaGold
-        else -> kenyaGreen
-    }
-
     val iconRes = when (announcement.type) {
         NotificationTypes.POLICY -> R.drawable.ic_policies
         NotificationTypes.POLL -> R.drawable.ic_polls
@@ -765,123 +786,112 @@ fun AnnouncementCard(
                 onClick = onClick,
                 onLongClick = { /* Optional: Handle long click */ }
             ),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(10.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(
-            containerColor = kenyaBlack.copy(alpha = 0.7f)
+            containerColor = cardBackgroundColor
         ),
         border = BorderStroke(
-            width = 2.dp,
-            brush = Brush.linearGradient(
-                colors = listOf(
-                    accentColor.copy(alpha = 0.7f),
-                    accentColor
-                )
-            )
+            width = 1.dp,
+            color = cardAccentColor.copy(alpha = 0.15f)
         )
     ) {
-        Column {
-            // Header with icon and background
+        Row(modifier = Modifier.fillMaxSize()) {
+            // Left icon column
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(130.dp)
+                    .fillMaxHeight()
+                    .width(72.dp)
                     .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                accentColor.copy(alpha = 0.3f),
-                                Color.Transparent
-                            )
-                        )
+                        color = cardAccentColor.copy(alpha = 0.08f)
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                // Large icon
                 Icon(
                     painter = painterResource(id = iconRes),
                     contentDescription = "Announcement icon",
-                    modifier = Modifier.size(70.dp),
-                    tint = accentColor
+                    modifier = Modifier.size(32.dp),
+                    tint = cardAccentColor
                 )
-
-                // Category badge
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(16.dp)
-                        .background(
-                            color = accentColor,
-                            shape = RoundedCornerShape(50)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = when (announcement.type) {
-                            NotificationTypes.POLICY -> "POLICY"
-                            NotificationTypes.POLL -> "POLL"
-                            NotificationTypes.PETITION -> "PETITION"
-                            else -> "BUDGET"
-                        },
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (announcement.type == NotificationTypes.PETITION) kenyaBlack else kenyaWhite,
-                            letterSpacing = 1.sp
-                        )
-                    )
-                }
             }
 
-            // Content area
+            // Content column
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Title
-                Text(
-                    text = announcement.title,
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = kenyaWhite
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Category badge
+                    Surface(
+                        color = cardAccentColor.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(4.dp),
+                        modifier = Modifier.wrapContentWidth()
+                    ) {
+                        Text(
+                            text = when (announcement.type) {
+                                NotificationTypes.POLICY -> "POLICY"
+                                NotificationTypes.POLL -> "POLL"
+                                NotificationTypes.PETITION -> "PETITION"
+                                else -> "BUDGET"
+                            },
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = cardAccentColor,
+                                letterSpacing = 0.5.sp
+                            )
+                        )
+                    }
 
-                // Description
-                Text(
-                    text = announcement.description,
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        color = kenyaWhite.copy(alpha = 0.8f)
-                    ),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                    // Title
+                    Text(
+                        text = announcement.title,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = cardContentColor
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    // Description
+                    Text(
+                        text = announcement.description,
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = cardContentColor.copy(alpha = 0.7f)
+                        ),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
 
                 // Footer with date
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.DateRange,
                         contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = accentColor
+                        modifier = Modifier.size(12.dp),
+                        tint = cardAccentColor.copy(alpha = 0.8f)
                     )
 
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
-                        text = HelpMe.getDate(announcement.createdAt.toLong(), "EEE dd MMM yyyy"),
+                        text = HelpMe.getDate(announcement.createdAt.toLong(), "dd MMM"),
                         style = TextStyle(
-                            fontSize = 12.sp,
-                            color = kenyaWhite.copy(alpha = 0.6f)
+                            fontSize = 10.sp,
+                            color = cardContentColor.copy(alpha = 0.6f)
                         )
                     )
                 }

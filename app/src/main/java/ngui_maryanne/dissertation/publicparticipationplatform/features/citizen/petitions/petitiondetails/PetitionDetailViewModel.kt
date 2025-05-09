@@ -1,6 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -10,8 +11,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Signature
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.OfficialPolicyDetailsEvent
@@ -20,6 +29,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petit
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
+import java.time.LocalDateTime
 import java.util.Objects.hash
 import java.util.UUID
 import javax.inject.Inject
@@ -30,134 +40,96 @@ class PetitionDetailsViewModel @Inject constructor(
     private val notificationRepository: NotificationRepository,
     private val storageRepository: StorageRepository,
     private val userPreferences: UserPreferences,
-    private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth,
 ) : ViewModel() {
-    private val _state = mutableStateOf(PetitionDetailsState())
-    var state: State<PetitionDetailsState> = _state
+
+    private val _state = MutableStateFlow(PetitionDetailsState())
+    val state: StateFlow<PetitionDetailsState> = _state.asStateFlow()
+
+    private val _events = Channel<PetitionDetailsResult>()
+    val events = _events.receiveAsFlow()
+
+    private var petitionListener: ListenerRegistration? = null
 
     init {
         viewModelScope.launch {
             userPreferences.role.collect { role ->
-                if (role != null) {
-                    _state.value = _state.value.copy(
-                        currentUserRole = role.name
-                    )
-                }
+                _state.update { it.copy(currentUserRole = role ?: UserRole.CITIZEN) }
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: PetitionDetailsEvent) {
         when (event) {
-            is PetitionDetailsEvent.LoadPetition -> {
-                getPetitionRealtime(event.petitionId)
-             /*   viewModelScope.launch {
-                    _state.value = _state.value.copy(isLoading = true)
-                    try {
-                        val petition = repository.getPetitionById(event.petitionId)
-                        _state.value = _state.value.copy(petition = petition, isLoading = false)
-                    } catch (e: Exception) {
-                        _state.value = _state.value.copy(error = e.message, isLoading = false)
-                    }
-                }*/
-            }
-            PetitionDetailsEvent.SignPetition -> {
-            /*    verifyAndSignPetition(userId = _state.value.currentUserId, petition = _state.value.petition!!, hashType = "SHA-256", )
-                HelpMe.promptBiometric(
-                    activity = activity,
-                    title = "Authorize Transaction",
-                    onSuccess = {
-                        fundWallet(wallet, onSuccess, onFailure)
-                    },
-                    onNoHardware = {
-                        fundWallet(wallet, onSuccess, onFailure)
-                    }
-                )
-               val petition = _state.value.petition ?: return
-                val userId = _state.value.currentUserId
-                if (petition.createdBy == userId || petition.signatures.contains(userId)) return
-
-                viewModelScope.launch {
-                    try {
-                        repository.signPetition(petition.id, userId)
-                        val updatedPetition = petition.copy(signatures = petition.signatures + userId)
-                        _state.value = _state.value.copy(petition = updatedPetition, hasSigned = true)
-                    } catch (e: Exception) {
-                        _state.value = _state.value.copy(error = e.message)
-                    }
-                }*/
-            }
-
-            is PetitionDetailsEvent.UpdatePetition -> updatePetition(event.name, event.imageUrl, event.otherDetails)
-            PetitionDetailsEvent.DeletePetition -> deletePolicy()
-
+            is PetitionDetailsEvent.LoadPetition -> loadPetition(event.petitionId)
+            is PetitionDetailsEvent.SignPetition -> signPetition(event.activity, event.isAnonymous)
+            is PetitionDetailsEvent.UpdatePetition -> updatePetition(event.title, event.description, event.coverImage, event.requestGoals)
+            PetitionDetailsEvent.DeletePetition -> deletePetition()
+            PetitionDetailsEvent.Retry -> retry()
+            PetitionDetailsEvent.ClearError -> clearError()
         }
     }
 
-    fun getPetitionRealtime(id: String) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun loadPetition(petitionId: String) {
+        petitionListener?.remove()
+        _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            repository.getPetitionById(id).collect { petition ->
-                val hasSigned = petition?.signatures?.any { it.userId == auth.currentUser!!.uid } == true
+            try {
+                repository.getPetitionById(petitionId).collect { snapshot ->
+                    val petition = snapshot ?: throw Exception("Petition not found")
+                    val currentUserId = auth.currentUser?.uid.orEmpty()
+                    val hasSigned = petition.signatures.any { it.userId == currentUserId }
 
-                _state.value = _state.value.copy(
-                    petition = petition,
-                    isLoading = false,
-                    currentUserId = auth.currentUser!!.uid,
-                    hasSigned = hasSigned
-                )
-            }
-        }
-    }
+                    _state.update {
+                        it.copy(
+                            petition = petition,
+                            currentUserId = currentUserId,
+                            hasSigned = hasSigned,
+                            isLoading = false,
+                            error = null,
+                            lastUpdated = LocalDateTime.now()
+                        )
+                    }
+
+                    _events.send(PetitionDetailsResult.PetitionLoaded(petition))
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message ?: "Failed to load petition"
+                    )
+                }
+                _events.send(PetitionDetailsResult.Error(e.message ?: "Failed to load petition"))
+
+            }}}
 
     @RequiresApi(Build.VERSION_CODES.P)
-    fun verifyAndSignPetition(
-        activity: FragmentActivity,
-        petition: Petition,
-        userId: String,
-        hashType: String,
-//        answer1: String,
-//        answer2: String,
-//        securityQuestion1: String,
-//        securityQuestion2: String,
-//        storedSecurityHash: String,
-        isAnonymous: Boolean,
-        onSuccess: () -> Unit,
-        onFailure: (String) -> Unit
-    ) {
- /*       val hash1 = hash(securityQuestion1 + answer1, hashType)
-        val hash2 = hash(securityQuestion2 + answer2, hashType)
-        val combinedHash = hash(hash1 + hash2, hashType)
+    private fun signPetition(activity: FragmentActivity, isAnonymous: Boolean) {
+        val currentState = _state.value
+        val petition = currentState.petition ?: return
+        val userId = currentState.currentUserId
 
-        if (combinedHash != storedSecurityHash) {
-            onFailure("Security answers don't match")
-            return
-        }
-*/
+        if (petition.createdBy == userId || currentState.hasSigned) return
+
         HelpMe.promptBiometric(
             activity = activity,
             title = "Authorize Petition Signing",
-            onSuccess = {
-                signPetition(petition, userId, hashType, isAnonymous, onSuccess, onFailure)
-            },
-            onNoHardware = {
-                signPetition(petition, userId, hashType, isAnonymous, onSuccess, onFailure)
-            }
+            onSuccess = { processSignature(petition, userId, isAnonymous) },
+            onNoHardware = { processSignature(petition, userId, isAnonymous) },
+            /*onFailure = { error ->
+                _events.send(PetitionDetailsResult.Error(error))
+            }*/
         )
     }
 
-    private fun signPetition(
-        petition: Petition,
-        userId: String,
-        hashType: String,
-        isAnonymous: Boolean,
-        onSuccess: () -> Unit,
-        onFailure: (String) -> Unit
-    ) {
+    private fun processSignature(petition: Petition, userId: String, isAnonymous: Boolean) {
         viewModelScope.launch {
             try {
                 val signatureId = UUID.randomUUID().toString()
-                val signatureHash = hash(userId + petition.id + System.currentTimeMillis(), hashType)
+                val signatureHash = hash(userId + petition.id + System.currentTimeMillis(), "SHA-256")
 
                 val newSignature = Signature(
                     id = signatureId,
@@ -173,58 +145,58 @@ class PetitionDetailsViewModel @Inject constructor(
 
                 repository.signPetition(petition.id, updatedSignatures)
                 notificationRepository.sendPetitionSignNotifications(petition, userId)
-                onSuccess()
-            }catch (e: Exception) {
-                onFailure(e.message ?: "Signing petition failed")
+
+                _events.send(PetitionDetailsResult.PetitionSigned(true))
+            } catch (e: Exception) {
+                _events.send(PetitionDetailsResult.Error(e.message ?: "Failed to sign petition"))
             }
         }
     }
 
-
-    private fun updatePetition(name: String, imageUrl: String, otherDetails: Map<String, Any?>) {
+    private fun updatePetition(title: String, description: String, coverImage: String, requestGoals: List<String>) {
         viewModelScope.launch {
             try {
                 val petitionId = _state.value.petition?.id ?: return@launch
-                val storageImageUrl = imageUrl.let { uri ->
-                    storageRepository.uploadPolicyImage(uri.toUri())
-                } ?: ""
 
-                repository.updatePetition(petitionId, name, storageImageUrl, otherDetails)
-                _state.value = _state.value.copy(
-                    error = null
+                val otherDetails = mapOf("description" to description, "requestGoals" to requestGoals)
+                val updatedCoverImage = storageRepository.uploadImage("petition_images/", coverImage.toUri())
+                Log.d("TAG", "updatePetition: $updatedCoverImage")
+                repository.updatePetition(
+                    petitionId = petitionId,
+                    name = title,
+                    imageUrl = updatedCoverImage,
+                    otherDetails = otherDetails,
                 )
+                _events.send(PetitionDetailsResult.PetitionUpdated(true))
             } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    error = "Failed to update policy: ${e.message}"
-                )
+                _events.send(PetitionDetailsResult.Error("Failed to update petition: ${e.message}"))
             }
         }
     }
 
-    private fun deletePolicy() {
+    private fun deletePetition() {
         viewModelScope.launch {
             try {
                 val petitionId = _state.value.petition?.id ?: return@launch
                 repository.deletePetition(petitionId)
-                _state.value = _state.value.copy(
-                    error = null
-                )
-                // Maybe navigate back after deleting? Trigger a nav action here if you want
+                _events.send(PetitionDetailsResult.PetitionDeleted(true))
             } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    error = "Failed to delete petition: ${e.message}"
-                )
+                _events.send(PetitionDetailsResult.Error("Failed to delete petition: ${e.message}"))
             }
         }
     }
 
-    fun updateError(error: String){
-        viewModelScope.launch {
-            _state.value = _state.value.copy(
-                error = error,
-                isLoading = false
-            )
-        }
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun retry() {
+        _state.value.petition?.id?.let { loadPetition(it) }
     }
 
+    private fun clearError() {
+        _state.update { it.copy(error = null) }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        petitionListener?.remove()
+    }
 }

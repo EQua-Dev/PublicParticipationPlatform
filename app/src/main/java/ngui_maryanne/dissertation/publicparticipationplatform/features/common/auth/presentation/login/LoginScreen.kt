@@ -1,5 +1,9 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -77,6 +81,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
@@ -107,14 +112,17 @@ fun LoginScreen(
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
-
+    var logoVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        logoVisible = true // Trigger the animation when the screen appears
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+
     ) {
         // Background with Kenyan-inspired patterns
-        KenyanBackgroundPattern()
+//        KenyanBackgroundPattern()
 
         Column(
             modifier = Modifier
@@ -125,10 +133,33 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Logo and title area
-            KenyanShieldLogo(
-                modifier = Modifier.size(120.dp)
-            )
+            // Logo with animation
+            AnimatedVisibility(
+                visible = logoVisible,
+                enter = fadeIn(animationSpec = tween(1000)) + scaleIn(
+                    initialScale = 0.5f,
+                    animationSpec = tween(1000)
+                )
+            ) {
+                /*Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .wrapContentSize()
+                ) {*/
+                Image(
+                    painter = painterResource(id = R.drawable.app_logo), // replace with your drawable
+                    contentDescription = "App Logo",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .padding(16.dp) // inner padding inside the card
+                        .clip(shape = RoundedCornerShape(12.dp))
+                )
+//                    }
+
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -152,8 +183,7 @@ fun LoginScreen(
             // Login card
             Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+                    .fillMaxWidth(),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
@@ -165,7 +195,7 @@ fun LoginScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 32.dp),
+                        .padding(horizontal = 8.dp, vertical = 32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {

@@ -32,7 +32,7 @@ class StorageRepositoryImpl @Inject constructor(
 
     override suspend fun uploadImage(path: String, imageUri: Uri): String {
         return try {
-            val storageRef = storage.reference.child("project_images/${UUID.randomUUID()}.jpg")
+            val storageRef = storage.reference.child("$path${UUID.randomUUID()}.jpg")
             storageRef.putFile(imageUri).await()
             storageRef.downloadUrl.await().toString()
         } catch (e: Exception) {
