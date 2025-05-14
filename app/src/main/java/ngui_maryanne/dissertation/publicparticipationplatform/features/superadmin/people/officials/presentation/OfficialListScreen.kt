@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -160,13 +161,23 @@ private fun OfficialItem(
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "${official.firstName} ${official.lastName}",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "${official.firstName} ${official.lastName}",
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
 
+                    // Status indicator
+                    Text(
+                        text = if (official.active) "Active" else "Inactive",
+                        color = if (official.active) MaterialTheme.colorScheme.primary else Color.Gray,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(

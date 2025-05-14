@@ -55,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -133,7 +134,7 @@ fun CitizenRegistrationStepOne(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Citizen Registration",
+                text = stringResource(id = R.string.citizen_registration),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -141,7 +142,7 @@ fun CitizenRegistrationStepOne(
             )
 
             Text(
-                text = "Join the digital Kenya platform",
+                text = stringResource(R.string.join_the_digital_kenya_platform),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
@@ -171,7 +172,7 @@ fun CitizenRegistrationStepOne(
                     if (!state.isOtpSent) {
                         // Personal Information Section
                         Text(
-                            text = "Personal Information",
+                            text = stringResource(R.string.personal_information),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -183,7 +184,7 @@ fun CitizenRegistrationStepOne(
                             OutlinedTextField(
                                 value = state.firstName,
                                 onValueChange = { onEvent(CitizenRegistrationEvent.FirstNameChanged(it)) },
-                                label = { Text("First Name") },
+                                label = { Text(stringResource(R.string.first_name)) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                /* leadingIcon = {
@@ -199,7 +200,7 @@ fun CitizenRegistrationStepOne(
                             OutlinedTextField(
                                 value = state.lastName,
                                 onValueChange = { onEvent(CitizenRegistrationEvent.LastNameChanged(it)) },
-                                label = { Text("Last Name") },
+                                label = { Text(stringResource(R.string.last_name)) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = textFieldColors()
@@ -210,7 +211,7 @@ fun CitizenRegistrationStepOne(
                         OutlinedTextField(
                             value = state.nationalID,
                             onValueChange = { onEvent(CitizenRegistrationEvent.NationalIDChanged(it)) },
-                            label = { Text("National ID") },
+                            label = { Text(stringResource(R.string.national_id)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             leadingIcon = {
@@ -224,7 +225,7 @@ fun CitizenRegistrationStepOne(
 
                         // Contact Information Section
                         Text(
-                            text = "Contact Information",
+                            text = stringResource(R.string.contact_information),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(top = 8.dp)
@@ -234,7 +235,7 @@ fun CitizenRegistrationStepOne(
                         OutlinedTextField(
                             value = state.email,
                             onValueChange = { onEvent(CitizenRegistrationEvent.EmailChanged(it)) },
-                            label = { Text("Email") },
+                            label = { Text(stringResource(R.string.email)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -251,7 +252,8 @@ fun CitizenRegistrationStepOne(
                         OutlinedTextField(
                             value = state.phoneNumber,
                             onValueChange = { onEvent(CitizenRegistrationEvent.PhoneNumberChanged(it)) },
-                            label = { Text("Phone Number") },
+                            placeholder = { Text(text = "eg: +234123456789")},
+                            label = { Text(stringResource(R.string.phone_number)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -282,7 +284,7 @@ fun CitizenRegistrationStepOne(
 */
                         // Password Section
                         Text(
-                            text = "Account Security",
+                            text = stringResource(R.string.account_security),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(top = 8.dp)
@@ -293,7 +295,7 @@ fun CitizenRegistrationStepOne(
                         OutlinedTextField(
                             value = state.password,
                             onValueChange = { onEvent(CitizenRegistrationEvent.PasswordChanged(it)) },
-                            label = { Text("Password") },
+                            label = { Text(stringResource(R.string.password)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -336,7 +338,7 @@ fun CitizenRegistrationStepOne(
                                     !state.isLoading
                         ) {
                             Text(
-                                text = "Send OTP",
+                                text = stringResource(id = R.string.send_otp),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold
                                 )
@@ -354,7 +356,7 @@ fun CitizenRegistrationStepOne(
                                 modifier = Modifier.size(48.dp)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("Sending OTP...")
+                            Text(stringResource(R.string.sending_otp))
                         }
                     } else {
                         // OTP Verification
@@ -364,13 +366,16 @@ fun CitizenRegistrationStepOne(
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             Text(
-                                text = "OTP Verification",
+                                text = stringResource(R.string.otp_verification),
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.primary
                             )
 
                             Text(
-                                text = "We've sent a 6-digit code to ${state.phoneNumber}",
+                                text = stringResource(
+                                    R.string.we_ve_sent_a_6_digit_code_to,
+                                    state.phoneNumber
+                                ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center
                             )
@@ -381,7 +386,7 @@ fun CitizenRegistrationStepOne(
                             OutlinedTextField(
                                 value = state.otp,
                                 onValueChange = { if (it.length <= 6) onEvent(CitizenRegistrationEvent.OtpChanged(it)) },
-                                label = { Text("Enter OTP") },
+                                label = { Text(stringResource(R.string.enter_otp)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -406,7 +411,7 @@ fun CitizenRegistrationStepOne(
                                 enabled = state.otp.length == 6
                             ) {
                                 Text(
-                                    text = "Verify OTP",
+                                    text = stringResource(R.string.verify_otp),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Bold
                                     )

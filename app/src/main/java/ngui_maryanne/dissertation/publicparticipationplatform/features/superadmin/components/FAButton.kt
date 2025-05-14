@@ -114,7 +114,7 @@ fun ExpandableFloatingActionButton(
                 .offset(y = 25.dp)
                 .size(width = expandedWidth, height = boxExpandedHeight)
                 .background(
-                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(18.dp)
                 ),
             contentAlignment = Alignment.TopCenter

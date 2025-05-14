@@ -40,12 +40,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login.KenyanBackgroundPattern
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login.KenyanShieldLogo
 
@@ -102,7 +104,7 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Forgot Password",
+                text = stringResource(id = R.string.forgot_password),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -110,7 +112,7 @@ fun ForgotPasswordScreen(
             )
 
             Text(
-                text = "Enter your email to receive a password reset link",
+                text = stringResource(R.string.enter_your_email_to_receive_a_password_reset_link),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center,
@@ -143,7 +145,7 @@ fun ForgotPasswordScreen(
                     OutlinedTextField(
                         value = state.email,
                         onValueChange = { viewModel.onEvent(ForgotPasswordEvent.EmailChanged(it)) },
-                        label = { Text("Email Address") },
+                        label = { Text(stringResource(R.string.email_address)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         keyboardOptions = KeyboardOptions(
@@ -196,7 +198,8 @@ fun ForgotPasswordScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Send Reset Link",
+                                    text = stringResource(R.string.send_reset_link)
+                                    ,
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Bold
                                     )
@@ -207,7 +210,7 @@ fun ForgotPasswordScreen(
 
                     // Help text
                     Text(
-                        text = "Check your email for instructions to reset your password",
+                        text = stringResource(R.string.check_your_email_for_instructions_to_reset_your_password),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         textAlign = TextAlign.Center,
@@ -244,7 +247,7 @@ fun ForgotPasswordScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Sending reset link...",
+                            text = stringResource(R.string.sending_reset_link),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }

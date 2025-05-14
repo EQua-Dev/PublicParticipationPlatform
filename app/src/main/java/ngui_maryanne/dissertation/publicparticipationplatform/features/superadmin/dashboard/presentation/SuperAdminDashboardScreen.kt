@@ -156,7 +156,7 @@ private fun DashboardGrid(
                 title = "Policies",
                 count = state.policiesCount,
                 icon = R.drawable.ic_policies,
-                color = MaterialTheme.colorScheme.tertiary,
+                color = MaterialTheme.colorScheme.onSurface,
                 onClick = {
                     navController.navigate(Screen.CitizenPolicies.route)
                 }
@@ -189,7 +189,7 @@ private fun DashboardGrid(
                 title = "Petitions",
                 count = state.petitionsCount,
                 icon = R.drawable.ic_petitions,
-                color = MaterialTheme.colorScheme.tertiary,
+                color = MaterialTheme.colorScheme.onSurface,
                 onClick = {
                     navController.navigate(Screen.CitizenPetitions.route)
                 }

@@ -78,7 +78,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -113,10 +115,11 @@ fun CitizenHomeScreen(
 
     // Define color palette with sophisticated hierarchy
     val backgroundColor = Color(0xFFF8F9FA) // Light neutral background
-    val surfaceColor = Color(0xFFFFFFFF) // Pure white for surfaces
+    val surfaceColor = MaterialTheme.colorScheme.surface // Pure white for surfaces
     val primaryText = Color(0xFF2C3E50) // Deep blue-gray for primary text
     val secondaryText = Color(0xFF5D6D7E) // Lighter blue-gray for secondary text
     val accentPrimary = MaterialTheme.colorScheme.primary
+
 
     // Service-specific subtle accent colors
     val policyColor = Color(0xFF5E81AC) // Soft blue for policies
@@ -151,7 +154,7 @@ fun CitizenHomeScreen(
         ) {
             // Content based on state
             when {
-                state.isLoading -> LoadingDialog(loadingText = "Loading your dashboard...")
+                state.isLoading -> LoadingDialog(loadingText = stringResource(R.string.loading_your_dashboard))
                 !state.isApproved -> AwaitingApprovalScreen(
                     contentColor = primaryText,
                     accentColor = accentPrimary
@@ -177,8 +180,8 @@ fun CitizenHomeScreen(
     if (openDialog.value) {
         ElegantAlertDialog(
             onDismissRequest = { openDialog.value = false },
-            title = "Logout",
-            message = "Do you want to logout?",
+            title = stringResource(R.string.logout),
+            message = stringResource(R.string.do_you_want_to_logout),
             onConfirm = { viewModel.onEvent(CitizenHomeEvent.Logout) },
             onDismiss = { openDialog.value = false },
             dialogBackgroundColor = surfaceColor,
@@ -238,7 +241,7 @@ fun ElegantAlertDialog(
                             contentColor = dialogContentColor.copy(alpha = 0.8f)
                         )
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
 
                     Button(
@@ -249,7 +252,7 @@ fun ElegantAlertDialog(
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Logout")
+                        Text(stringResource(id = R.string.logout))
                     }
                 }
             }
@@ -285,7 +288,7 @@ fun AwaitingApprovalScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.HourglassEmpty,
-                contentDescription = "Awaiting Approval",
+                contentDescription = stringResource(R.string.awaiting_approval),
                 modifier = Modifier.size(80.dp),
                 tint = accentColor
             )
@@ -294,7 +297,7 @@ fun AwaitingApprovalScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            "Awaiting Approval",
+            stringResource(R.string.awaiting_approval),
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Medium,
@@ -307,7 +310,7 @@ fun AwaitingApprovalScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            "Your account is pending approval. You'll gain access to all features once approved.",
+            stringResource(R.string.your_account_is_pending_approval_you_ll_gain_access_to_all_features_once_approved),
             style = TextStyle(
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
@@ -341,7 +344,7 @@ fun AwaitingApprovalScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "Learn About the App",
+                    text = stringResource(R.string.learn_about_the_app),
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -363,6 +366,9 @@ fun ApprovedCitizenHome(
     petitionsColor: Color,
     budgetColor: Color
 ) {
+
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -371,8 +377,8 @@ fun ApprovedCitizenHome(
         // Announcements section
         if (announcements.isNotEmpty()) {
             Text(
-                text = "ANNOUNCEMENTS",
-                style = TextStyle(
+                text = stringResource(R.string.announcements),
+                style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = secondaryText,
@@ -404,8 +410,8 @@ fun ApprovedCitizenHome(
 
         // Services section heading
         Text(
-            text = "SERVICES",
-            style = TextStyle(
+            text = stringResource(R.string.services),
+            style = MaterialTheme.typography.bodyLarge.copy(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = secondaryText,
@@ -421,16 +427,18 @@ fun ApprovedCitizenHome(
             contentPadding = PaddingValues(bottom = 80.dp)
         ) {
             val services = listOf(
-                ServiceItem(R.drawable.ic_policies, "Policies", policyColor) {
+                ServiceItem(R.drawable.ic_policies,
+                    context.getString(R.string.policies), policyColor) {
                     navController.navigate(Screen.CitizenPolicies.route)
                 },
-                ServiceItem(R.drawable.ic_polls, "Polls", pollsColor) {
+                ServiceItem(R.drawable.ic_polls, context.getString(R.string.polls), pollsColor) {
                     navController.navigate(Screen.CitizenPolls.route)
                 },
-                ServiceItem(R.drawable.ic_petitions, "Petitions", petitionsColor) {
+                ServiceItem(R.drawable.ic_petitions,
+                    context.getString(R.string.petitions), petitionsColor) {
                     navController.navigate(Screen.CitizenPetitions.route)
                 },
-                ServiceItem(R.drawable.ic_budget, "Budget", budgetColor) {
+                ServiceItem(R.drawable.ic_budget, context.getString(R.string.budget), budgetColor) {
                     navController.navigate(Screen.CitizenParticipatoryBudget.route)
                 }
             )
@@ -490,8 +498,9 @@ fun ActionCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(
-            containerColor = cardBackgroundColor
-        )
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
     ) {
         Box(
             modifier = Modifier
@@ -606,14 +615,14 @@ fun CitizenHomeTopBar(
 
                 Column {
                     Text(
-                        "Wajibika Welcomes You,",
+                        "Wajibika,",
                         style = TextStyle(
                             fontSize = 12.sp,
                             color = topBarContentColor.copy(alpha = 0.7f)
                         )
                     )
                     Text(
-                        text = citizen?.firstName ?: "Citizen",
+                        text = citizen?.firstName?.let { stringResource(R.string.welcome, it) } ?: "Citizen",
                         style = TextStyle(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,

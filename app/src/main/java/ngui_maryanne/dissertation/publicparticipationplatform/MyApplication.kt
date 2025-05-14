@@ -17,7 +17,7 @@ class MyApplication: Application() {
         super.onCreate()
     }
 
-    override fun attachBaseContext(base: Context) {
+ /*   override fun attachBaseContext(base: Context) {
         // Get saved language and apply it when app starts
         val language = LanguageHelper.getLanguage(base)
         super.attachBaseContext(LanguageHelper.updateLocale(base, language).baseContext)
@@ -28,7 +28,7 @@ class MyApplication: Application() {
         // Re-apply language configuration when system configuration changes
         val language = LanguageHelper.getLanguage(this)
         LanguageHelper.updateLocale(this, language)
-    }
+    }*/
 }
 
 

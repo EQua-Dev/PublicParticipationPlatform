@@ -136,7 +136,7 @@ fun CitizenRegistrationStepTwo(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Complete Your Profile",
+                text = stringResource(R.string.complete_your_profile),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -144,7 +144,7 @@ fun CitizenRegistrationStepTwo(
             )
 
             Text(
-                text = "Finish setting up your citizen account",
+                text = stringResource(R.string.finish_setting_up_your_citizen_account),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
@@ -173,7 +173,7 @@ fun CitizenRegistrationStepTwo(
                 ) {
                     // Profile Picture Section
                     Text(
-                        text = "Profile Picture",
+                        text = stringResource(R.string.profile_picture),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -214,7 +214,7 @@ fun CitizenRegistrationStepTwo(
                     }
 
                     Text(
-                        text = "Tap to add profile photo",
+                        text = stringResource(R.string.tap_to_add_profile_photo),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -224,7 +224,7 @@ fun CitizenRegistrationStepTwo(
 
                     // Personal Details Section
                     Text(
-                        text = "Personal Details",
+                        text = stringResource(R.string.personal_details),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -233,7 +233,7 @@ fun CitizenRegistrationStepTwo(
                     OutlinedTextField(
                         value = state.occupation,
                         onValueChange = { onEvent(CitizenRegistrationEvent.OccupationChanged(it)) },
-                        label = { Text("Occupation") },
+                        label = { Text(stringResource(R.string.occupation)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         leadingIcon = {
@@ -304,7 +304,7 @@ fun CitizenRegistrationStepTwo(
                             )
                         } else {
                             Text(
-                                text = "Complete Registration",
+                                text = stringResource(R.string.complete_registration),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold
                                 )
@@ -342,7 +342,7 @@ fun CitizenRegistrationStepTwo(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Completing Registration...",
+                            text = stringResource(R.string.completing_registration),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }

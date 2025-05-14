@@ -26,8 +26,12 @@ import android.os.Build
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import java.util.Locale
 
 
@@ -44,6 +48,7 @@ enum class AppLanguage(val code: String, val locale: Locale) {
 }
 
 // Utility class to manage language settings
+/*
 object LanguageHelper {
     // SharedPreferences key
     private const val PREF_NAME = "app_language_pref"
@@ -90,24 +95,66 @@ object LanguageHelper {
         }
     }
 }
+*/
+
+object LanguageHelper {
+
+    // Get saved language from DataStore
+    suspend fun getLanguage(userPreferences: UserPreferences): AppLanguage {
+        return userPreferences.languageFlow.first() // suspending call
+    }
+
+    // Save selected language to DataStore
+    suspend fun saveLanguage(userPreferences: UserPreferences, language: AppLanguage) {
+        userPreferences.saveLanguage(language)
+    }
+
+    // Update locale configuration
+    fun updateLocale(context: Context, language: AppLanguage): ContextWrapper {
+        val locale = language.locale
+        Locale.setDefault(locale)
+
+        val resources = context.resources
+        val configuration = Configuration(resources.configuration)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            configuration.setLocale(locale)
+            return ContextWrapper(context.createConfigurationContext(configuration))
+        } else {
+            configuration.locale = locale
+            resources.updateConfiguration(configuration, resources.displayMetrics)
+            return ContextWrapper(context)
+        }
+    }
+
+    // Restart the activity to apply language changes
+    fun restartActivity(activity: Activity?) {
+        activity?.let {
+            val intent = it.intent
+            it.finish()
+            it.startActivity(intent)
+            it.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
+    }
+}
+
 
 @Composable
 fun LanguageSettingSection(
     isEditing: Boolean,
     selectedLanguage: AppLanguage,
-    onLanguageSelected: (AppLanguage) -> Unit
+    onLanguageSelected: (AppLanguage) -> Unit,
+    userPreferences: UserPreferences
 ) {
     val languages = AppLanguage.values().toList()
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
-    // Get the activity from the context
     fun findActivity(context: Context): Activity? {
         var currentContext = context
         while (currentContext is ContextWrapper) {
-            if (currentContext is Activity) {
-                return currentContext
-            }
+            if (currentContext is Activity) return currentContext
             currentContext = currentContext.baseContext
         }
         return null
@@ -143,18 +190,24 @@ fun LanguageSettingSection(
                         DropdownMenuItem(
                             text = { Text(text = language.name.capitalize()) },
                             onClick = {
-                                // Update language in preferences
-                                LanguageHelper.saveLanguage(context, language)
-
-                                // Update UI state
-                                onLanguageSelected(language)
-
-                                // Apply language change by updating configuration and restarting
-                                val activity = findActivity(context)
-                                LanguageHelper.updateLocale(context, language)
-                                LanguageHelper.restartActivity(activity)
-
                                 expanded = false
+
+                                coroutineScope.launch {
+                                    // Save in datastore
+                                    LanguageHelper.saveLanguage(userPreferences, language)
+
+                                    // Update UI state
+                                    onLanguageSelected(language)
+
+                                    // Get the current language and compare before updating locale
+                                    val currentLanguage = LanguageHelper.getLanguage(userPreferences)
+                                    if (currentLanguage != language) {
+                                        // Only update locale if the language is different
+                                        val activity = findActivity(context)
+                                        LanguageHelper.updateLocale(context, language)
+                                        LanguageHelper.restartActivity(activity)
+                                    }
+                                }
                             }
                         )
                     }

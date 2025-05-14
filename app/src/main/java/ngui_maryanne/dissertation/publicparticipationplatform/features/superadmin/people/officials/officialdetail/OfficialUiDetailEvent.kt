@@ -7,7 +7,9 @@ sealed class OfficialDetailEvent {
 
     data class UpdateOfficial(val updatedOfficial: Official) : OfficialDetailEvent()
     object DeactivateOfficial : OfficialDetailEvent()
+    object ActivateOfficial : OfficialDetailEvent()
     object OfficialUpdated : OfficialDetailEvent()
     object OfficialDeactivated : OfficialDetailEvent()
+    object OfficialActivated : OfficialDetailEvent()
     data class ShowError(val message: String) : OfficialDetailEvent()
 }

@@ -54,7 +54,9 @@ fun InitScreen(
 ) {
 
     val context = LocalContext.current
-    val selectedLocale = Locale("en")
+    val currentLanguage = LocalAppLanguage.current
+
+    val selectedLocale = Locale(currentLanguage.code)
     val localizedContext = remember(selectedLocale) {
         context.wrapInLocale(selectedLocale)
     }

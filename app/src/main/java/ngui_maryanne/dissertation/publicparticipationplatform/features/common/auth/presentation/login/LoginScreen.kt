@@ -203,7 +203,7 @@ fun LoginScreen(
                     OutlinedTextField(
                         value = state.email,
                         onValueChange = { viewModel.onEvent(LoginEvent.EmailChanged(it)) },
-                        label = { Text("Email") },
+                        label = { Text(stringResource(id = R.string.email_label)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         keyboardOptions = KeyboardOptions(
@@ -229,7 +229,7 @@ fun LoginScreen(
                     OutlinedTextField(
                         value = state.password,
                         onValueChange = { viewModel.onEvent(LoginEvent.PasswordChanged(it)) },
-                        label = { Text("Password") },
+                        label = { Text(stringResource(id = R.string.password_label)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         keyboardOptions = KeyboardOptions(
@@ -270,7 +270,7 @@ fun LoginScreen(
                                     contentColor = MaterialTheme.colorScheme.primary
                                 )
                             ) {
-                                Text("Forgot Password?")
+                                Text(stringResource(id = R.string.forgot_password))
                             }
                         }
                     }
@@ -301,7 +301,7 @@ fun LoginScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Login",
+                                text = stringResource(id = R.string.login),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold
                                 )
@@ -320,7 +320,7 @@ fun LoginScreen(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        "Don't have an account?",
+                        stringResource(id = R.string.dont_have_account),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                     )
@@ -330,7 +330,7 @@ fun LoginScreen(
                             contentColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
-                        Text("Create Account")
+                        Text(stringResource(id = R.string.create_account))
                     }
                 }
             }
@@ -363,7 +363,7 @@ fun LoginScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Logging in...",
+                            text = stringResource(id = R.string.logging_in),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }

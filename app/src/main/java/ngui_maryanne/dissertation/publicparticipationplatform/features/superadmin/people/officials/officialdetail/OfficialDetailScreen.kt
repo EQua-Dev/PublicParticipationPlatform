@@ -4,11 +4,13 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -20,13 +22,29 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,10 +57,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -66,7 +87,15 @@ fun OfficialDetailScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
+
+    LaunchedEffect(uiState) {
+        uiState.error?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.uiState.value.copy(error = null)
+        }
+    }
 
 
     LaunchedEffect(true) {
@@ -89,6 +118,10 @@ fun OfficialDetailScreen(
                     Toast.makeText(context, "Official deactivated", Toast.LENGTH_SHORT).show()
                     navController.popBackStack()
                 }
+                OfficialDetailEvent.OfficialActivated -> {
+                    Toast.makeText(context, "Official activated", Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
+                }
 
                 else -> {
 
@@ -97,68 +130,45 @@ fun OfficialDetailScreen(
         }
     }
 
-    // Show loading indicator while data is being fetched
-    if (uiState.isLoading) {
-        CircularProgressIndicator()
-    } else {
-        Column(Modifier.padding(16.dp)) {
-            // Display Profile Image
-            Image(
-                painter = rememberImagePainter(uiState.official?.profileImageUrl),
-                contentDescription = "Official Profile Image",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(Color.Gray)
-                    .padding(8.dp)
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Official Details
-            Text(text = "Name: ${uiState.official?.firstName} ${uiState.official?.lastName}")
-            Text(text = "Phone: ${uiState.official?.phoneNumber}")
-
-            // Display Permissions List
-            uiState.official?.permissions?.let { permissions ->
-                if (permissions.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = "Permissions:")
-                    permissions.forEach { permission ->
-                        Text(text = "• $permission", modifier = Modifier.padding(start = 16.dp))
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Official Details") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                } else {
-                    Text(text = "This official has no permissions")
                 }
-            }
-
-
-            // Edit Button to trigger the Bottom Sheet
-            CustomButton(
-                onClick = {
-                    showBottomSheet = true
-                    coroutineScope.launch {
-                        sheetState.show()
-                    }
-                },
-                modifier = Modifier.padding(top = 16.dp),
-                text = "Edit Details"
-            )
-
-            // Deactivate Button
-            CustomButton(
-                onClick = { viewModel.onEvent(OfficialDetailEvent.DeactivateOfficial) },
-                modifier = Modifier.padding(top = 8.dp),
-                text = "Deactivate Official"
             )
         }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            when {
+                uiState.isLoading -> FullScreenLoading()
+                uiState.official == null -> ErrorState(
+                    error = "Official not found",
+                    onRetry = { viewModel.onEvent(OfficialDetailEvent.LoadOfficial(officialId)) }
+                )
+                else -> OfficialDetailsContent(
+                    official = uiState.official!!,
+                    onEditClick = { showBottomSheet = true },
+                    onToggleStatus = { isActive ->
+                        viewModel.onEvent(
+                            if (isActive) OfficialDetailEvent.DeactivateOfficial
+                            else OfficialDetailEvent.ActivateOfficial
+                        )
+                    }
+                )
+            }
+        }
     }
-
-    if (uiState.isLoading) {
-        LoadingDialog()
-    }
-
-
     // Bottom Sheet for Editing Official Details
     /*   ModalBottomSheetLayout(
            sheetState = sheetState,
@@ -187,6 +197,150 @@ fun OfficialDetailScreen(
         )
     }
 }
+
+
+@Composable
+private fun OfficialDetailsContent(
+    official: Official,
+    onEditClick: () -> Unit,
+    onToggleStatus: (Boolean) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        // Profile Section
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = official.profileImageUrl,
+                contentDescription = "Official profile",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .border(
+                        width = 2.dp,
+                        color = if (official.active) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.error,
+                        shape = CircleShape
+                    ),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Status Chip
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            FilterChip(
+                selected = true,
+                onClick = {},
+                label = {
+                    Text(if (official.active) "Active" else "Inactive")
+                },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = if (official.active) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.errorContainer,
+                    selectedLabelColor = if (official.active) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onErrorContainer
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Personal Information
+        Text(
+            text = "Personal Information",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                LabeledText(label = "Full Name", text = "${official.firstName} ${official.lastName}")
+                LabeledText(label = "Email", text = official.email)
+                LabeledText(label = "Phone", text = official.phoneNumber)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Permissions
+        Text(
+            text = "Permissions",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        if (official.permissions.isNotEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    official.permissions.forEach { permission ->
+                        Row(
+                            modifier = Modifier.padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = permission.replace("_", " ").replaceFirstChar { it.uppercase() },
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+            Text(
+                text = "No permissions assigned",
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Action Buttons
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            FilledTonalButton(
+                onClick = onEditClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Edit Details")
+            }
+
+            Button(
+                onClick = { onToggleStatus(official.active) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (official.active) MaterialTheme.colorScheme.errorContainer
+                    else MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = if (official.active) MaterialTheme.colorScheme.onErrorContainer
+                    else MaterialTheme.colorScheme.onTertiaryContainer
+                )
+            ) {
+                Text(if (official.active) "Deactivate Official" else "Activate Official")
+            }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -355,4 +509,58 @@ fun EditOfficialDetails(
 
         }
     )
+}
+
+
+@Composable
+private fun LabeledText(label: String, text: String) {
+    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun FullScreenLoading() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun ErrorState(error: String, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.ErrorOutline,
+            contentDescription = null,
+            modifier = Modifier.size(48.dp),
+            tint = MaterialTheme.colorScheme.error
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = error,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onRetry) {
+            Text("Retry")
+        }
+    }
 }

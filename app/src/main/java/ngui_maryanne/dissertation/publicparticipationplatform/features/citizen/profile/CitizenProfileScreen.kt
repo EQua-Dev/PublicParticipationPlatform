@@ -1,5 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -57,6 +58,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.holder.HolderViewModel
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.getSavedLanguagePreference
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -67,8 +69,11 @@ fun CitizenProfileScreen(
     viewModel: CitizenProfileViewModel = hiltViewModel(),
     holderViewModel: HolderViewModel = hiltViewModel()
 ) {
+
+
     val state = viewModel.state.value
     val context = LocalContext.current
+    val userPreferences = UserPreferences(context)
     var selectedLanguage by remember { mutableStateOf(holderViewModel.selectedLanguage) }
 
 
@@ -97,15 +102,20 @@ fun CitizenProfileScreen(
                 FloatingActionButton(
                     onClick = {
 //                        if (state.phoneNumber.isNotBlank())
-                            viewModel.onEvent(
+                        viewModel.onEvent(
                             CitizenProfileEvent.SaveProfile
                         )
+                        Toast
+                            .makeText(
+                                context,
+                                R.string.restart_to_change_language,
+                                Toast.LENGTH_LONG
+                            ).show()
                     },
                 ) {
                     Icon(Icons.Default.Save, contentDescription = "Save")
                 }
-            }
-            else {
+            } else {
                 FloatingActionButton(
                     onClick = {
                         navController.navigate(Screen.AuditLogScreen.route)
@@ -200,10 +210,10 @@ fun CitizenProfileScreen(
                             )
 
 
-                                ProfileDetailItem(
-                                    label = "Email",
-                                    value = it.email
-                                )
+                            ProfileDetailItem(
+                                label = "Email",
+                                value = it.email
+                            )
 
 
                             if (state.isEditing) {
@@ -236,7 +246,11 @@ fun CitizenProfileScreen(
                                 OutlinedTextField(
                                     value = state.countyOfResidence,
                                     onValueChange = {
-                                        viewModel.onEvent(CitizenProfileEvent.CountyOfResidenceChanged(it))
+                                        viewModel.onEvent(
+                                            CitizenProfileEvent.CountyOfResidenceChanged(
+                                                it
+                                            )
+                                        )
                                     },
                                     label = { Text("County of Residence") },
                                     modifier = Modifier.fillMaxWidth()
@@ -259,7 +273,9 @@ fun CitizenProfileScreen(
                             selectedLanguage = selectedLanguage.value,
                             onLanguageSelected = {
                                 holderViewModel.saveLanguage(it)
-                                viewModel.onEvent(CitizenProfileEvent.LanguageChanged(it)) },
+                                viewModel.onEvent(CitizenProfileEvent.LanguageChanged(it))
+                            },
+                            userPreferences = userPreferences
                         )
 
                     }

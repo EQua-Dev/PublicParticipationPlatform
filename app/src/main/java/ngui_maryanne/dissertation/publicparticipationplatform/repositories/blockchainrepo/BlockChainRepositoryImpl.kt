@@ -42,9 +42,10 @@ class BlockChainRepositoryImpl @Inject constructor(
                                     previousHash = previousHash,
                                     location = locationAddress,
                                     transactionType = transactionType.name
-                                ).copy(hash = AuditLog().computeHash())
+                                )
+                                val transactionWithHash = transaction.copy(hash = transaction.computeHash())
 
-                                blockchainRef.add(transaction)
+                                blockchainRef.add(transactionWithHash)
                             } else {
 
                                 val transaction = AuditLog(
@@ -52,9 +53,10 @@ class BlockChainRepositoryImpl @Inject constructor(
                                     previousHash = previousHash,
                                     location = "Unknown Location",
                                     transactionType = transactionType.name
-                                ).copy(hash = AuditLog().computeHash())
+                                )
+                                val transactionWithHash = transaction.copy(hash = transaction.computeHash())
 
-                                blockchainRef.add(transaction)
+                                blockchainRef.add(transactionWithHash)
                             }
                         }
                         .addOnFailureListener { e ->

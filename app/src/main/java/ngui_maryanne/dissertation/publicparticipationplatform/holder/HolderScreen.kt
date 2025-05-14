@@ -76,6 +76,10 @@ import ngui_maryanne.dissertation.publicparticipationplatform.ui.components.Back
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Common.mAuth
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.getDp
 
+// Define the CompositionLocal for language
+val LocalAppLanguage = compositionLocalOf { AppLanguage.ENGLISH }
+
+
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -228,8 +232,23 @@ fun ScaffoldSection(
     onNewScreenRequest: (route: String, id: String?) -> Unit,
     onLogoutRequested: () -> Unit
 ) {
-    val LocalAppLanguage = compositionLocalOf { AppLanguage.ENGLISH }
+    // Access the selected language from the ViewModel
     val selectedLanguage by holderViewModel.selectedLanguage
+    val context = LocalContext.current
+
+    LaunchedEffect(selectedLanguage) {
+        // Update the locale
+        LanguageHelper.updateLocale(context, selectedLanguage)
+        holderViewModel.setLocale(selectedLanguage)
+
+
+        // Optionally, you can store the selected language in shared preferences
+        val sharedPreferences = context.getSharedPreferences("app_language_pref", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putString("selected_language", selectedLanguage.code).apply()
+
+        // Recreate the activity to apply the language change
+//        (context as? Activity)?.recreate()
+    }
 
     CompositionLocalProvider(LocalAppLanguage provides selectedLanguage) {
         Scaffold(

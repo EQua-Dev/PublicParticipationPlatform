@@ -45,16 +45,22 @@ class MainActivity : FragmentActivity() {
         val sharedPreferences = newBase.getSharedPreferences("app_language_pref", Context.MODE_PRIVATE)
         val languageCode = sharedPreferences.getString("selected_language", "en") ?: "en"
 
-        // Create a context with the correct locale
-        val locale = Locale(languageCode)
-        Locale.setDefault(locale)
+        val currentLanguage = Locale.getDefault().language
+        if (currentLanguage != languageCode) {
+            // Create a context with the correct locale if the language has changed
+            val locale = Locale(languageCode)
+            Locale.setDefault(locale)
 
-        val configuration = Configuration(newBase.resources.configuration)
-        configuration.setLocale(locale)
+            val configuration = Configuration(newBase.resources.configuration)
+            configuration.setLocale(locale)
 
-        val context = newBase.createConfigurationContext(configuration)
-        super.attachBaseContext(context)
+            val context = newBase.createConfigurationContext(configuration)
+            super.attachBaseContext(context)
+        } else {
+            super.attachBaseContext(newBase)
+        }
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
 //        setAppLanguage(this)
@@ -134,7 +140,7 @@ class MainActivity : FragmentActivity() {
     override fun onResume() {
         super.onResume()
         // Re-apply locale if needed
-        applyLocale()
+//        applyLocale()
     }
 
     private fun applyLocale() {

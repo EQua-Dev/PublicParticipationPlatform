@@ -1,6 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.utils
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -56,6 +57,7 @@ class UserPreferences(private val context: Context) {
 
     // Save Language
     suspend fun saveLanguage(language: AppLanguage) {
+        Log.d("UserPrefs", "saveLanguage: $language")
         context.dataStore.edit { preferences ->
             preferences[PREFERRED_LANGUAGE] = language.code  // e.g. "en", "fr"
         }

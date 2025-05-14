@@ -42,6 +42,7 @@ class OfficialDetailViewModel @Inject constructor(
 
             is OfficialDetailEvent.UpdateOfficial -> updateOfficial(event.updatedOfficial)
             OfficialDetailEvent.DeactivateOfficial -> deactivateOfficial()
+            OfficialDetailEvent.ActivateOfficial -> activateOfficial()
             is OfficialDetailEvent.OfficialUpdated -> {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }
@@ -123,6 +124,20 @@ class OfficialDetailViewModel @Inject constructor(
                 updateOfficial(deactivatedOfficial)
                 blockChainRepository.createBlockchainTransaction(TransactionTypes.DEACTIVATE_OFFICIAL)
                 _eventFlow.emit(OfficialDetailEvent.OfficialDeactivated)
+            } catch (e: Exception) {
+                _eventFlow.emit(OfficialDetailEvent.ShowError(e.message ?: "Unknown error"))
+            }
+        }
+    }
+   private fun activateOfficial() {
+        val official = _uiState.value.official ?: return
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isLoading = true)
+                val activatedOfficial = official.copy(permissions = emptyList(), active = true)
+                updateOfficial(activatedOfficial)
+                blockChainRepository.createBlockchainTransaction(TransactionTypes.ACTIVATE_OFFICIAL)
+                _eventFlow.emit(OfficialDetailEvent.OfficialActivated)
             } catch (e: Exception) {
                 _eventFlow.emit(OfficialDetailEvent.ShowError(e.message ?: "Unknown error"))
             }
