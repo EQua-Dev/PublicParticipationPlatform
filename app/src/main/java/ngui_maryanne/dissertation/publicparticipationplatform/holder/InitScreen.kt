@@ -107,7 +107,7 @@ fun InitScreen(
 
                 // Super Admin Button
                 CustomButton(
-                    text = localizedContext.getString(R.string.super_admin_text),
+                    text = stringResource(id = R.string.super_admin_text),
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         holderViewModel.saveRole(UserRole.SUPERADMIN)

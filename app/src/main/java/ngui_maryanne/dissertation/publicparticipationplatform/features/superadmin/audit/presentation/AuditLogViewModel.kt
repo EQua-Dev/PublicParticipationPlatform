@@ -34,12 +34,15 @@ class SuperAdminAuditLogViewModel @Inject constructor(private val repo: AuditLog
             is SuperAdminAuditLogEvent.RevealUser -> {
                 viewModelScope.launch {
                     val (name, type, profileImage) = repo.getUserDetails(event.userId)
-                    val updated = _state.value.logs.toMutableList()
-                    val target = updated[event.index]
-                    updated[event.index] = target.copy(revealedName = name, userType = type)
+                    val updated = _state.value.logs.map { logUI ->
+                        if (logUI.log.transactionId == event.logId) {
+                            logUI.copy(revealedName = name, userType = type, profileImage = profileImage)
+                        } else logUI
+                    }
                     _state.value = _state.value.copy(logs = updated)
                 }
             }
+
 
             is SuperAdminAuditLogEvent.RunDiscrepancyCheck -> {
                 val logs = _state.value.logs.map { it.log }

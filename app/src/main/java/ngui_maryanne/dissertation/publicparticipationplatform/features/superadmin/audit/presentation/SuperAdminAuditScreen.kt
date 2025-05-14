@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -59,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 
 
@@ -99,7 +101,7 @@ fun SuperAdminAuditScreen(
                 icon = { Icon(Icons.Default.Search, contentDescription = "Run check") },
                 text = { Text("Verify Integrity") },
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.primary
+                contentColor = MaterialTheme.colorScheme.surface
             )
         }
     ) { paddingValues ->
@@ -178,12 +180,16 @@ private fun AuditLogList(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        itemsIndexed(state.logs.sortedByDescending { it.log.timestamp }) { index, logUI ->
+        val sortedLogs = state.logs.sortedByDescending { it.log.timestamp }
+        items(sortedLogs) { logUI ->
             AuditLogItem(
                 logUI = logUI,
                 onRevealClick = {
                     viewModel.onEvent(
-                        SuperAdminAuditLogEvent.RevealUser(logUI.log.createdBy, index)
+                        SuperAdminAuditLogEvent.RevealUser(
+                            userId = logUI.log.createdBy,
+                            logId = logUI.log.transactionId // Or another unique field
+                        )
                     )
                 },
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -307,8 +313,9 @@ private fun AuditLogItem(
                 )
             }
 
+            val currentUser = FirebaseAuth.getInstance().currentUser
             // Reveal Button (if not already revealed)
-            if (logUI.revealedName == null) {
+            if (logUI.revealedName == null || logUI.log.createdBy != currentUser!!.uid) {
                 Spacer(modifier = Modifier.height(8.dp))
                 TextButton(
                     onClick = onRevealClick,

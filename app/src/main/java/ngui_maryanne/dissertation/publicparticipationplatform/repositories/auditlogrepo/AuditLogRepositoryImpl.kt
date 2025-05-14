@@ -55,6 +55,6 @@ class AuditLogRepositoryImpl @Inject constructor(private val firestore: Firebase
             )
         }
 
-        return Triple("Unknown", "Unknown" ,"Unknown")
+        return Triple("Admin", "User" ,"Unknown")
     }
 }
