@@ -48,6 +48,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,6 +70,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.components.AnimatedProgressIndicator
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.daysToExpiry
@@ -110,7 +112,7 @@ fun PetitionDetailsScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = { Text("Petition Details") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -216,7 +218,6 @@ private fun PetitionDetailsContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .clip(MaterialTheme.shapes.large)
         ) {
             if (petition.coverImage.isNotEmpty()) {
@@ -233,7 +234,7 @@ private fun PetitionDetailsContent(
                     modifier = Modifier
                         .size(64.dp)
                         .align(Alignment.Center),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.surface
                 )
             }
         }
@@ -255,7 +256,7 @@ private fun PetitionDetailsContent(
         // Description
         Text(
             text = petition.description,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyMedium
         )
 
         // Request Goals
@@ -306,14 +307,16 @@ private fun PetitionDetailsContent(
                 )
             }
 
-            LinearProgressIndicator(
+            AnimatedProgressIndicator(percentage = progress)
+
+            /*LinearProgressIndicator(
                 progress = animatedProgress,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp),
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+            )*/
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

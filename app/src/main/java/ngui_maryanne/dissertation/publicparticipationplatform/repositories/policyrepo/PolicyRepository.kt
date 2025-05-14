@@ -6,7 +6,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.Flow
 
 interface PolicyRepository {
-    suspend fun getAllPolicies(): List<Policy>
+    fun getAllPolicies(): Flow<List<Policy>>
     suspend fun createPolicy(policy: Policy)
     suspend fun getPoliciesBeforePublicOpinion(): List<Policy>
     fun getPolicyListener(policyId: String, onUpdate: (Policy?) -> Unit): ListenerRegistration

@@ -26,18 +26,27 @@ class PolicyRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : PolicyRepository {
 
-    override suspend fun getAllPolicies(): List<Policy> {
-        return try {
-            firestore.collection(POLICIES_REF)
-                .orderBy("dateCreated", Query.Direction.DESCENDING)
-                .get()
-                .await()
-                .toObjects(Policy::class.java)
-        } catch (e: Exception) {
-            throw Exception("Failed to fetch policies: ${e.message}")
+   override fun getAllPolicies(): Flow<List<Policy>> = callbackFlow {
+        val listenerRegistration = firestore.collection(POLICIES_REF)
+            .orderBy("dateCreated", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(Exception("Failed to listen for policy changes: ${error.message}", error))
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && !snapshot.isEmpty) {
+                    val policies = snapshot.toObjects(Policy::class.java)
+                    trySend(policies).isSuccess
+                } else {
+                    trySend(emptyList()).isSuccess
+                }
+            }
+
+        awaitClose {
+            listenerRegistration.remove()
         }
     }
-
     override suspend fun createPolicy(policy: Policy) {
         try {
             firestore.collection(POLICIES_REF)

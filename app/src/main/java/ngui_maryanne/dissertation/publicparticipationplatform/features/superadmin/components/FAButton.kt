@@ -114,14 +114,14 @@ fun ExpandableFloatingActionButton(
                 .offset(y = 25.dp)
                 .size(width = expandedWidth, height = boxExpandedHeight)
                 .background(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(18.dp)
                 ),
             contentAlignment = Alignment.TopCenter
         ) {
             Column(
                 modifier = Modifier.padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.Start
             ) {
                 AnimatedVisibility(visible = expanded) {
                     Column(
@@ -196,8 +196,8 @@ fun ExpandableFloatingActionButton(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxSize()
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

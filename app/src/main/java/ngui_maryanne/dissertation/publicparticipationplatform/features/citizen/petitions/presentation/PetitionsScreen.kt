@@ -32,6 +32,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -42,6 +43,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,11 +62,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
+import ngui_maryanne.dissertation.publicparticipationplatform.components.AnimatedProgressIndicator
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.signaturesProgress
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.newpetition.CreatePetitionBottomSheet
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.newpetition.PetitionViewModel
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation.SearchBar
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.sectors
 import java.time.Duration
@@ -97,9 +101,9 @@ fun CitizenPetitionsScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = { Text("Public Petitions") },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     scrolledContainerColor = MaterialTheme.colorScheme.surface
                 )
@@ -122,7 +126,6 @@ fun CitizenPetitionsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background)
         ) {
             when {
                 uiState.isLoading -> FullScreenLoading()
@@ -160,6 +163,7 @@ fun CitizenPetitionsScreen(
                         // Search Bar
                         SearchBar(
                             query = uiState.searchQuery,
+                            placeholder = "Search petitions by title or description...",
                             onQueryChange = { viewModel.onEvent(PetitionEvent.OnSearchQueryChanged(it)) },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -176,13 +180,25 @@ fun CitizenPetitionsScreen(
                             FilterChip(
                                 selected = uiState.selectedSector == null,
                                 onClick = { viewModel.onEvent(PetitionEvent.OnSectorFilterChanged(null)) },
-                                label = { Text("All Sectors") }
+                                label = { Text("All Sectors") },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                    selectedLabelColor = MaterialTheme.colorScheme.primary,
+                                    labelColor = MaterialTheme.colorScheme.onSurface
+                                )
                             )
                             sectors.forEach { sector ->
                                 FilterChip(
                                     selected = uiState.selectedSector == sector.first,
                                     onClick = { viewModel.onEvent(PetitionEvent.OnSectorFilterChanged(sector.first)) },
-                                    label = { Text(sector.first) }
+                                    label = { Text(sector.first) },
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        selectedLabelColor = MaterialTheme.colorScheme.primary,
+                                        labelColor = MaterialTheme.colorScheme.onSurface
+                                    )
                                 )
                             }
                         }
@@ -233,6 +249,7 @@ fun CitizenPetitionsScreen(
     }
 }
 
+/*
 @Composable
 private fun SearchBar(
     query: String,
@@ -266,6 +283,7 @@ private fun SearchBar(
         singleLine = true
     )
 }
+*/
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -339,14 +357,15 @@ fun PetitionCard(
             Spacer(modifier = Modifier.height(12.dp))
 
 //            LinearProgressIndicator()
-            LinearProgressIndicator(
+            AnimatedProgressIndicator(percentage = petition.signaturesProgress() / petition.signatureGoal.toFloat())
+            /*LinearProgressIndicator(
                 progress = petition.signaturesProgress() / petition.signatureGoal.toFloat(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(6.dp),
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+            )*/
 
             Spacer(modifier = Modifier.height(8.dp))
 

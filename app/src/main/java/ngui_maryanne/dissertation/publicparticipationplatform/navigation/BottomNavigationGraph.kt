@@ -166,6 +166,19 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
                 navController = navController
             )
         }
+        composable(
+            Screen.CitizenPolicyDetailsScreen.route,
+            arguments = listOf(
+                navArgument(name = "policyId") { type = NavType.StringType }
+            ),
+        ) {
+            val policyId = it.arguments?.getString("policyId")
+
+            CitizenPolicyDetailsScreen(
+                policyId = policyId!!,
+                navController = navController
+            )
+        }
 
         /*composable(
             Screen.FeesSemester.route,

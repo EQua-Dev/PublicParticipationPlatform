@@ -25,8 +25,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -39,11 +41,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -124,15 +131,12 @@ fun OfficialHomeScreen(
                         },
                         icon = {
                             Icon(painter = painterResource(id = screen.icon), contentDescription = screen.title)
-
-
-
-
-
-
-
-
                         },
+                        colors = NavigationDrawerItemDefaults.colors(
+                            selectedContainerColor = MaterialTheme.colorScheme.surface, // same as FAB background
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                        ),
                         modifier = Modifier.padding(horizontal = 12.dp)
                     )
                 }
@@ -319,14 +323,10 @@ fun AppBar(
         else -> "Good Night"
     }
 
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(id = R.string.app_name),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
+            Column {
+                ColoredAppName()
                 Text(
                     text = "$greeting, $officialName",
                     style = MaterialTheme.typography.bodySmall,
@@ -366,11 +366,38 @@ fun AppBar(
                 }
             }
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.primary
         ),
-        modifier = modifier
+        modifier = Modifier.shadow(4.dp) // Add visual shadow/elevation
+
+    )
+}
+
+@Composable
+fun ColoredAppName() {
+    val context = LocalContext.current
+    val appName = stringResource(id = R.string.app_name)
+
+    val kenyanColors = listOf(
+        Color(0xFF000000), // Black
+        Color(0xFFB00B1C), // Red
+        Color(0xFF006600), // Green
+//        Color(0xFFFFFFFF)  // White
+    )
+
+    Text(
+        text = buildAnnotatedString {
+            appName.forEachIndexed { index, char ->
+                val color = kenyanColors[index % kenyanColors.size]
+                withStyle(style = SpanStyle(color = color)) {
+                    append(char)
+                }
+            }
+        },
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold
     )
 }

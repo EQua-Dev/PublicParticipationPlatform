@@ -36,12 +36,14 @@ class PolicyViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true)
             try {
                 val official = officialRepository.getCurrentOfficial()
-                val policies = policyRepository.getAllPolicies()
-                _state.value = _state.value.copy(
-                    policies = policies,
-                    canCreatePolicy = official.permissions.contains("create_policy"),
-                    isLoading = false
-                )
+                policyRepository.getAllPolicies().collect{ policies ->
+                    _state.value = _state.value.copy(
+                        policies = policies,
+                        canCreatePolicy = official.permissions.contains("create_policy"),
+                        isLoading = false
+                    )
+                }
+
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     error = e.message,

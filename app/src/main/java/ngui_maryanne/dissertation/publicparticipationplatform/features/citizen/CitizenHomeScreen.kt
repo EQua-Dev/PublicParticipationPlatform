@@ -405,7 +405,7 @@ fun ApprovedCitizenHome(
                 budgetColor = budgetColor
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
         }
 
         // Services section heading
@@ -616,14 +616,14 @@ fun CitizenHomeTopBar(
                 Column {
                     Text(
                         "Wajibika,",
-                        style = TextStyle(
+                        style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 12.sp,
                             color = topBarContentColor.copy(alpha = 0.7f)
                         )
                     )
                     Text(
                         text = citizen?.firstName?.let { stringResource(R.string.welcome, it) } ?: "Citizen",
-                        style = TextStyle(
+                        style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = topBarContentColor
@@ -705,7 +705,7 @@ fun AnnouncementsCarousel(
             state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(180.dp),
+                .height(120.dp),
             contentPadding = PaddingValues(horizontal = 32.dp),
             pageSpacing = 16.dp
         ) { pageIndex ->
@@ -848,7 +848,7 @@ fun AnnouncementCard(
                                 else -> "BUDGET"
                             },
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                            style = TextStyle(
+                            style = MaterialTheme.typography.bodyLarge.copy(
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = cardAccentColor,
@@ -860,7 +860,7 @@ fun AnnouncementCard(
                     // Title
                     Text(
                         text = announcement.title,
-                        style = TextStyle(
+                        style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = cardContentColor
@@ -872,7 +872,7 @@ fun AnnouncementCard(
                     // Description
                     Text(
                         text = announcement.description,
-                        style = TextStyle(
+                        style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 12.sp,
                             color = cardContentColor.copy(alpha = 0.7f)
                         ),
@@ -898,7 +898,7 @@ fun AnnouncementCard(
 
                     Text(
                         text = HelpMe.getDate(announcement.createdAt.toLong(), "dd MMM"),
-                        style = TextStyle(
+                        style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 10.sp,
                             color = cardContentColor.copy(alpha = 0.6f)
                         )

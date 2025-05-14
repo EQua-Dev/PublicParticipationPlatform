@@ -35,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.components.AnimatedProgressIndicator
 import ngui_maryanne.dissertation.publicparticipationplatform.components.getTimeLeft
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
@@ -94,7 +96,7 @@ fun PollDetailsScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = { Text("Poll Details") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -207,7 +209,7 @@ private fun PollDetailsContent(
         // Poll Question
         Text(
             text = poll.pollQuestion,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold
         )
 
@@ -247,7 +249,11 @@ private fun PolicyCard(
     Card(
         onClick = onClick,
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -288,6 +294,10 @@ private fun PollOptionCard(
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(1.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
         border = if (isSelected) BorderStroke(
             2.dp,
             MaterialTheme.colorScheme.primary
@@ -297,7 +307,7 @@ private fun PollOptionCard(
             // Option Text
             Text(
                 text = option.optionText,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold
             )
 
@@ -313,7 +323,8 @@ private fun PollOptionCard(
 
             // Progress Bar
             Spacer(Modifier.height(8.dp))
-            androidx.compose.material3.LinearProgressIndicator(
+            AnimatedProgressIndicator(percentage = percentage, isSelected)
+           /* androidx.compose.material3.LinearProgressIndicator(
                 progress = percentage / 100f,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -321,7 +332,7 @@ private fun PollOptionCard(
                 color = if (isSelected) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+            )*/
 
             // Vote Info and Button
             Row(

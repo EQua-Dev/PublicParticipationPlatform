@@ -42,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -104,7 +105,7 @@ fun BudgetDetailsScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = { Text("Budget Details") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -122,7 +123,6 @@ fun BudgetDetailsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(MaterialTheme.colorScheme.background)
         ) {
             when {
                 detailsState.isLoading -> FullScreenLoading()
@@ -145,7 +145,7 @@ fun BudgetDetailsScreen(
                         item {
                             Text(
                                 text = "Budget Options (${detailsState.budgetOptions.size})",
-                                style = MaterialTheme.typography.titleLarge
+                                style = MaterialTheme.typography.titleSmall
                             )
                         }
 
@@ -263,8 +263,10 @@ private fun BudgetHeaderCard(budget: Budget) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -274,7 +276,7 @@ private fun BudgetHeaderCard(budget: Budget) {
             ) {
                 Text(
                     text = "Budget #${budget.budgetNo}",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 

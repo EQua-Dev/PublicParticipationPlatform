@@ -32,6 +32,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -97,7 +98,10 @@ fun CreatePolicyScreen(
                 ExtendedFloatingActionButton(
                     icon = { Icon(Icons.Default.Save, contentDescription = "Save") },
                     text = { Text("Create Policy") },
-                    onClick = { viewModel.onEvent(CreatePolicyEvent.Submit) } // Empty if using Box's clickable
+                    onClick = { viewModel.onEvent(CreatePolicyEvent.Submit) }, // Empty if using Box's clickable
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 2.dp),
                 )
             }
         }

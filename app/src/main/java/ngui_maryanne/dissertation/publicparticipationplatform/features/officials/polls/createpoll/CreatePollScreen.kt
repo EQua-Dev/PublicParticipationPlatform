@@ -9,20 +9,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomTextField
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollOption
 
@@ -89,7 +94,10 @@ fun CreatePollScreen(
                 ExtendedFloatingActionButton(
                     onClick = { viewModel.onEvent(CreatePollEvent.Submit) },
                     icon = { Icon(Icons.Default.Save, contentDescription = "Save") },
-                    text = { Text("Create Poll") }
+                    text = { Text("Create Poll") },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 2.dp),
                 )
             }
         }
@@ -110,10 +118,10 @@ fun CreatePollScreen(
             )
 
             // Poll Question
-            OutlinedTextField(
+            CustomTextField(
                 value = state.pollQuestion,
                 onValueChange = { viewModel.onEvent(CreatePollEvent.QuestionChanged(it)) },
-                label = { Text("Poll Question *") },
+                label = "Poll Question *",
                 modifier = Modifier.fillMaxWidth(),
                 isError = state.error?.contains("Poll Question") == true
             )
@@ -133,6 +141,7 @@ fun CreatePollScreen(
                     },
                     onRemove = { viewModel.onEvent(CreatePollEvent.RemoveOption(index)) }
                 )
+                Divider()
             }
             Button(
                 onClick = { viewModel.onEvent(CreatePollEvent.AddOption) },
@@ -185,13 +194,13 @@ private fun PolicyDropdown(
     var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
+        CustomTextField(
             value = selectedPolicy?.policyTitle ?: "Select Policy *",
             onValueChange = {},
-            label = { Text("Associated Policy") },
-            trailingIcon = {
-                Icon(Icons.Default.ArrowDropDown, null, Modifier.clickable { expanded = true })
-            },
+            label = "Associated Policy",
+            leadingIcon = Icons.Default.Category,
+            trailingIcon = Icons.Default.ArrowDropDown,
+            onTrailingIconClick = { expanded = true },
             readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
@@ -218,6 +227,7 @@ private fun PolicyDropdown(
                         expanded = false
                     }
                 )
+                Divider()
             }
         }
     }
@@ -233,14 +243,27 @@ private fun PollOptionItem(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        OutlinedTextField(
+        CustomTextField(
             value = option.optionText,
             onValueChange = {
                 onOptionChanged(option.copy(optionText = it))
             },
-            label = { Text("Option Text") },
+            label = "Option Text",
             modifier = Modifier.weight(1f)
         )
+
+        CustomTextField(
+            value = option.optionExplanation,
+            onValueChange = { newExplanation -> onOptionChanged(option.copy(optionExplanation = newExplanation)) },
+            label = "Poll Explanation",
+            modifier = Modifier
+                .fillMaxWidth()  // Make the text area fill the available width
+                .heightIn(min = 100.dp), // Set a minimum height to give more space for input
+            maxLines = 5, // Allow the user to enter multiple lines
+//            minLines = 3, // Set a minimum line height to make it more spacious
+            isSingleLine = false // Allow multi-line input
+        )
+
         IconButton(onClick = onRemove) {
             Icon(Icons.Default.Delete, contentDescription = "Remove")
         }

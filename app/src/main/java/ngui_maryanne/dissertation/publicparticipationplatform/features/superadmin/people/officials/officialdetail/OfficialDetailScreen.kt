@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -243,7 +244,7 @@ private fun OfficialDetailsContent(
                     Text(if (official.active) "Active" else "Inactive")
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = if (official.active) MaterialTheme.colorScheme.primaryContainer
+                    selectedContainerColor = if (official.active) MaterialTheme.colorScheme.surface
                     else MaterialTheme.colorScheme.errorContainer,
                     selectedLabelColor = if (official.active) MaterialTheme.colorScheme.onPrimaryContainer
                     else MaterialTheme.colorScheme.onErrorContainer
@@ -261,7 +262,7 @@ private fun OfficialDetailsContent(
         )
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 LabeledText(label = "Full Name", text = "${official.firstName} ${official.lastName}")
@@ -320,7 +321,11 @@ private fun OfficialDetailsContent(
         ) {
             FilledTonalButton(
                 onClick = onEditClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             ) {
                 Text("Edit Details")
             }
@@ -331,8 +336,8 @@ private fun OfficialDetailsContent(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (official.active) MaterialTheme.colorScheme.errorContainer
                     else MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor = if (official.active) MaterialTheme.colorScheme.onErrorContainer
-                    else MaterialTheme.colorScheme.onTertiaryContainer
+                    contentColor = if (official.active) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(if (official.active) "Deactivate Official" else "Activate Official")
