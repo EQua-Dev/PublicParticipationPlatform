@@ -1,6 +1,8 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls
 
 import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ListenerRegistration
@@ -11,20 +13,41 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation.PollWithPolicyName
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import javax.inject.Inject
 
 @HiltViewModel
 class PollViewModel @Inject constructor(
     private val pollRepository: PollsRepository,
     private val policyRepository: PolicyRepository,
-    private val officialRepository: OfficialsRepository
+    private val officialRepository: OfficialsRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PollState())
     val state: StateFlow<PollState> = _state.asStateFlow()
+
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
+
+    init {
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                }
+        }
+    }
+
 
     private var listenerRegistration: ListenerRegistration? = null
 
@@ -45,8 +68,9 @@ class PollViewModel @Inject constructor(
             try {
                 val official = officialRepository.getCurrentOfficial()
                 val policies = policyRepository.getPoliciesBeforePublicOpinion()
-                val polls = pollRepository.getAllPolls()
+                val polls = pollRepository.getAllPolls(_selectedLanguage.value).first()
 
+                Log.d("Polls ViewModel", "loadData: $polls")
                 _state.value = _state.value.copy(
                     polls = polls,
                     policies = policies,

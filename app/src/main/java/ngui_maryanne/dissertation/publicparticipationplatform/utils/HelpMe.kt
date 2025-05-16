@@ -23,7 +23,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-
+import com.google.mlkit.nl.translate.*
+import kotlinx.coroutines.tasks.await
 
 object HelpMe {
 
@@ -278,6 +279,32 @@ object HelpMe {
         val sharedPref = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         val languageName = sharedPref.getString("app_language", AppLanguage.ENGLISH.name)
         return AppLanguage.valueOf(languageName ?: AppLanguage.ENGLISH.name)
+    }
+
+
+    suspend fun translateTextWithMLKit(text: String, targetLang: String, sourceLang: String = TranslateLanguage.ENGLISH): String {
+        val options = TranslatorOptions.Builder()
+            .setSourceLanguage(sourceLang)
+            .setTargetLanguage(targetLang)
+            .build()
+        val translator = Translation.getClient(options)
+
+        try {
+            // Download the model if needed
+            translator.downloadModelIfNeeded().await()
+            return translator.translate(text).await()
+        } catch (e: Exception) {
+            Log.e("Translate", "Translation failed: ${e.message}")
+            return text // fallback to original
+        } finally {
+            translator.close()
+        }
+    }
+
+    fun AppLanguage.toTargetLang(): String = when (this) {
+        AppLanguage.SWAHILI -> TranslateLanguage.SWAHILI
+        AppLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+        else -> TranslateLanguage.ENGLISH
     }
 
 

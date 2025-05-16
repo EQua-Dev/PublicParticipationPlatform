@@ -49,6 +49,7 @@ firebaseStorageKtx = "21.0.1"
 composeMaterial = "1.4.1"
 biometricKtx = "1.1.0"
 biometric = "1.4.0-alpha02"
+translate = "17.0.3"
 
 
 
@@ -114,6 +115,7 @@ firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage
 androidx-biometric-ktx = { group = "androidx.biometric", name = "biometric-ktx", version.ref = "biometricKtx" }
 androidx-biometric = { module = "androidx.biometric:biometric" }
 biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
+translate = { module = "com.google.mlkit:translate", version.ref = "translate" }
 
 
 

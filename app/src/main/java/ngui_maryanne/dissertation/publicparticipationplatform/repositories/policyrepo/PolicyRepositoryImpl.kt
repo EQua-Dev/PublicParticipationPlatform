@@ -1,5 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.repositories.policyrepo
 
+import android.util.Log
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.POLICIES_REF
@@ -8,15 +9,22 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.google.mlkit.nl.translate.TranslateLanguage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.announcementrepo.AnnouncementRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.translateTextWithMLKit
 import java.util.UUID
 import javax.inject.Inject
 
@@ -26,7 +34,12 @@ class PolicyRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : PolicyRepository {
 
-   override fun getAllPolicies(): Flow<List<Policy>> = callbackFlow {
+   override fun getAllPolicies(language: AppLanguage): Flow<List<Policy>> = callbackFlow {
+       val targetLang = when (language) {
+           AppLanguage.SWAHILI -> TranslateLanguage.SWAHILI
+           AppLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+           else -> TranslateLanguage.ENGLISH
+       }
         val listenerRegistration = firestore.collection(POLICIES_REF)
             .orderBy("dateCreated", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
@@ -36,8 +49,15 @@ class PolicyRepositoryImpl @Inject constructor(
                 }
 
                 if (snapshot != null && !snapshot.isEmpty) {
-                    val policies = snapshot.toObjects(Policy::class.java)
-                    trySend(policies).isSuccess
+                    val originalPolicies = snapshot.toObjects(Policy::class.java)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val translatedPolicies = originalPolicies.map { policy ->
+                            Log.d("PolicyRepository", "getAllPolicies: $policy")
+                            translatePolicyToLanguage(policy, targetLang)
+                        }
+                        Log.d("Translate", "getPolicyListener: $language$translatedPolicies")
+                        trySend(translatedPolicies).isSuccess
+                    }
                 } else {
                     trySend(emptyList()).isSuccess
                 }
@@ -97,14 +117,33 @@ class PolicyRepositoryImpl @Inject constructor(
 
     override fun getPolicyListener(
         policyId: String,
+        language: AppLanguage,
         onUpdate: (Policy?) -> Unit
     ): ListenerRegistration {
+        val targetLang = when (language) {
+            AppLanguage.SWAHILI -> TranslateLanguage.SWAHILI
+            AppLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+            else -> TranslateLanguage.ENGLISH
+        }
+
         return firestore.collection(POLICIES_REF)
             .document(policyId)
             .addSnapshotListener { snapshot, _ ->
-                onUpdate(snapshot?.toObject(Policy::class.java))
+                val policy = snapshot?.toObject(Policy::class.java)
+                if (policy != null) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val translatedPolicy = translatePolicyToLanguage(policy, targetLang)
+                        Log.d("Translate", "getPolicyListener: $language$translatedPolicy")
+                        withContext(Dispatchers.Main) {
+                            onUpdate(translatedPolicy)
+                        }
+                    }
+                } else {
+                    onUpdate(null)
+                }
             }
     }
+
 
     override suspend fun updatePolicyStage(policyId: String, newStage: PolicyStatus) {
         try {
@@ -188,5 +227,20 @@ class PolicyRepositoryImpl @Inject constructor(
 
         awaitClose { listener.remove() }
     }
+
+    private suspend fun translatePolicyToLanguage(policy: Policy, targetLang: String): Policy {
+        return policy.copy(
+            policyName = translateTextWithMLKit(policy.policyName, targetLang),
+            policyTitle = translateTextWithMLKit(policy.policyTitle, targetLang),
+            policySector = translateTextWithMLKit(policy.policySector, targetLang),
+            policyDescription = translateTextWithMLKit(policy.policyDescription, targetLang),
+            statusHistory = policy.statusHistory.map {
+                it.copy(
+                    notes = translateTextWithMLKit(it.notes, targetLang)
+                )
+            }
+        )
+    }
+
 
 }

@@ -1,5 +1,8 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.policydetails
 
+import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -10,15 +13,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Comment
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.citizenrepo.CitizenRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.commentrepo.CommentRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.policyrepo.PolicyRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.pollsrepo.PollsRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import java.util.UUID
 import javax.inject.Inject
 
@@ -30,6 +36,7 @@ class PolicyDetailsViewModel @Inject constructor(
     private val notificationRepository: NotificationRepository,
     private val citizenRepository: CitizenRepository,
     private val auth: FirebaseAuth,
+    private val userPreferences: UserPreferences,
     private val pollsRepository: PollsRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PolicyDetailsUiState())
@@ -37,6 +44,20 @@ class PolicyDetailsViewModel @Inject constructor(
 
     private val _events = MutableSharedFlow<PolicyDetailsEvent>()
     val events: SharedFlow<PolicyDetailsEvent> = _events
+
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
+
+    init {
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                }
+        }
+    }
 
     private var commentsListener: ListenerRegistration? = null
 
@@ -126,7 +147,7 @@ class PolicyDetailsViewModel @Inject constructor(
 
     private fun loadPolls(policyId: String) {
         viewModelScope.launch {
-            pollsRepository.getPollsForPolicy(policyId).collect { polls ->
+            pollsRepository.getPollsForPolicy(policyId, _selectedLanguage.value).collect { polls ->
                 _uiState.update { it.copy(polls = polls) }
             }
         }
@@ -134,7 +155,7 @@ class PolicyDetailsViewModel @Inject constructor(
 
     private fun setupCommentsListener(policyId: String) {
         commentsListener?.remove()
-        commentsListener = commentRepository.getCommentsListener(policyId) { comments ->
+        commentsListener = commentRepository.getCommentsListener(policyId, _selectedLanguage.value) { comments ->
             _uiState.update { it.copy(comments = comments) }
         }
     }

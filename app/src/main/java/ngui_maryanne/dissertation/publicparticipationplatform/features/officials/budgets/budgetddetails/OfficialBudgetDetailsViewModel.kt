@@ -1,6 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -13,14 +14,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import java.util.Objects.hash
 import java.util.UUID
 import javax.inject.Inject
@@ -31,10 +35,26 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
     private val notificationRepository: NotificationRepository,
     private val storageRepository: StorageRepository,
     private val auth: FirebaseAuth,
+    private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BudgetDetailsState())
     val uiState: StateFlow<BudgetDetailsState> = _uiState.asStateFlow()
+
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
+
+    init {
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                }
+        }
+    }
+
 
     fun onEvent(event: BudgetDetailsEvent) {
         when (event) {
@@ -58,7 +78,7 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
 
     private fun loadBudget(budgetId: String) {
         viewModelScope.launch {
-            repository.getBudgetById(budgetId).collect { budget ->
+            repository.getBudgetById(budgetId, _selectedLanguage.value).collect { budget ->
                 if (budget != null) {
                     val votedOption = budget.responses.find { it.userId == auth.currentUser!!.uid }
                     val votedOptionId = votedOption?.optionId

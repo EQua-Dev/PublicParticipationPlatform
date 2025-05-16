@@ -13,9 +13,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollResponses
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.pollsrepo.PollsRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
@@ -35,6 +37,21 @@ class PollDetailsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(PollDetailsUiState())
     val uiState: StateFlow<PollDetailsUiState> = _uiState.asStateFlow()
+
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
+
+    init {
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                }
+        }
+    }
+
 
     init {
         viewModelScope.launch {
@@ -63,7 +80,7 @@ class PollDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 Log.d("Get Poll", "loadPollDetails: $pollId")
-                val pollSnapshot = repository.getPollById(pollId)
+                val pollSnapshot = repository.getPollById(pollId, _selectedLanguage.value)
                 if (pollSnapshot != null) {
                     val policy = repository.getPolicySnapshot(pollSnapshot.policyId)
                     val currentUserId = auth.currentUser!!.uid // however you get current user

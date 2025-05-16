@@ -1,5 +1,8 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails
 
+import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,13 +19,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import javax.inject.Inject
 
 @HiltViewModel
 class OfficialPolicyDetailsViewModel @Inject constructor(
     private val auth: FirebaseAuth,
+    private val userPreferences: UserPreferences,
     private val policyRepository: PolicyRepository,
     private val pollRepository: PollsRepository,
     private val commentRepository: CommentRepository,
@@ -33,6 +40,21 @@ class OfficialPolicyDetailsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(OfficialPolicyDetailsState())
     val state: StateFlow<OfficialPolicyDetailsState> = _state.asStateFlow()
+
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
+
+    init {
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                }
+        }
+    }
+
 
     private var policyListener: ListenerRegistration? = null
     private var pollsListener: ListenerRegistration? = null
@@ -47,7 +69,12 @@ class OfficialPolicyDetailsViewModel @Inject constructor(
             OfficialPolicyDetailsEvent.DismissError -> dismissError()
             is OfficialPolicyDetailsEvent.CreatePoll -> createPoll(event.policyId)
 
-            is OfficialPolicyDetailsEvent.UpdatePolicy -> updatePolicy(event.name, event.imageUrl, event.otherDetails)
+            is OfficialPolicyDetailsEvent.UpdatePolicy -> updatePolicy(
+                event.name,
+                event.imageUrl,
+                event.otherDetails
+            )
+
             OfficialPolicyDetailsEvent.DeletePolicy -> deletePolicy()
         }
     }
@@ -80,21 +107,24 @@ class OfficialPolicyDetailsViewModel @Inject constructor(
     private fun setupListeners(policyId: String) {
 //        val policyId = _state.value.policy?.id ?: return
 
-        policyListener = policyRepository.getPolicyListener(policyId) { policy ->
-            _state.value = _state.value.copy(
-                policy = policy,
-                currentStage = policy?.policyStatus ?: PolicyStatus.DRAFT,
-                isLoading = false
-            )
-        }
+        policyListener =
+            policyRepository.getPolicyListener(policyId, _selectedLanguage.value) { policy ->
+                _state.value = _state.value.copy(
+                    policy = policy,
+                    currentStage = policy?.policyStatus ?: PolicyStatus.DRAFT,
+                    isLoading = false
+                )
+            }
 
-        pollsListener = pollRepository.getPollsListener(policyId) { polls ->
-            _state.value = _state.value.copy(polls = polls)
-        }
+        pollsListener =
+            pollRepository.getPollsListener(policyId, _selectedLanguage.value) { polls ->
+                _state.value = _state.value.copy(polls = polls)
+            }
 
-        commentsListener = commentRepository.getCommentsListener(policyId) { comments ->
-            _state.value = _state.value.copy(comments = comments)
-        }
+        commentsListener =
+            commentRepository.getCommentsListener(policyId, _selectedLanguage.value) { comments ->
+                _state.value = _state.value.copy(comments = comments)
+            }
     }
 
     private fun updateStage(newStage: PolicyStatus) {

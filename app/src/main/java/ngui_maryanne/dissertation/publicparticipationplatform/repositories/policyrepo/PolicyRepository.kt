@@ -4,12 +4,13 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyS
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.Flow
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 
 interface PolicyRepository {
-    fun getAllPolicies(): Flow<List<Policy>>
+    fun getAllPolicies(language: AppLanguage): Flow<List<Policy>>
     suspend fun createPolicy(policy: Policy)
     suspend fun getPoliciesBeforePublicOpinion(): List<Policy>
-    fun getPolicyListener(policyId: String, onUpdate: (Policy?) -> Unit): ListenerRegistration
+    fun getPolicyListener(policyId: String,language: AppLanguage, onUpdate: (Policy?) -> Unit): ListenerRegistration
     suspend fun updatePolicyStage(policyId: String, newStage: PolicyStatus)
     suspend fun getPublicPolicies(): Flow<List<Policy>>
     suspend fun searchPolicies(query: String): Flow<List<Policy>>

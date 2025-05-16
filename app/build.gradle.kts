@@ -182,5 +182,7 @@ dependencies {
 
     implementation (libs.androidx.foundation)
     implementation (libs.accompanist.pager.indicators)
+    implementation (libs.translate)
+
 
 }

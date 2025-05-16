@@ -1,6 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -109,11 +110,11 @@ fun CitizenPollsScreen(
     }
 
     // Handle initial load and errors
-    LaunchedEffect(Unit) {
-        if (uiState.polls.isEmpty() && !uiState.isLoading) {
-            viewModel.onEvent(CitizenPollsEvent.RefreshPolls)
-        }
-    }
+//    LaunchedEffect(Unit) {
+//        if (uiState.polls.isEmpty() && !uiState.isLoading) {
+//            viewModel.onEvent(CitizenPollsEvent.RefreshPolls)
+//        }
+//    }
 
 
     Box(
@@ -363,6 +364,7 @@ fun PollCard(
     }
     val isActive = pollStatus == PollStatus.ACTIVE
 
+    Log.d("Poll Screen", "PollCard: $poll")
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),

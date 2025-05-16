@@ -2,16 +2,23 @@ package ngui_maryanne.dissertation.publicparticipationplatform.repositories.noti
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AppNotification
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.COMMENTS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.NOTIFICATIONS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.POLICIES_REF
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.toTargetLang
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.translateTextWithMLKit
 
 class NotificationRepositoryImpl(
     private val firestore: FirebaseFirestore
@@ -21,9 +28,12 @@ class NotificationRepositoryImpl(
 
     override fun getUserNotificationsRealtime(
         userId: String,
+        language: AppLanguage,
         onResult: (List<AppNotification>) -> Unit,
         onError: (Exception) -> Unit
     ): ListenerRegistration {
+        val targetLang = language.toTargetLang()
+
         return firestore.collection(NOTIFICATIONS_REF)
             .whereEqualTo("receiverId", userId)
             .addSnapshotListener { snapshot, error ->
@@ -33,20 +43,29 @@ class NotificationRepositoryImpl(
                 }
 
                 if (snapshot != null && !snapshot.isEmpty) {
-                    val notifications = snapshot.documents.mapNotNull { doc ->
+                    val originalNotifications = snapshot.documents.mapNotNull { doc ->
                         try {
                             doc.toObject(AppNotification::class.java)?.copy(id = doc.id)
                         } catch (e: Exception) {
                             null
                         }
                     }
-                    onResult(notifications)
+
+                    // Translate notifications in background thread
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val translatedNotifications = originalNotifications.map { notification ->
+                            translateNotificationToLanguage(notification, targetLang)
+                        }
+                        // Return result on main thread
+                        withContext(Dispatchers.Main) {
+                            onResult(translatedNotifications)
+                        }
+                    }
                 } else {
                     onResult(emptyList())
                 }
             }
     }
-
     override suspend fun sendPetitionSignNotifications(
         petition: Petition,
         newSignerId: String
@@ -184,4 +203,13 @@ class NotificationRepositoryImpl(
           listenerRegistration?.remove()
           listenerRegistration = null
       }*/
+
+    private suspend fun translateNotificationToLanguage(
+        notification: AppNotification,
+        targetLang: String
+    ): AppNotification {
+        return notification.copy(
+            message = translateTextWithMLKit(notification.message, targetLang)
+        )
+    }
 }

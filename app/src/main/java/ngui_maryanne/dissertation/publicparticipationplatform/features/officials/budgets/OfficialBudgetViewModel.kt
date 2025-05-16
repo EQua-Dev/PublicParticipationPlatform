@@ -1,5 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -9,11 +10,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.announcementrepo.AnnouncementRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
@@ -33,6 +36,21 @@ class OfficialBudgetViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(OfficialBudgetUiState())
     val uiState: StateFlow<OfficialBudgetUiState> = _uiState.asStateFlow()
+
+
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
+
+    init {
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                }
+        }
+    }
 
     init {
         fetchBudgets()
@@ -99,7 +117,7 @@ class OfficialBudgetViewModel @Inject constructor(
 
     private fun fetchBudgets() {
         viewModelScope.launch {
-            budgetRepo.getAllBudgets().collect { budgetList ->
+            budgetRepo.getAllBudgets(_selectedLanguage.value).collect { budgetList ->
                 _uiState.value = _uiState.value.copy(budgets = budgetList.filter { it.isActive })
             }
         }

@@ -3,10 +3,14 @@ package ngui_maryanne.dissertation.publicparticipationplatform.features.official
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -19,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,10 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
@@ -70,132 +77,146 @@ fun EditBudgetBottomSheet(
            }
        }
    */
-    ModalBottomSheet(
+    Dialog(
         onDismissRequest = { onClose() },
         content = {
-            Column(
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-                    .navigationBarsPadding()
-                    .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
+                    .fillMaxHeight(0.9f),
+                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Box(modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+//                        .verticalScroll(rememberScrollState())
+//                        .navigationBarsPadding()
+                        /*.padding(
+                            bottom = WindowInsets.navigationBars.asPaddingValues()
+                                .calculateBottomPadding()
+                        )*/,
 
-                ) {
-                Text("Edit Budget", style = MaterialTheme.typography.titleLarge)
-
-                CustomTextField(
-                    value = amount,
-                    onValueChange = { amount = it },
-                    label = "Total Budget Amount",
-                    keyboardType = KeyboardType.Number
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                CustomTextField(
-                    value = note,
-                    onValueChange = { note = it },
-                    label = "Budget Note",
-                    maxLines = 3
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                CustomTextField(
-                    value = impact,
-                    onValueChange = { impact = it },
-                    label = "Impact",
-                    maxLines = 3
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Budget Options", style = MaterialTheme.typography.titleMedium)
-
-
-                budgetOptions.forEachIndexed { index, option ->
-                    Spacer(modifier = Modifier.height(12.dp))
-                    var projectName by remember { mutableStateOf(option.optionProjectName) }
-                    var description by remember { mutableStateOf(option.optionDescription) }
-                    var optionAmount by remember { mutableStateOf(option.optionAmount) }
-                    val imageUri = remember { mutableStateOf(option.imageUrl?.let { Uri.parse(it) }) }
-
-//                    val imageUri = remember { mutableStateOf<Uri?>(null) }
-                    val launcher = rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.GetContent()
-                    ) { uri ->
-                        uri?.let {
-                            imageUri.value = it
-                            budgetOptions[index] =
-                                budgetOptions[index].copy(imageUrl = it.toString()) // Add imageUri to model
-                        }
-                    }
+                    ) {
+                    Text("Edit Budget", style = MaterialTheme.typography.titleLarge)
 
                     CustomTextField(
-                        value = projectName,
-                        onValueChange = {
-                            projectName = it
-                            budgetOptions[index] = option.copy(optionProjectName = it)
-                        },
-                        label = "Project Name"
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    CustomTextField(
-                        value = description,
-                        onValueChange = {
-                            description = it
-                            budgetOptions[index] = option.copy(optionDescription = it)
-                        },
-                        label = "Description"
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    CustomTextField(
-                        value = optionAmount,
-                        onValueChange = {
-                            optionAmount = it
-                            budgetOptions[index] = option.copy(optionAmount = it)
-                        },
-                        label = "Amount",
+                        value = amount,
+                        onValueChange = { amount = it },
+                        label = "Total Budget Amount",
                         keyboardType = KeyboardType.Number
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    imageUri.value?.let {
-                        AsyncImage(
-                            model = it,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(140.dp)
-                                .clip(RoundedCornerShape(8.dp)),
-                            contentScale = ContentScale.Crop
+                    CustomTextField(
+                        value = note,
+                        onValueChange = { note = it },
+                        label = "Budget Note",
+                        maxLines = 3
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    CustomTextField(
+                        value = impact,
+                        onValueChange = { impact = it },
+                        label = "Impact",
+                        maxLines = 3
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Budget Options", style = MaterialTheme.typography.titleMedium)
+
+
+                    budgetOptions.forEachIndexed { index, option ->
+                        Spacer(modifier = Modifier.height(12.dp))
+                        var projectName by remember { mutableStateOf(option.optionProjectName) }
+                        var description by remember { mutableStateOf(option.optionDescription) }
+                        var optionAmount by remember { mutableStateOf(option.optionAmount) }
+                        val imageUri =
+                            remember { mutableStateOf(option.imageUrl?.let { Uri.parse(it) }) }
+
+//                    val imageUri = remember { mutableStateOf<Uri?>(null) }
+                        val launcher = rememberLauncherForActivityResult(
+                            contract = ActivityResultContracts.GetContent()
+                        ) { uri ->
+                            uri?.let {
+                                imageUri.value = it
+                                budgetOptions[index] =
+                                    budgetOptions[index].copy(imageUrl = it.toString()) // Add imageUri to model
+                            }
+                        }
+
+                        CustomTextField(
+                            value = projectName,
+                            onValueChange = {
+                                projectName = it
+                                budgetOptions[index] = option.copy(optionProjectName = it)
+                            },
+                            label = "Project Name"
                         )
-                    }
 
-                    TextButton(onClick = { launcher.launch("image/*") }) {
-                        Text(if (imageUri.value == null) "Add Image" else "Change Image")
-                    }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                CustomButton(
-                    text = "Save Changes",
-                    onClick = {
-                        onSave(amount, note, impact, budgetOptions)
+                        CustomTextField(
+                            value = description,
+                            onValueChange = {
+                                description = it
+                                budgetOptions[index] = option.copy(optionDescription = it)
+                            },
+                            label = "Description"
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        CustomTextField(
+                            value = optionAmount,
+                            onValueChange = {
+                                optionAmount = it
+                                budgetOptions[index] = option.copy(optionAmount = it)
+                            },
+                            label = "Amount",
+                            keyboardType = KeyboardType.Number
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        imageUri.value?.let {
+                            AsyncImage(
+                                model = it,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(140.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+                        TextButton(onClick = { launcher.launch("image/*") }) {
+                            Text(if (imageUri.value == null) "Add Image" else "Change Image")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    CustomButton(
+                        text = "Save Changes",
+                        onClick = {
+                            onSave(amount, note, impact, budgetOptions)
 //                viewModel.onEvent(OfficialBudgetEvent.OnSubmitBudgetEdit(budgetId))
-                    }
-                )
+                        }
+                    )
 
-                OutlinedButton(onClick = { onClose() }) {
-                    Text(text = "Cancel")
+                    OutlinedButton(onClick = { onClose() }) {
+                        Text(text = "Cancel")
+                    }
                 }
             }
-        }
+        }}
     )
 
 }

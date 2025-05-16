@@ -1,31 +1,43 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo
 
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.BUDGETS_REF
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.toTargetLang
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.translateTextWithMLKit
 import javax.inject.Inject
 
-class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFirestore,
-                                               private val blockChainRepository: BlockChainRepository
+class BudgetRepositoryImpl @Inject constructor(
+    private val firestore: FirebaseFirestore,
+    private val blockChainRepository: BlockChainRepository
 ) :
     BudgetRepository {
     override suspend fun createBudget(budget: Budget) {
         firestore.collection(BUDGETS_REF)
             .document(budget.id)
             .set(budget)
-            .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
-                TransactionTypes.CREATE_BUDGET) }
+            .addOnSuccessListener {
+                blockChainRepository.createBlockchainTransaction(
+                    TransactionTypes.CREATE_BUDGET
+                )
+            }
             .await()
     }
 
-    override fun getAllBudgets(): Flow<List<Budget>> = callbackFlow {
+    override fun getAllBudgets(language: AppLanguage): Flow<List<Budget>> = callbackFlow {
+        val targetLang = language.toTargetLang()
         val collectionRef = firestore.collection(BUDGETS_REF)
 
         val listener = collectionRef.addSnapshotListener { snapshot, error ->
@@ -34,15 +46,23 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
                 return@addSnapshotListener
             }
 
-            val budgets =
-                snapshot?.documents?.mapNotNull { it.toObject(Budget::class.java) } ?: emptyList()
-            trySend(budgets)
+            val originalBudgets = snapshot?.documents?.mapNotNull {
+                it.toObject(Budget::class.java)?.copy(id = it.id)
+            } ?: emptyList()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val translatedBudgets = originalBudgets.map { budget ->
+                    translateBudgetToLanguage(budget, targetLang)
+                }
+                trySend(translatedBudgets)
+            }
         }
 
         awaitClose { listener.remove() }
     }
 
-    override fun getBudgetById(id: String): Flow<Budget?> = callbackFlow {
+    override fun getBudgetById(id: String, language: AppLanguage): Flow<Budget?> = callbackFlow {
+        val targetLang = language.toTargetLang()
         val docRef = firestore.collection(BUDGETS_REF).document(id)
 
         val listener = docRef.addSnapshotListener { snapshot, error ->
@@ -51,8 +71,14 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
                 return@addSnapshotListener
             }
 
-            val budget = snapshot?.toObject(Budget::class.java)
-            trySend(budget)
+            val originalBudget = snapshot?.toObject(Budget::class.java)?.copy(id = snapshot.id)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val translatedBudget = originalBudget?.let {
+                    translateBudgetToLanguage(it, targetLang)
+                }
+                trySend(translatedBudget)
+            }
         }
 
         awaitClose { listener.remove() }
@@ -76,8 +102,11 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
             firestore.collection(BUDGETS_REF)
                 .document(budgetId)
                 .update("isActive", isActive)  // Update the 'isActive' field to the new status
-                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
-                    TransactionTypes.TOGGLE_BUDGET_ACTIVATION) }
+                .addOnSuccessListener {
+                    blockChainRepository.createBlockchainTransaction(
+                        TransactionTypes.TOGGLE_BUDGET_ACTIVATION
+                    )
+                }
                 .await()
         } catch (e: Exception) {
             // Handle the exception
@@ -86,15 +115,21 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
     }
 
 
-    override suspend fun voteForBudgetOption(budgetId: String, updatedResponses: MutableList<BudgetResponse>) {
+    override suspend fun voteForBudgetOption(
+        budgetId: String,
+        updatedResponses: MutableList<BudgetResponse>
+    ) {
         try {
             // Add vote to Firestore
 //            val voteData = mapOf("optionId" to optionId, "timestamp" to FieldValue.serverTimestamp())
             firestore.collection(BUDGETS_REF)
                 .document(budgetId)
                 .update("responses", updatedResponses)
-                .addOnSuccessListener { blockChainRepository.createBlockchainTransaction(
-                    TransactionTypes.VOTE_ON_BUDGET) }
+                .addOnSuccessListener {
+                    blockChainRepository.createBlockchainTransaction(
+                        TransactionTypes.VOTE_ON_BUDGET
+                    )
+                }
                 .await()
         } catch (e: Exception) {
             throw Exception("Failed to vote for budget option: ${e.message}")
@@ -115,6 +150,36 @@ class BudgetRepositoryImpl @Inject constructor(private val firestore: FirebaseFi
         }
     }
 
+
+    private suspend fun translateBudgetToLanguage(
+        budget: Budget,
+        targetLang: String
+    ): Budget {
+        return budget.copy(
+            budgetNote = translateTextWithMLKit(budget.budgetNote, targetLang),
+            impact = translateTextWithMLKit(budget.impact, targetLang),
+            budgetOptions = budget.budgetOptions.map { option ->
+                translateBudgetOptionToLanguage(option, targetLang)
+            },
+            // Responses typically don't need translation as they contain user-generated content
+            // and system-generated IDs/dates
+            responses = budget.responses
+        )
+    }
+
+    private suspend fun translateBudgetOptionToLanguage(
+        option: BudgetOption,
+        targetLang: String
+    ): BudgetOption {
+        return option.copy(
+            optionProjectName = translateTextWithMLKit(option.optionProjectName, targetLang),
+            optionDescription = translateTextWithMLKit(option.optionDescription, targetLang),
+            // Don't translate these as they contain IDs, amounts (numbers), and URLs
+            optionAssociatedPolicy = option.optionAssociatedPolicy,
+            optionAmount = option.optionAmount,
+            imageUrl = option.imageUrl
+        )
+    }
 
 
 }
