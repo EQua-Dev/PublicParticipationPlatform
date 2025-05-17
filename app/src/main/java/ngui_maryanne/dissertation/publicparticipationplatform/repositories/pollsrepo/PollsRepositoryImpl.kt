@@ -50,18 +50,18 @@ class PollsRepositoryImpl @Inject constructor(
                     close(Exception("Failed to listen for poll changes: ${error.message}", error))
                     return@addSnapshotListener
                 }
-
+                val originalPolls = snapshot?.toObjects(Poll::class.java) ?: emptyList()
                 if (snapshot != null && !snapshot.isEmpty) {
-                    val originalPolls = snapshot.toObjects(Poll::class.java)
+
                     CoroutineScope(Dispatchers.IO).launch {
                         val translatedPolls = originalPolls.map { poll ->
                             translatePollToLanguage(poll, targetLang)
                         }
                         Log.d("Translate", "getPolicyListener: $language$translatedPolls")
-                        trySend(translatedPolls).isSuccess
+                        trySend(translatedPolls)
                     }
                 } else {
-                    trySend(emptyList()).isSuccess
+                    trySend(emptyList())
                 }
             }
 
@@ -213,7 +213,7 @@ class PollsRepositoryImpl @Inject constructor(
             throw Exception("Failed to vote for poll option: ${e.message}")
         }
     }
-    private suspend fun translatePollToLanguage(poll: Poll, targetLang: String): Poll {
+     suspend fun translatePollToLanguage(poll: Poll, targetLang: String): Poll {
         return poll.copy(
             pollQuestion = translateTextWithMLKit(poll.pollQuestion, targetLang),
             pollOptions = poll.pollOptions.map { option ->

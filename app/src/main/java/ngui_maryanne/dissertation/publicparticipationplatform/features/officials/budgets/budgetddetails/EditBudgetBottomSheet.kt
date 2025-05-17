@@ -4,8 +4,10 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -16,10 +18,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -77,7 +84,148 @@ fun EditBudgetBottomSheet(
            }
        }
    */
-    Dialog(
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(WindowInsets.systemBars.asPaddingValues()) // Handle status/nav bars
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Edit Budget", style = MaterialTheme.typography.titleLarge)
+                IconButton(onClick = onClose) {
+                    Icon(Icons.Default.Close, contentDescription = "Close")
+                }
+            }
+
+            // Your fields here
+            CustomTextField(
+                value = amount,
+                onValueChange = { /* update logic */ },
+                label = "Total Budget Amount",
+                keyboardType = KeyboardType.Number
+            )
+
+
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            CustomTextField(
+                value = note,
+                onValueChange = { note = it },
+                label = "Budget Note",
+                maxLines = 3
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            CustomTextField(
+                value = impact,
+                onValueChange = { impact = it },
+                label = "Impact",
+                maxLines = 3
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Budget Options", style = MaterialTheme.typography.titleMedium)
+
+
+            budgetOptions.forEachIndexed { index, option ->
+                Spacer(modifier = Modifier.height(12.dp))
+                var projectName by remember { mutableStateOf(option.optionProjectName) }
+                var description by remember { mutableStateOf(option.optionDescription) }
+                var optionAmount by remember { mutableStateOf(option.optionAmount) }
+                val imageUri =
+                    remember { mutableStateOf(option.imageUrl?.let { Uri.parse(it) }) }
+
+//                    val imageUri = remember { mutableStateOf<Uri?>(null) }
+                val launcher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.GetContent()
+                ) { uri ->
+                    uri?.let {
+                        imageUri.value = it
+                        budgetOptions[index] =
+                            budgetOptions[index].copy(imageUrl = it.toString()) // Add imageUri to model
+                    }
+                }
+
+                CustomTextField(
+                    value = projectName,
+                    onValueChange = {
+                        projectName = it
+                        budgetOptions[index] = option.copy(optionProjectName = it)
+                    },
+                    label = "Project Name"
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                CustomTextField(
+                    value = description,
+                    onValueChange = {
+                        description = it
+                        budgetOptions[index] = option.copy(optionDescription = it)
+                    },
+                    label = "Description"
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                CustomTextField(
+                    value = optionAmount,
+                    onValueChange = {
+                        optionAmount = it
+                        budgetOptions[index] = option.copy(optionAmount = it)
+                    },
+                    label = "Amount",
+                    keyboardType = KeyboardType.Number
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                imageUri.value?.let {
+                    AsyncImage(
+                        model = it,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(140.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                TextButton(onClick = { launcher.launch("image/*") }) {
+                    Text(if (imageUri.value == null) "Add Image" else "Change Image")
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            CustomButton(
+                text = "Save Changes",
+                onClick = {
+                    onSave(amount, note, impact, budgetOptions)
+                }
+            )
+
+            OutlinedButton(onClick = onClose) {
+                Text(text = "Cancel")
+            }
+        }
+    }}
+
+   /* Dialog(
         onDismissRequest = { onClose() },
         content = {
             Surface(
@@ -95,10 +243,10 @@ fun EditBudgetBottomSheet(
                         .padding(16.dp)
 //                        .verticalScroll(rememberScrollState())
 //                        .navigationBarsPadding()
-                        /*.padding(
+                        *//*.padding(
                             bottom = WindowInsets.navigationBars.asPaddingValues()
                                 .calculateBottomPadding()
-                        )*/,
+                        )*//*,
 
                     ) {
                     Text("Edit Budget", style = MaterialTheme.typography.titleLarge)
@@ -219,4 +367,4 @@ fun EditBudgetBottomSheet(
         }}
     )
 
-}
+}*/

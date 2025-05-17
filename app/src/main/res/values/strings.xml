@@ -109,4 +109,6 @@
     <string name="petitions">Petitions</string>
     <string name="budget">Budget</string>
     <string name="welcome">Welcome %1$s</string>
+    <string name="save">Save</string>
+    <string name="audit_logs">Audit Logs</string>
 </resources>

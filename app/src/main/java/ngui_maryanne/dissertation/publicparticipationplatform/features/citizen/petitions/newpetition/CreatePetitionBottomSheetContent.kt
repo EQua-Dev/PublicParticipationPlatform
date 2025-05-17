@@ -146,7 +146,7 @@ fun CreatePetitionBottomSheet(
                             onEvent(NewPetitionEvent.OnTargetSignatureManuallyChanged(0))
                         }
                     },
-                    modifier = Modifier.width(80.dp).padding(horizontal = 8.dp),
+                    modifier = Modifier.width(120.dp).padding(horizontal = 8.dp),
                     label = { Text("") } // Remove label to save space
                     , singleLine = true
                 )

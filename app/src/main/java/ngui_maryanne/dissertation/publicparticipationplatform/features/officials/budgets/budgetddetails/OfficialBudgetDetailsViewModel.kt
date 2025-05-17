@@ -213,30 +213,85 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
+            val originalBudget = _uiState.value.budget ?: return@launch
+
             try {
-                val updatedBudgetOptions = budgetOptions.map {
-                    val optionImage =
-                        storageRepository.uploadImage("budget_images/", it.imageUrl.toUri())
-                    it.copy(imageUrl = optionImage)
+                val updateMap = mutableMapOf<String, Any>()
+
+                // Check top-level field changes
+                if (amount != originalBudget.amount) updateMap["amount"] = amount
+                if (note != originalBudget.budgetNote) updateMap["budgetNote"] = note
+                if (impact != originalBudget.impact) updateMap["impact"] = impact
+
+                // Compare budgetOptions
+                val updatedBudgetOptions = mutableListOf<BudgetOption>()
+                var hasOptionsChanged = false
+
+                budgetOptions.forEachIndexed { index, newOption ->
+                    val oldOption = originalBudget.budgetOptions.getOrNull(index)
+
+                    if (oldOption != null) {
+                        var optionChanged = false
+                        var imageUrl = oldOption.imageUrl
+
+                        // Check if image URL is a new Uri that needs uploading
+                        if (newOption.imageUrl != null &&
+                            newOption.imageUrl != oldOption.imageUrl &&
+                            !newOption.imageUrl!!.startsWith("https://")
+                        ) {
+                            imageUrl = storageRepository.uploadImage("budget_images/", newOption.imageUrl!!.toUri())
+                            optionChanged = true
+                        }
+
+                        if (
+                            newOption.optionProjectName != oldOption.optionProjectName ||
+                            newOption.optionDescription != oldOption.optionDescription ||
+                            newOption.optionAmount != oldOption.optionAmount ||
+                            imageUrl != oldOption.imageUrl
+                        ) {
+                            optionChanged = true
+                        }
+
+                        if (optionChanged) {
+                            hasOptionsChanged = true
+                            updatedBudgetOptions.add(
+                                newOption.copy(imageUrl = imageUrl)
+                            )
+                        } else {
+                            updatedBudgetOptions.add(oldOption)
+                        }
+                    } else {
+                        // New option added
+                        hasOptionsChanged = true
+                        var imageUrl = newOption.imageUrl
+                        if (imageUrl != null && !imageUrl.startsWith("https://")) {
+                            imageUrl = storageRepository.uploadImage("budget_images/", imageUrl.toUri())
+                        }
+                        updatedBudgetOptions.add(newOption.copy(imageUrl = imageUrl))
+                    }
                 }
 
-                val updatedFields = mapOf(
-                    "amount" to amount,
-                    "budgetNote" to note,
-                    "impact" to impact,
-                    "budgetOptions" to updatedBudgetOptions
-                )
-                repository.updateBudgetDetails(budgetId, updatedFields)
-                notificationRepository.sendBudgetVoteNotifications(
-                    _uiState.value.budget!!,
-                    auth.currentUser!!.uid
-                )
+                if (hasOptionsChanged) {
+                    updateMap["budgetOptions"] = updatedBudgetOptions
+                }
 
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    editSuccess = true,
-                    message = "Budget successfully updated"
-                )
+                if (updateMap.isNotEmpty()) {
+                    repository.updateBudgetDetails(budgetId, updateMap)
+                    notificationRepository.sendBudgetVoteNotifications(originalBudget, auth.currentUser!!.uid)
+
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        editSuccess = true,
+                        message = "Budget successfully updated"
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        editSuccess = false,
+                        message = "No changes to update"
+                    )
+                }
+
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,

@@ -92,7 +92,7 @@ fun CitizenPollsScreen(
     val showFab by remember { derivedStateOf { fabScrollState.firstVisibleItemIndex == 0 } }
 
 
-    LaunchedEffect(Unit) {
+ /*   LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is CitizenPollsEvent.OnPollClicked -> {
@@ -107,7 +107,7 @@ fun CitizenPollsScreen(
                 else -> Unit
             }
         }
-    }
+    }*/
 
     // Handle initial load and errors
 //    LaunchedEffect(Unit) {

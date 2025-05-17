@@ -19,15 +19,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -99,30 +103,35 @@ fun CitizenProfileScreen(
         },
         floatingActionButton = {
             if (state.isEditing) {
-                FloatingActionButton(
-                    onClick = {
-//                        if (state.phoneNumber.isNotBlank())
-                        viewModel.onEvent(
-                            CitizenProfileEvent.SaveProfile
-                        )
+                ExtendedFloatingActionButton(
+                    onClick = {   viewModel.onEvent(
+                        CitizenProfileEvent.SaveProfile
+                    )
                         Toast
                             .makeText(
                                 context,
                                 R.string.restart_to_change_language,
                                 Toast.LENGTH_LONG
-                            ).show()
-                    },
-                ) {
-                    Icon(Icons.Default.Save, contentDescription = "Save")
-                }
+                            ).show() },
+                    modifier = Modifier.padding(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 2.dp),
+                    icon = { Icon(Icons.Default.Save, contentDescription = "Save") },
+                    text = { Text(stringResource(R.string.save)) }
+                )
+
             } else {
-                FloatingActionButton(
-                    onClick = {
-                        navController.navigate(Screen.AuditLogScreen.route)
-                    },
-                ) {
-                    Text(text = "Audit Logs")
-                }
+                ExtendedFloatingActionButton(
+                    onClick = {   navController.navigate(Screen.AuditLogScreen.route)},
+                    modifier = Modifier.padding(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 2.dp),
+                    icon = { Icon(Icons.Default.Security, contentDescription = "Audit Logs") },
+                    text = { Text(stringResource(R.string.audit_logs)) }
+                )
+
             }
         }
     ) { paddingValues ->
