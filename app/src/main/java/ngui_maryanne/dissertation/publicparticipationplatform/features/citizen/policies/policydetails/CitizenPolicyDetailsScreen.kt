@@ -136,6 +136,7 @@ fun CitizenPolicyDetailsScreen(
             modifier = modifier,
             topBar = {
                 CenterAlignedTopAppBar(
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface),
                     title = {
                         Text(
                             uiState.policy?.policyTitle ?: "Policy Details",
@@ -272,7 +273,7 @@ fun CitizenPolicyDetailsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(16f / 9f)
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .background(MaterialTheme.colorScheme.surface)
                         ) {
                             if (policy.policyCoverImage.isNotEmpty()) {
                                 AsyncImage(
@@ -588,7 +589,7 @@ private fun PollCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(
@@ -612,7 +613,7 @@ private fun PollCard(
                 )
 
                 Text(
-                    text = "Expires: ${poll.pollExpiry}",
+                    text = "Expires: ${getDate(poll.pollExpiry.toLong(), "EEE, dd MMM yyyy")}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -641,7 +642,8 @@ private fun CommentsSection(
         if (canComment) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -743,7 +745,7 @@ private fun CommentCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(

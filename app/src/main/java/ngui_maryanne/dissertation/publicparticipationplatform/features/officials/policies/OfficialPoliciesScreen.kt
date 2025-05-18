@@ -169,7 +169,8 @@ private fun PolicyCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
-                    .background(colorScheme.surfaceVariant)
+                    .background(colorScheme.surface)
+
             ) {
                 if (policy.policyCoverImage.isNotEmpty()) {
                     AsyncImage(

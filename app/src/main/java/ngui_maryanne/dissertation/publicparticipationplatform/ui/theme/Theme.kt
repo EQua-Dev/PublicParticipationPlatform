@@ -32,6 +32,7 @@ private val KenyaLightColorScheme = lightColorScheme(
     tertiary = KenyaGold,
     background = KenyaWhite,
     surface = Color(0xFFF9F9F9),
+    surfaceVariant = Color(0xFFF9F9F9),
     onBackground = KenyaBlack,
     onSurface = KenyaBlack,
 )
@@ -45,6 +46,7 @@ private val KenyaDarkColorScheme = darkColorScheme(
     tertiary = KenyaGold,
     background = KenyaBlack,
     surface = Color(0xFF1A1A1A),
+    surfaceVariant = Color(0xFF1A1A1A),
     onBackground = KenyaWhite,
     onSurface = KenyaWhite,
 )

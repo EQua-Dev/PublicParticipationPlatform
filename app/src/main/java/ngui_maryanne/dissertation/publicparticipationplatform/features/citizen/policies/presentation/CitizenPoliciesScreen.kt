@@ -153,7 +153,7 @@ fun CitizenPoliciesScreen(
                 Text(
                     text = "Explore government policies and proposed legislation. " +
                             "Participate in consultations and stay informed about new initiatives.",
-                    style = MaterialTheme.typography.bodyMedium.copy(
+                    style = MaterialTheme.typography.bodySmall.copy(
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                     ),
                     modifier = Modifier.fillMaxWidth()

@@ -82,6 +82,10 @@ class CitizenPollsViewModel @Inject constructor(
         loadData()
     }
 
+    init {
+        observePolls()
+    }
+
 
     private var pollsListener: ListenerRegistration? = null
 
@@ -188,6 +192,13 @@ class CitizenPollsViewModel @Inject constructor(
                 repository.getAllPollsListener(_selectedLanguage.value) { polls ->
                     Log.d("Polls Viewmodelsss", "loadData: $polls")
 //                    _state.value = _state.value.copy(polls = polls)
+                    viewModelScope.launch {
+                        val translatedPolls = polls.map { poll ->
+                            translatePollToLanguage(poll, "sw")
+                        }
+                        Log.d("Polls Viewmodelsss", "loadData: $translatedPolls")
+                    }
+
                 }
         }
     }

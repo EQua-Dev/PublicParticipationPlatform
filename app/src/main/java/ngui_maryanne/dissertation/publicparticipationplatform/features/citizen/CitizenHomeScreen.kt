@@ -543,7 +543,7 @@ fun ActionCard(
                 Text(
                     text = label,
                     textAlign = TextAlign.Center,
-                    style = TextStyle(
+                    style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = cardContentColor
