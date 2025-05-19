@@ -115,7 +115,7 @@ class PolicyDetailsViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
 
             try {
-                policyRepository.getPolicy(policyId).collect { policy ->
+                policyRepository.getPolicy(policyId, _selectedLanguage.value).collect { policy ->
                     policy?.let {
                         _uiState.update { state ->
                             state.copy(

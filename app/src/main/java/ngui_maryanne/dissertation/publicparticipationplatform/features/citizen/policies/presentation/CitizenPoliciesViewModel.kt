@@ -1,5 +1,8 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.presentation
 
+import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,14 +12,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.policyrepo.PolicyRepository
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import javax.inject.Inject
 
 @HiltViewModel
 class CitizenPoliciesViewModel @Inject constructor(
-    private val repository: PolicyRepository
+    private val repository: PolicyRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CitizenPoliciesUiState())
     val uiState: StateFlow<CitizenPoliciesUiState> = _uiState.asStateFlow()
@@ -26,9 +33,30 @@ class CitizenPoliciesViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
+
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
+
     init {
-        loadPolicies()
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                    Log.d("TAG", "selected language: ${_selectedLanguage.value}")
+//                    observePolls(lang)
+                    loadPolicies(lang)
+                }
+
+//            observePolls()
+        }
     }
+
+
+  /*  init {
+        loadPolicies(lang)
+    }*/
 
     fun handleAction(action: CitizenPoliciesAction) {
         when (action) {
@@ -37,7 +65,7 @@ class CitizenPoliciesViewModel @Inject constructor(
                 searchJob = viewModelScope.launch {
                     _uiState.update { it.copy(searchQuery = action.query) }
                     if (action.query.isBlank()) {
-                        loadPolicies()
+                        loadPolicies(_selectedLanguage.value)
                     } else {
                         searchPolicies(action.query)
                     }
@@ -55,20 +83,20 @@ class CitizenPoliciesViewModel @Inject constructor(
             }
 
             CitizenPoliciesAction.LoadPolicies ->  {
-                loadPolicies()
+//                loadPolicies(lang)
             }
             is CitizenPoliciesAction.OnStatusFilterChanged -> {
                 _uiState.value = _uiState.value.copy(selectedStatus = action.status)
-                loadPolicies()
+                loadPolicies(_selectedLanguage.value)
             }
         }
     }
 
-    private fun loadPolicies() {
+    private fun loadPolicies(lang: AppLanguage) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                repository.getPublicPolicies().collect { policies ->
+                repository.getPublicPolicies(_selectedLanguage.value).collect { policies ->
                     _uiState.update {
                         it.copy(
                             policies = policies,

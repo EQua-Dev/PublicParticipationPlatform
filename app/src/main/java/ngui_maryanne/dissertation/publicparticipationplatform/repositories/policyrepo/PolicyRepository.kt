@@ -12,9 +12,9 @@ interface PolicyRepository {
     suspend fun getPoliciesBeforePublicOpinion(): List<Policy>
     fun getPolicyListener(policyId: String,language: AppLanguage, onUpdate: (Policy?) -> Unit): ListenerRegistration
     suspend fun updatePolicyStage(policyId: String, newStage: PolicyStatus)
-    suspend fun getPublicPolicies(): Flow<List<Policy>>
+    suspend fun getPublicPolicies(language: AppLanguage): Flow<List<Policy>>
     suspend fun searchPolicies(query: String): Flow<List<Policy>>
-    suspend fun getPolicy(policyId: String): Flow<Policy?>
+    suspend fun getPolicy(policyId: String, language: AppLanguage): Flow<Policy?>
     suspend fun updatePolicy(policyId: String, name: String, imageUrl: String, otherDetails: Map<String, Any?>)
     suspend fun deletePolicy(policyId: String)
 

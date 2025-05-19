@@ -130,8 +130,11 @@ object FirebaseModule {
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
         blockchain: BlockChainRepository,
+        translator: TranslatorProvider
     ): PolicyRepository {
-        return PolicyRepositoryImpl(blockchain, firestore, auth)
+        return PolicyRepositoryImpl(
+            blockchain, firestore, auth, translator
+        )
     }
 
     @Provides
@@ -139,9 +142,9 @@ object FirebaseModule {
     fun providePollsRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
-        blockchain: BlockChainRepository
+        blockchain: BlockChainRepository, translator: TranslatorProvider
     ): PollsRepository {
-        return PollsRepositoryImpl(firestore, auth, blockchain)
+        return PollsRepositoryImpl(firestore, auth, blockchain, translator)
     }
 
     @Provides
@@ -169,9 +172,10 @@ object FirebaseModule {
     fun provideBudgetRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
-        blockchain: BlockChainRepository
+        blockchain: BlockChainRepository,
+        translator: TranslatorProvider
     ): BudgetRepository {
-        return BudgetRepositoryImpl(firestore, blockchain)
+        return BudgetRepositoryImpl(firestore, blockchain, translator)
     }
 
     @Provides

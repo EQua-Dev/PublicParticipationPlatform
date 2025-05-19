@@ -16,12 +16,14 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollResponses
+import ngui_maryanne.dissertation.publicparticipationplatform.di.TranslatorProvider
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.BUDGETS_REF
@@ -30,11 +32,13 @@ import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.toTar
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.translateTextWithMLKit
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.coroutines.resumeWithException
 
 class PollsRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth,
-    private val blockChainRepository: BlockChainRepository
+    private val blockChainRepository: BlockChainRepository,
+    private val translatorProvider: TranslatorProvider
 ) : PollsRepository {
 
     override fun getAllPolls(language: AppLanguage): Flow<List<Poll>> = callbackFlow {
@@ -52,7 +56,7 @@ class PollsRepositoryImpl @Inject constructor(
                 }
                 val originalPolls = snapshot?.toObjects(Poll::class.java) ?: emptyList()
                 if (snapshot != null && !snapshot.isEmpty) {
-
+//                    trySend(originalPolls)
                     CoroutineScope(Dispatchers.IO).launch {
                         val translatedPolls = originalPolls.map { poll ->
                             translatePollToLanguage(poll, targetLang)
@@ -184,20 +188,28 @@ class PollsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPollById(pollId: String, language: AppLanguage): Poll? {
+        val targetLang = when (language) {
+            AppLanguage.SWAHILI -> TranslateLanguage.SWAHILI
+            AppLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+            else -> TranslateLanguage.ENGLISH
+        }
+
         return try {
-            val targetLang = language.toTargetLang()
             val snapshot = firestore.collection(POLLS_REF)
                 .document(pollId)
                 .get()
                 .await()
 
             snapshot.toObject(Poll::class.java)?.let { poll ->
-                translatePollToLanguage(poll, targetLang)
+                val translatedPoll = translatePollToLanguage(poll, targetLang)
+                Log.d("Translate", "getPollById: $language $translatedPoll")
+                translatedPoll
             }
         } catch (e: Exception) {
             null
         }
     }
+
 
     override suspend fun voteForPollOption(pollId: String, updatedResponses: MutableList<PollResponses>) {
         try {
@@ -213,9 +225,27 @@ class PollsRepositoryImpl @Inject constructor(
             throw Exception("Failed to vote for poll option: ${e.message}")
         }
     }
-     suspend fun translatePollToLanguage(poll: Poll, targetLang: String): Poll {
+
+
+    suspend fun translateText(text: String, sourceLang: String, targetLang: String): String {
+        val translator = translatorProvider.getTranslator(sourceLang, targetLang)
+        return suspendCancellableCoroutine { cont ->
+            translator.translate(text)
+                .addOnSuccessListener { cont.resume(it) {} }
+                .addOnFailureListener { e -> cont.resumeWithException(e) }
+        }
+    }
+
+    suspend fun translatePollToLanguage(poll: Poll, targetLang: String): Poll {
+        val sourceLang = if (targetLang == TranslateLanguage.ENGLISH) {
+            TranslateLanguage.SWAHILI
+        } else {
+            TranslateLanguage.ENGLISH
+        }
+
+        Log.d("translatePollToLanguage", "$targetLang $poll")
         return poll.copy(
-            pollQuestion = translateTextWithMLKit(poll.pollQuestion, targetLang),
+            pollQuestion = translateText(poll.pollQuestion, sourceLang, targetLang),
             pollOptions = poll.pollOptions.map { option ->
                 option.copy(
                     optionText = translateTextWithMLKit(option.optionText, targetLang),

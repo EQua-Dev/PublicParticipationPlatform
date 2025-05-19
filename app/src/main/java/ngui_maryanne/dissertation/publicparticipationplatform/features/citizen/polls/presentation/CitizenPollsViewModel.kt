@@ -9,15 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.Translator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -32,7 +28,6 @@ import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferen
 import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlin.coroutines.resumeWithException
-import kotlin.math.log
 
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
@@ -56,9 +51,10 @@ class CitizenPollsViewModel @Inject constructor(
                     Log.d("TAG", "selected language: $lang")
                     _selectedLanguage.value = lang
                     Log.d("TAG", "selected language: ${_selectedLanguage.value}")
+                    observePolls(lang)
                 }
 
-            observePolls()
+//            observePolls()
         }
     }
 
@@ -83,29 +79,32 @@ class CitizenPollsViewModel @Inject constructor(
     }
 
     init {
-        observePolls()
+//        observePolls()
     }
 
 
     private var pollsListener: ListenerRegistration? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun observePolls() {
+    private fun observePolls(lang: AppLanguage) {
         // Clean up previous listener if needed
         pollsListener?.remove()
 
         viewModelScope.launch {
             try {
-                val targetLang = _selectedLanguage.value.toTargetLang()
+                val targetLang = lang.toTargetLang()
                 Log.d("translatePollToLanguage", "observePolls: ${_selectedLanguage.value}")
                 // Use a single collect operation to handle the Flow of polls
-                repository.getAllPolls(_selectedLanguage.value).collect { rawPolls ->
+                repository.getAllPolls(lang).collect { rawPolls ->
                     Log.d("Citizen Polls ViewModel", "observePolls: received raw polls $rawPolls")
                     val translatedPolls = rawPolls.map { poll ->
-                        translatePollToLanguage(poll, targetLang)
+                        val translated = translatePollToLanguage(poll, targetLang)
+                        Log.d("translatePollToLanguage", "observePolls: $translated")
+                        translated
                     }
 
-                    Log.d("TAG", "observePolls: $targetLang $translatedPolls")
+
+//                    Log.d("TAG", "observePolls: $targetLang $translatedPolls")
                     // Process each poll to get policy information
                     val pollsWithPolicyName = rawPolls.mapNotNull { poll ->
                         try {
@@ -177,7 +176,7 @@ class CitizenPollsViewModel @Inject constructor(
 
             CitizenPollsEvent.RefreshPolls -> {
                 _uiState.update { it.copy(isLoading = true) }
-                observePolls()
+//                observePolls()
             }
 
             CitizenPollsEvent.OnErrorShown -> {

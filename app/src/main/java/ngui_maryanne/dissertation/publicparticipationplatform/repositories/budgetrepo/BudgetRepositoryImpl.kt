@@ -1,27 +1,34 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.mlkit.nl.translate.TranslateLanguage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.TransactionTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
+import ngui_maryanne.dissertation.publicparticipationplatform.di.TranslatorProvider
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.blockchainrepo.BlockChainRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.BUDGETS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.toTargetLang
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.translateTextWithMLKit
 import javax.inject.Inject
+import kotlin.coroutines.resumeWithException
 
 class BudgetRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val blockChainRepository: BlockChainRepository
+    private val blockChainRepository: BlockChainRepository,
+    private val translatorProvider: TranslatorProvider
 ) :
     BudgetRepository {
     override suspend fun createBudget(budget: Budget) {
@@ -37,7 +44,11 @@ class BudgetRepositoryImpl @Inject constructor(
     }
 
     override fun getAllBudgets(language: AppLanguage): Flow<List<Budget>> = callbackFlow {
-        val targetLang = language.toTargetLang()
+        val targetLang = when (language) {
+            AppLanguage.SWAHILI -> TranslateLanguage.SWAHILI
+            AppLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+            else -> TranslateLanguage.ENGLISH
+        }
         val collectionRef = firestore.collection(BUDGETS_REF)
 
         val listener = collectionRef.addSnapshotListener { snapshot, error ->
@@ -62,7 +73,12 @@ class BudgetRepositoryImpl @Inject constructor(
     }
 
     override fun getBudgetById(id: String, language: AppLanguage): Flow<Budget?> = callbackFlow {
-        val targetLang = language.toTargetLang()
+        val targetLang = when (language) {
+            AppLanguage.SWAHILI -> TranslateLanguage.SWAHILI
+            AppLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+            else -> TranslateLanguage.ENGLISH
+        }
+
         val docRef = firestore.collection(BUDGETS_REF).document(id)
 
         val listener = docRef.addSnapshotListener { snapshot, error ->
@@ -151,15 +167,40 @@ class BudgetRepositoryImpl @Inject constructor(
     }
 
 
-    private suspend fun translateBudgetToLanguage(
-        budget: Budget,
-        targetLang: String
-    ): Budget {
+
+    suspend fun translateText(text: String, sourceLang: String, targetLang: String): String {
+        val translator = translatorProvider.getTranslator(sourceLang, targetLang)
+        return suspendCancellableCoroutine { cont ->
+            translator.translate(text)
+                .addOnSuccessListener { cont.resume(it) {} }
+                .addOnFailureListener { e -> cont.resumeWithException(e) }
+        }
+    }
+
+    suspend fun translateBudgetToLanguage(budget: Budget, targetLang: String): Budget {
+        val sourceLang = if (targetLang == TranslateLanguage.ENGLISH) {
+            TranslateLanguage.SWAHILI
+        } else {
+            TranslateLanguage.ENGLISH
+        }
+
+        Log.d("translatePollToLanguage", "$targetLang $budget")
+        /*  return poll.copy(
+              pollQuestion = translateText(poll.pollQuestion, sourceLang, targetLang),
+              pollOptions = poll.pollOptions.map { option ->
+                  option.copy(
+                      optionText = translateTextWithMLKit(option.optionText, targetLang),
+                      optionExplanation = translateTextWithMLKit(option.optionExplanation, targetLang)
+                  )
+              }
+          )
+  */
+
         return budget.copy(
-            budgetNote = translateTextWithMLKit(budget.budgetNote, targetLang),
-            impact = translateTextWithMLKit(budget.impact, targetLang),
+            budgetNote = translateText(budget.budgetNote, sourceLang, targetLang),
+            impact = translateText(budget.impact, sourceLang, targetLang),
             budgetOptions = budget.budgetOptions.map { option ->
-                translateBudgetOptionToLanguage(option, targetLang)
+                translateBudgetOptionToLanguage(option, sourceLang, targetLang)
             },
             // Responses typically don't need translation as they contain user-generated content
             // and system-generated IDs/dates
@@ -169,11 +210,12 @@ class BudgetRepositoryImpl @Inject constructor(
 
     private suspend fun translateBudgetOptionToLanguage(
         option: BudgetOption,
+        sourceLang: String,
         targetLang: String
     ): BudgetOption {
         return option.copy(
-            optionProjectName = translateTextWithMLKit(option.optionProjectName, targetLang),
-            optionDescription = translateTextWithMLKit(option.optionDescription, targetLang),
+            optionProjectName = translateText(option.optionProjectName, sourceLang, targetLang),
+            optionDescription = translateText(option.optionDescription, sourceLang, targetLang),
             // Don't translate these as they contain IDs, amounts (numbers), and URLs
             optionAssociatedPolicy = option.optionAssociatedPolicy,
             optionAmount = option.optionAmount,
