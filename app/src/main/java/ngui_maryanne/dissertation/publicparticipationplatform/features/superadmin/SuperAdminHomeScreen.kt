@@ -70,7 +70,7 @@ fun SuperAdminHomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Hello, Admin")
+                    Text("Hello, Admin", style = MaterialTheme.typography.titleMedium)
                 },
                 actions = {
                     Icon(
@@ -89,13 +89,19 @@ fun SuperAdminHomeScreen(
         },
     ) { innerPadding ->
 
+        val reducedTopPadding = (innerPadding.calculateTopPadding() - 8.dp).coerceAtLeast(0.dp)
+        val reducedBottomPadding =
+            (innerPadding.calculateBottomPadding() - 8.dp).coerceAtLeast(0.dp)
+
+
         Box(
             modifier = Modifier.padding(
-                top = innerPadding.calculateTopPadding(),
-                bottom = innerPadding.calculateBottomPadding()
+                top = reducedTopPadding,
+                bottom = reducedBottomPadding
             )
+
         ) {
-            BackgroundAnimations()
+//            BackgroundAnimations()
             AppBackground {
                 SuperAdminBottomNavigationGraph(navController = navController)
             }
@@ -103,41 +109,41 @@ fun SuperAdminHomeScreen(
     }
 
 
-        if (openDialog.value) {
-            AlertDialog(
-                onDismissRequest = {
-                    // Dismiss the dialog when the user clicks outside the dialog or on the back
-                    // button. If you want to disable that functionality, simply use an empty
-                    // onDismissRequest.
-                    openDialog.value = false
-                },
-                title = {
-                    Text(text = "Logout", style = MaterialTheme.typography.titleLarge)
-                },
-                text = {
-                    Text(text = "Do you want to logout?")
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            viewModel.onEvent(SuperAdminHomeEvent.Logout)
-                        }
-                    ) {
-                        Text("Yes")
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                // Dismiss the dialog when the user clicks outside the dialog or on the back
+                // button. If you want to disable that functionality, simply use an empty
+                // onDismissRequest.
+                openDialog.value = false
+            },
+            title = {
+                Text(text = "Logout", style = MaterialTheme.typography.titleLarge)
+            },
+            text = {
+                Text(text = "Do you want to logout?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.onEvent(SuperAdminHomeEvent.Logout)
                     }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            openDialog.value = false
-                        }
-                    ) {
-                        Text("No")
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
                     }
-                },
+                ) {
+                    Text("No")
+                }
+            },
 
-                )
-        }
+            )
+    }
     /*
 
         if (showLoading.value) {

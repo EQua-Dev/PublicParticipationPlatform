@@ -31,9 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.getTimeLeft
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollOption
@@ -86,7 +89,7 @@ fun PollDetailsContent(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Related Policy",
+                    text = stringResource(R.string.related_policy),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -214,7 +217,7 @@ fun PollOptionItem(
             ) {
                 Text(
                     text = if (totalVotes > 0) "${percentage.toInt()}% ($votes votes)"
-                    else "No votes yet",
+                    else stringResource(R.string.no_votes_yet),
                     style = MaterialTheme.typography.labelSmall
                 )
 
@@ -224,7 +227,7 @@ fun PollOptionItem(
                         modifier = Modifier.height(36.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        Text("Vote")
+                        Text(stringResource(R.string.vote))
                     }
                 } else if (isSelected) {
                     Row(
@@ -233,11 +236,11 @@ fun PollOptionItem(
                     ) {
                         Icon(
                             imageVector = Icons.Default.CheckCircle,
-                            contentDescription = "Voted",
+                            contentDescription = stringResource(R.string.voted),
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "Your vote",
+                            text = stringResource(R.string.your_vote),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -250,6 +253,7 @@ fun PollOptionItem(
 
 @Composable
 fun PolicyStatusBadge(status: PollStatus) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)
@@ -263,7 +267,7 @@ fun PolicyStatusBadge(status: PollStatus) {
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
-            text = status.displayName,
+            text = status.getDisplayName(context),
             style = MaterialTheme.typography.labelSmall.copy(
                 color = when (status) {
                     PollStatus.ACTIVE -> MaterialTheme.colorScheme.primary

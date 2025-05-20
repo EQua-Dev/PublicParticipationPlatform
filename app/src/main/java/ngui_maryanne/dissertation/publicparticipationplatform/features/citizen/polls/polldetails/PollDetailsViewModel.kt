@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollResponses
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
@@ -67,22 +66,42 @@ class PollDetailsViewModel @Inject constructor(
 
     fun onEvent(event: PollDetailsEvent) {
         when (event) {
-            is PollDetailsEvent.LoadPollDetails -> loadPollDetails(event.pollId)
+            is PollDetailsEvent.LoadPollDetails -> {
+                viewModelScope.launch {
+                    userPreferences.languageFlow
+                        .distinctUntilChanged()
+                        .collect { lang ->
+                            Log.d("TAG", "selected language: $lang")
+                            _selectedLanguage.value = lang
+                            loadPollDetails(event.pollId, lang)
+                        }
+                }
+
+            }
             PollDetailsEvent.Retry -> {
-                uiState.value.poll?.id?.let { loadPollDetails(it) }
+                viewModelScope.launch {
+                    userPreferences.languageFlow
+                        .distinctUntilChanged()
+                        .collect { lang ->
+                            Log.d("TAG", "selected language: $lang")
+                            _selectedLanguage.value = lang
+                            uiState.value.poll?.id?.let { loadPollDetails(it, lang) }
+                        }
+                }
+
             }
         }
     }
 
-    private fun loadPollDetails(pollId: String) {
+    private fun loadPollDetails(pollId: String, lang: AppLanguage) {
         _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
         viewModelScope.launch {
             try {
                 Log.d("Get Poll", "loadPollDetails: $pollId")
-                val pollSnapshot = repository.getPollById(pollId, _selectedLanguage.value)
+                val pollSnapshot = repository.getPollById(pollId, lang)
                 if (pollSnapshot != null) {
-                    val policy = repository.getPolicySnapshot(pollSnapshot.policyId)
+                    val policy = repository.getPolicySnapshot(pollSnapshot.policyId, lang)
                     val currentUserId = auth.currentUser!!.uid // however you get current user
                     val userResponse = pollSnapshot.responses.find { it.userId == currentUserId }
                     val votedOptionId = userResponse?.optionId

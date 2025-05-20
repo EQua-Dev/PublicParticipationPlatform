@@ -145,6 +145,8 @@ fun RowScope.SuperAdminAddItem(
         },
         colors = NavigationBarItemDefaults.colors(
             indicatorColor = Color.Transparent // We're handling background manually
-        )
+        ),
+        modifier = Modifier.padding(0.dp) // Remove additional padding
+
     )
 }

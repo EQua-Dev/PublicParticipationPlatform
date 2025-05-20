@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,13 +33,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
+import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
+import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomTextField
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.FullScreenLoading
 
 @Composable
 fun CreateCitizenScreen(viewModel: CreateCitizenViewModel = hiltViewModel()) {
-    val uiState = viewModel.state.value
+    val uiState by viewModel.state.collectAsState()
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     val imagePickerLauncher =
@@ -81,38 +87,37 @@ fun CreateCitizenScreen(viewModel: CreateCitizenViewModel = hiltViewModel()) {
         Spacer(modifier = Modifier.height(16.dp))
 
 
-        OutlinedTextField(
+        CustomTextField(
             value = uiState.name,
             onValueChange = { viewModel.onEvent(AddCitizenEvent.EnteredName(it)) },
-            label = { Text("Full Name") },
+            label = stringResource(R.string.full_name),
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
+        CustomTextField(
             value = uiState.phoneNumber,
             onValueChange = { viewModel.onEvent(AddCitizenEvent.EnteredPhone(it)) },
-            label = { Text("Phone Number") },
+            label = stringResource(id = R.string.phone_number),
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
+        CustomTextField(
             value = uiState.nationalId,
             onValueChange = { viewModel.onEvent(AddCitizenEvent.EnteredNationalId(it)) },
-            label = { Text("National ID") },
+            label = stringResource(id = R.string.national_id),
             modifier = Modifier.fillMaxWidth()
         )
 
-        Button(
+        CustomButton(
+            text = stringResource(R.string.add_citizen),
             onClick = { viewModel.onEvent(AddCitizenEvent.Submit) },
             modifier = Modifier.fillMaxWidth(),
             enabled = selectedImageUri != null // Ensure an image is selected
 
-        ) {
-            Text("Add Citizen")
-        }
+        )
 
         if (uiState.isLoading) {
-            CircularProgressIndicator()
+            FullScreenLoading()
         }
 
         uiState.successMessage?.let {

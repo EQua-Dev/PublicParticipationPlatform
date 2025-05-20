@@ -3,7 +3,6 @@ package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -28,16 +26,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.AssimOutlinedDropdown
-import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.signup.CitizenRegistrationEvent
-import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.createpolicy.CreatePolicyEvent
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.createpolicy.PolicyCoverImageSection
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.countiesMap
-import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.sectors
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.getSectors
 
 @Composable
 fun CreatePetitionBottomSheet(
@@ -46,13 +43,15 @@ fun CreatePetitionBottomSheet(
     onSubmit: () -> Unit,
     onDismiss: () -> Unit
 ) {
+
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        Text("Create Petition", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.create_petition), style = MaterialTheme.typography.titleLarge)
 
         Spacer(Modifier.height(8.dp))
         BannerDisclaimer()
@@ -73,7 +72,7 @@ fun CreatePetitionBottomSheet(
         AssimOutlinedDropdown(
             label = stringResource(id = R.string.sector_label),
             hint = stringResource(id = R.string.sector_hint),
-            options = sectors,
+            options = getSectors(context),
             selectedValue = state.sector,
             onValueSelected = { onEvent(NewPetitionEvent.OnSectorChanged(it.toString())) },
             isCompulsory = true,
@@ -84,7 +83,7 @@ fun CreatePetitionBottomSheet(
         OutlinedTextField(
             value = state.title,
             onValueChange = { onEvent(NewPetitionEvent.OnTitleChanged(it)) },
-            label = { Text("Petition Title") },
+            label = { Text(stringResource(R.string.petition_title)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -110,7 +109,7 @@ fun CreatePetitionBottomSheet(
 
         Spacer(Modifier.height(16.dp))
         Column(horizontalAlignment = Alignment.Start) {
-            Text("Request Goal (what the petition is to achieve)")
+            Text(stringResource(R.string.request_goal_what_the_petition_is_to_achieve))
             state.requestGoals.forEachIndexed { index, goal ->
                 OutlinedTextField(
                     value = goal,
@@ -121,7 +120,7 @@ fun CreatePetitionBottomSheet(
                 )
             }
             TextButton(onClick = { onEvent(NewPetitionEvent.OnAddRequestGoal) }) {
-                Text("Add Goal")
+                Text(stringResource(R.string.add_goal))
             }
         }
 
@@ -146,7 +145,9 @@ fun CreatePetitionBottomSheet(
                             onEvent(NewPetitionEvent.OnTargetSignatureManuallyChanged(0))
                         }
                     },
-                    modifier = Modifier.width(120.dp).padding(horizontal = 8.dp),
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(horizontal = 8.dp),
                     label = { Text("") } // Remove label to save space
                     , singleLine = true
                 )
@@ -158,7 +159,7 @@ fun CreatePetitionBottomSheet(
 
         Spacer(Modifier.height(16.dp))
         Column(horizontalAlignment = Alignment.Start) {
-            Text("Supporting Reason (backing your petition)")
+            Text(stringResource(R.string.supporting_reason_backing_your_petition))
             state.supportingReasons.forEachIndexed { index, reason ->
                 OutlinedTextField(
                     value = reason,
@@ -169,7 +170,7 @@ fun CreatePetitionBottomSheet(
                 )
             }
             TextButton(onClick = { onEvent(NewPetitionEvent.OnAddSupportingReason) }) {
-                Text("Add Reason")
+                Text(stringResource(R.string.add_reason))
             }
         }
 
@@ -179,12 +180,12 @@ fun CreatePetitionBottomSheet(
             enabled = !state.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Submit Petition")
+            Text(stringResource(R.string.submit_petition))
         }
 
         Spacer(Modifier.height(8.dp))
         TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
-            Text("Cancel")
+            Text(stringResource(R.string.cancel))
         }
     }
 }

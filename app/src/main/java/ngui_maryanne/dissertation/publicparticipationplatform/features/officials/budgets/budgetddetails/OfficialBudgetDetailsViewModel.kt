@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetResponse
-import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.budgetrepo.BudgetRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
@@ -59,7 +58,16 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
     fun onEvent(event: BudgetDetailsEvent) {
         when (event) {
             is BudgetDetailsEvent.LoadBudget -> {
-                loadBudget(event.budgetId)
+                viewModelScope.launch {
+                    userPreferences.languageFlow
+                        .distinctUntilChanged()
+                        .collect { lang ->
+                            Log.d("TAG", "selected language: $lang")
+                            _selectedLanguage.value = lang
+                            loadBudget(event.budgetId, lang)
+                        }
+                }
+
             }
 
             is BudgetDetailsEvent.VoteOption -> {
@@ -76,9 +84,12 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun loadBudget(budgetId: String) {
+    private fun loadBudget(budgetId: String, lang: AppLanguage) {
         viewModelScope.launch {
-            repository.getBudgetById(budgetId, _selectedLanguage.value).collect { budget ->
+            _uiState.value = _uiState.value.copy(
+                isLoading = true
+            )
+            repository.getBudgetById(budgetId, lang).collect { budget ->
                 if (budget != null) {
                     val votedOption = budget.responses.find { it.userId == auth.currentUser!!.uid }
                     val votedOptionId = votedOption?.optionId

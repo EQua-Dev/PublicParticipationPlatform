@@ -1,6 +1,7 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.presentation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -12,11 +13,13 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.UserPreferences
 import java.time.LocalDateTime
@@ -37,13 +40,28 @@ class CitizenPetitionsViewModel @Inject constructor(
 
     private var listenerRegistration: ListenerRegistration? = null
 
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
+
+    init {
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                    observePetitions(lang)
+                }
+        }
+    }
+
     init {
         viewModelScope.launch {
             userPreferences.role.collect { role ->
                 _uiState.update { it.copy(currentUserRole = role ?: UserRole.CITIZEN) }
             }
         }
-        observePetitions()
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -62,7 +80,7 @@ class CitizenPetitionsViewModel @Inject constructor(
             }
             PetitionEvent.RefreshPetitions -> {
                 _uiState.update { it.copy(isLoading = true) }
-                observePetitions()
+//                observePetitions(lang)
             }
             PetitionEvent.OnErrorShown -> {
                 _uiState.update { it.copy(error = null) }
@@ -71,10 +89,10 @@ class CitizenPetitionsViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun observePetitions() {
+    fun observePetitions(lang: AppLanguage) {
         listenerRegistration?.remove()
 
-        listenerRegistration = repository.getAllPetitionsListener { petitions ->
+        listenerRegistration = repository.getAllPetitionsListener(lang) { petitions ->
             viewModelScope.launch {
                 try {
                     val sectors = petitions.map { it.sector }.toSet()

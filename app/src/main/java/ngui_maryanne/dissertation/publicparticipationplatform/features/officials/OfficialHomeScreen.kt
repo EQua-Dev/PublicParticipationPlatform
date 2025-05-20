@@ -188,10 +188,15 @@ fun OfficialHomeScreen(
                 )
             }
         ) { innerPadding ->
+            val reducedTopPadding = (innerPadding.calculateTopPadding() - 8.dp).coerceAtLeast(0.dp)
+            val reducedBottomPadding = (innerPadding.calculateBottomPadding() - 8.dp).coerceAtLeast(0.dp)
+
+
+
             Box(
                 modifier = Modifier.padding(
-                    top = innerPadding.calculateTopPadding(),
-                    bottom = innerPadding.calculateBottomPadding()
+                    top = reducedTopPadding,
+                    bottom = reducedBottomPadding
                 )
             ) {
                 BackgroundAnimations()
@@ -317,10 +322,10 @@ fun AppBar(
 ) {
     val currentHour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
     val greeting = when (currentHour) {
-        in 6..11 -> "Good Morning"
-        in 12..17 -> "Good Afternoon"
-        in 18..21 -> "Good Evening"
-        else -> "Good Night"
+        in 6..11 -> stringResource(R.string.good_morning)
+        in 12..17 -> stringResource(R.string.good_afternoon)
+        in 18..21 -> stringResource(R.string.good_evening)
+        else -> stringResource(R.string.good_night)
     }
 
     TopAppBar(

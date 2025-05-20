@@ -10,20 +10,20 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Signature
-import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.policies.policydetails.OfficialPolicyDetailsEvent
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.petitionrepo.PetitionRepository
 import ngui_maryanne.dissertation.publicparticipationplatform.repositories.storagerepo.StorageRepository
@@ -49,6 +49,20 @@ class PetitionDetailsViewModel @Inject constructor(
     private val _events = Channel<PetitionDetailsResult>()
     val events = _events.receiveAsFlow()
 
+    private val _selectedLanguage = mutableStateOf(AppLanguage.ENGLISH)
+    val selectedLanguage: State<AppLanguage> = _selectedLanguage
+
+    init {
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                }
+        }
+    }
+
     private var petitionListener: ListenerRegistration? = null
 
     init {
@@ -62,7 +76,19 @@ class PetitionDetailsViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: PetitionDetailsEvent) {
         when (event) {
-            is PetitionDetailsEvent.LoadPetition -> loadPetition(event.petitionId)
+            is PetitionDetailsEvent.LoadPetition -> {
+                viewModelScope.launch {
+                    userPreferences.languageFlow
+                        .distinctUntilChanged()
+                        .collect { lang ->
+                            Log.d("TAG", "selected language: $lang")
+                            _selectedLanguage.value = lang
+                            loadPetition(event.petitionId, lang)
+                        }
+                }
+
+
+            }
             is PetitionDetailsEvent.SignPetition -> signPetition(event.activity, event.isAnonymous)
             is PetitionDetailsEvent.UpdatePetition -> updatePetition(event.title, event.description, event.coverImage, event.requestGoals)
             PetitionDetailsEvent.DeletePetition -> deletePetition()
@@ -72,12 +98,12 @@ class PetitionDetailsViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun loadPetition(petitionId: String) {
+    private fun loadPetition(petitionId: String, lang: AppLanguage) {
         petitionListener?.remove()
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                repository.getPetitionById(petitionId).collect { snapshot ->
+                repository.getPetitionById(petitionId, lang).collect { snapshot ->
                     val petition = snapshot ?: throw Exception("Petition not found")
                     val currentUserId = auth.currentUser?.uid.orEmpty()
                     val hasSigned = petition.signatures.any { it.userId == currentUserId }
@@ -188,7 +214,16 @@ class PetitionDetailsViewModel @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun retry() {
-        _state.value.petition?.id?.let { loadPetition(it) }
+        viewModelScope.launch {
+            userPreferences.languageFlow
+                .distinctUntilChanged()
+                .collect { lang ->
+                    Log.d("TAG", "selected language: $lang")
+                    _selectedLanguage.value = lang
+                    _state.value.petition?.id?.let { loadPetition(it, lang) }
+                }
+        }
+
     }
 
     private fun clearError() {

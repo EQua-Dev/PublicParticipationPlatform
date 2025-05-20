@@ -31,8 +31,7 @@ class OfficialBudgetViewModel @Inject constructor(
     private val announcementRepository: AnnouncementRepository,
     private val userPreferences: UserPreferences,
     private val auth: FirebaseAuth
-) : ViewModel()
-{
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OfficialBudgetUiState())
     val uiState: StateFlow<OfficialBudgetUiState> = _uiState.asStateFlow()
@@ -48,13 +47,16 @@ class OfficialBudgetViewModel @Inject constructor(
                 .collect { lang ->
                     Log.d("TAG", "selected language: $lang")
                     _selectedLanguage.value = lang
+                    fetchBudgets(lang)
                 }
+
         }
     }
 
-    init {
-        fetchBudgets()
-    }
+    /*   init {
+           fetchBudgets(lang)
+
+       }*/
 
     init {
         viewModelScope.launch {
@@ -111,14 +113,19 @@ class OfficialBudgetViewModel @Inject constructor(
                 updatedOptions[event.index] = updatedOptions[event.index].copy(imageUri = event.uri)
                 _uiState.value = _uiState.value.copy(budgetOptions = updatedOptions)
             }
+
             OfficialBudgetEvent.OnResetCreateState -> TODO()
         }
     }
 
-    private fun fetchBudgets() {
+    private fun fetchBudgets(lang: AppLanguage) {
+        _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
-            budgetRepo.getAllBudgets(_selectedLanguage.value).collect { budgetList ->
-                _uiState.value = _uiState.value.copy(budgets = budgetList.filter { it.isActive })
+            budgetRepo.getAllBudgets(lang).collect { budgetList ->
+                _uiState.value = _uiState.value.copy(
+                    budgets = budgetList.filter { it.isActive },
+                    isLoading = false
+                )
             }
         }
     }
@@ -155,7 +162,8 @@ class OfficialBudgetViewModel @Inject constructor(
                     responses = listOf(),
                     createdBy = auth.currentUser!!.uid, // Replace this with actual user ID
                     dateCreated = System.currentTimeMillis().toString(),
-                    budgetExpiry = System.currentTimeMillis().plus(30 * 24 * 60 * 60 * 1000L).toString(),
+                    budgetExpiry = System.currentTimeMillis().plus(30 * 24 * 60 * 60 * 1000L)
+                        .toString(),
                     impact = _uiState.value.impact
                 )
                 budgetRepo.createBudget(budget)

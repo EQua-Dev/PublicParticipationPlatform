@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.AnimatedProgressIndicator
 import ngui_maryanne.dissertation.publicparticipationplatform.components.getTimeLeft
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
@@ -97,7 +99,7 @@ fun PollDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Poll Details") },
+                title = { Text(stringResource(R.string.poll_details)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -257,7 +259,7 @@ private fun PolicyCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Related Policy",
+                text = stringResource(id = R.string.related_policy),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -401,6 +403,7 @@ private fun PollStatistics(
 
 @Composable
 private fun PollStatusChip(status: PollStatus) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)
@@ -414,7 +417,7 @@ private fun PollStatusChip(status: PollStatus) {
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
-            text = status.displayName,
+            text = status.getDisplayName(context),
             style = MaterialTheme.typography.labelSmall.copy(
                 color = when (status) {
                     PollStatus.ACTIVE -> MaterialTheme.colorScheme.primary

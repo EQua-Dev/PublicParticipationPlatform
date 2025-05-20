@@ -50,11 +50,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citizen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,7 +93,12 @@ fun CitizenListScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Citizen Verification") },
+                title = {
+                    Text(
+                        stringResource(R.string.citizen_verification_text),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     scrolledContainerColor = MaterialTheme.colorScheme.surface
@@ -131,7 +138,7 @@ private fun CitizenList(
         items(citizens) { citizen ->
             CitizenCard(
                 citizen = citizen,
-                onClick = { onCitizenSelected(citizen) }
+                onClick = { /*onCitizenSelected(citizen)*/ }
             )
             Divider(
                 color = MaterialTheme.colorScheme.surfaceVariant,
@@ -151,7 +158,7 @@ private fun CitizenCard(
     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
 
     Card(
-        onClick = onClick,
+//        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
@@ -285,6 +292,7 @@ private fun CitizenVerificationBottomSheet(
                     Text("Cancel")
                 }
 
+                if(citizen.approved == "false")
                 Button(
                     onClick = onApprove,
                     modifier = Modifier.weight(1f),

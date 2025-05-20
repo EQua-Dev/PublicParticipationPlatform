@@ -23,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -44,6 +46,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citize
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.NationalCitizen
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Official
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,12 +79,19 @@ fun OfficialCitizensScreen(
     Scaffold(
         floatingActionButton = {
             if (showFab) {
-                FloatingActionButton(
+                ExtendedFloatingActionButton(
+                    onClick = { onAddCitizenClick },
+                    icon = { Icon(Icons.Default.Add, contentDescription = "Run check") },
+                    text = { Text(stringResource(id = R.string.add_citizen)) },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.surface
+                )
+              /*  FloatingActionButton(
                     onClick = onAddCitizenClick,
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Citizen")
-                }
+                }*/
             }
         }
     ) { paddingValues ->

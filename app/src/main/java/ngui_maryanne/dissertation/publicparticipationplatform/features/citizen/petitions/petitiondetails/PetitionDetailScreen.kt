@@ -62,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -70,6 +71,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.AnimatedProgressIndicator
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
@@ -113,7 +115,7 @@ fun PetitionDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Petition Details") },
+                title = { Text(stringResource(R.string.petition_details)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -145,7 +147,7 @@ fun PetitionDetailsScreen(
                             ?: run { /*snackbarHostState.showSnackbar("Could not authenticate signature")*/ }
                     },
                     icon = { Icon(Icons.Default.EditNote, contentDescription = "Sign Petition") },
-                    text = { Text("Sign Petition") },
+                    text = { Text(stringResource(R.string.sign_petition)) },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
@@ -247,7 +249,7 @@ private fun PetitionDetailsContent(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "County: ${petition.county}",
+                text = stringResource(R.string.county, petition.county),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
@@ -262,7 +264,7 @@ private fun PetitionDetailsContent(
         // Request Goals
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                text = "Request Goals",
+                text = stringResource(R.string.request_goals),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -295,12 +297,12 @@ private fun PetitionDetailsContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Signatures",
+                    text = stringResource(R.string.signatures),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "${petition.daysToExpiry()} days left",
+                    text = stringResource(R.string.days_left, petition.daysToExpiry()),
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (petition.daysToExpiry() < 3) MaterialTheme.colorScheme.error
                     else MaterialTheme.colorScheme.onSurface
@@ -323,11 +325,11 @@ private fun PetitionDetailsContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "${petition.signatures.size} signatures",
+                    text = stringResource(R.string.signatures_signed, petition.signatures.size),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Goal: ${petition.signatureGoal}",
+                    text = stringResource(R.string.goal, petition.signatureGoal),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -345,7 +347,7 @@ private fun PetitionDetailsContent(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "You've signed this petition",
+                        text = stringResource(R.string.you_ve_signed_this_petition),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -380,7 +382,7 @@ private fun EditPetitionBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Edit Petition",
+                text = stringResource(R.string.edit_petition),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -398,7 +400,7 @@ private fun EditPetitionBottomSheet(
                 value = title,
                 onValueChange = { title = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Title") },
+                label = { Text(stringResource(R.string.title)) },
                 singleLine = true
             )
 
@@ -408,7 +410,7 @@ private fun EditPetitionBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 120.dp),
-                label = { Text("Description") }
+                label = { Text(stringResource(R.string.description)) }
             )
 
             OutlinedTextField(
@@ -417,7 +419,7 @@ private fun EditPetitionBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 100.dp),
-                label = { Text("Request Goals (one per line)") }
+                label = { Text(stringResource(R.string.request_goals_one_per_line)) }
             )
 
             Row(
@@ -437,7 +439,7 @@ private fun EditPetitionBottomSheet(
                     modifier = Modifier.weight(1f),
                     enabled = title.isNotEmpty() && description.isNotEmpty()
                 ) {
-                    Text("Save Changes")
+                    Text(stringResource(R.string.save_changes))
                 }
 
                 Button(
@@ -448,7 +450,7 @@ private fun EditPetitionBottomSheet(
                         contentColor = MaterialTheme.colorScheme.onErrorContainer
                     )
                 ) {
-                    Text("Delete Petition")
+                    Text(stringResource(R.string.delete_petition))
                 }
             }
         }

@@ -20,41 +20,33 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.PendingActions
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.AnimatedProgressIndicator
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
@@ -70,7 +63,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.p
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.newpetition.PetitionViewModel
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation.SearchBar
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
-import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.sectors
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.getSectors
 import java.time.Duration
 import java.time.Instant
 
@@ -87,7 +80,7 @@ fun CitizenPetitionsScreen(
     val newPetitionState by newViewModel.newPetitionState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
-
+    val context = LocalContext.current
     /*LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -131,9 +124,11 @@ fun CitizenPetitionsScreen(
                 uiState.isLoading -> FullScreenLoading()
                 uiState.error != null -> ErrorState(
                     error = uiState.error!!,
-                    onRetry = { viewModel.observePetitions()
+                    onRetry = {
+                        viewModel.observePetitions(viewModel.selectedLanguage.value)
                     }
                 )
+
                 uiState.isCreatingNewPetition -> {
                     CreatePetitionBottomSheet(
                         state = newPetitionState,
@@ -154,6 +149,7 @@ fun CitizenPetitionsScreen(
                         onDismiss = { viewModel.onEvent(PetitionEvent.OnToggleCreatePetition) }
                     )
                 }
+
                 else -> {
                     Column(
                         modifier = Modifier
@@ -163,8 +159,14 @@ fun CitizenPetitionsScreen(
                         // Search Bar
                         SearchBar(
                             query = uiState.searchQuery,
-                            placeholder = "Search petitions by title or description...",
-                            onQueryChange = { viewModel.onEvent(PetitionEvent.OnSearchQueryChanged(it)) },
+                            placeholder = stringResource(R.string.search_petitions_by_title_or_description),
+                            onQueryChange = {
+                                viewModel.onEvent(
+                                    PetitionEvent.OnSearchQueryChanged(
+                                        it
+                                    )
+                                )
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
@@ -179,22 +181,38 @@ fun CitizenPetitionsScreen(
                         ) {
                             FilterChip(
                                 selected = uiState.selectedSector == null,
-                                onClick = { viewModel.onEvent(PetitionEvent.OnSectorFilterChanged(null)) },
-                                label = { Text("All Sectors") },
+                                onClick = {
+                                    viewModel.onEvent(
+                                        PetitionEvent.OnSectorFilterChanged(
+                                            null
+                                        )
+                                    )
+                                },
+                                label = { Text(stringResource(R.string.all_sectors)) },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(
+                                        alpha = 0.2f
+                                    ),
                                     containerColor = MaterialTheme.colorScheme.surface,
                                     selectedLabelColor = MaterialTheme.colorScheme.primary,
                                     labelColor = MaterialTheme.colorScheme.onSurface
                                 )
                             )
-                            sectors.forEach { sector ->
+                            getSectors(context).forEach { sector ->
                                 FilterChip(
                                     selected = uiState.selectedSector == sector.first,
-                                    onClick = { viewModel.onEvent(PetitionEvent.OnSectorFilterChanged(sector.first)) },
+                                    onClick = {
+                                        viewModel.onEvent(
+                                            PetitionEvent.OnSectorFilterChanged(
+                                                sector.first
+                                            )
+                                        )
+                                    },
                                     label = { Text(sector.first) },
                                     colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                        selectedContainerColor = MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.2f
+                                        ),
                                         containerColor = MaterialTheme.colorScheme.surface,
                                         selectedLabelColor = MaterialTheme.colorScheme.primary,
                                         labelColor = MaterialTheme.colorScheme.onSurface

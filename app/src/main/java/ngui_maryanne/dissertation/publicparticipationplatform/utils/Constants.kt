@@ -1,19 +1,20 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.utils
 
+import android.content.Context
+import ngui_maryanne.dissertation.publicparticipationplatform.R
+
 object Constants {
-    val subjects = listOf(
-        "Math" to "maths",
-        "Science" to "science",
-        "History" to "history",
-        "English" to "english"
-    )
-    val sectors = listOf(
-        "Agriculture" to "Agriculture",
-        "Education" to "Education",
-        "Environment" to "Environment",
-        "Health" to "Health",
-        "Economic" to "Economic"
-    )
+
+    fun getSectors(context: Context): List<Pair<String, String>> {
+        return listOf(
+            context.getString(R.string.agriculture) to "Agriculture",
+            context.getString(R.string.education) to "Education",
+            context.getString(R.string.environment) to "Environment",
+            context.getString(R.string.health) to "Health",
+            context.getString(R.string.economic) to "Economic"
+        )
+    }
+
 
     val countiesMap = listOf(
         "All" to "All",

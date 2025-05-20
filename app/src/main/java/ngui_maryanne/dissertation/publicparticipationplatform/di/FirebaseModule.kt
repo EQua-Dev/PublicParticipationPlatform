@@ -162,9 +162,10 @@ object FirebaseModule {
     fun providePetitionRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
-        blockchain: BlockChainRepository
+        blockchain: BlockChainRepository,
+        translator: TranslatorProvider
     ): PetitionRepository {
-        return PetitionRepositoryImpl(firestore, blockchain)
+        return PetitionRepositoryImpl(firestore, blockchain, translator)
     }
 
     @Provides
@@ -200,16 +201,18 @@ object FirebaseModule {
     @Singleton
     fun provideNotificationRepository(
         firestore: FirebaseFirestore,
+        translator: TranslatorProvider
     ): NotificationRepository {
-        return NotificationRepositoryImpl(firestore)
+        return NotificationRepositoryImpl(firestore, translator)
     }
 
     @Provides
     @Singleton
     fun provideAnnouncementRepository(
         firestore: FirebaseFirestore,
+        translator: TranslatorProvider
     ): AnnouncementRepository {
-        return AnnouncementRepositoryImpl(firestore)
+        return AnnouncementRepositoryImpl(firestore, translator)
     }
 
 }

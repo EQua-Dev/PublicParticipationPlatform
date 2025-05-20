@@ -142,7 +142,11 @@ class PollsRepositoryImpl @Inject constructor(
 
 
     override fun getAllPollsListener(language: AppLanguage, onUpdate: (List<Poll>) -> Unit): ListenerRegistration {
-        val targetLang = language.toTargetLang()
+        val targetLang = when (language) {
+            AppLanguage.SWAHILI -> TranslateLanguage.SWAHILI
+            AppLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+            else -> TranslateLanguage.ENGLISH
+        }
 
         return firestore.collection(POLLS_REF)
             .addSnapshotListener { snapshot, error ->
@@ -175,13 +179,23 @@ class PollsRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun getPolicySnapshot(policyId: String): Policy? {
+    override suspend fun getPolicySnapshot(policyId: String, language: AppLanguage): Policy? {
+        val targetLang = when (language) {
+            AppLanguage.SWAHILI -> TranslateLanguage.SWAHILI
+            AppLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+            else -> TranslateLanguage.ENGLISH
+        }
         return try {
             val snapshot = firestore.collection(POLICIES_REF)
                 .document(policyId)
                 .get()
                 .await()
-            snapshot.toObject(Policy::class.java)
+            snapshot.toObject(Policy::class.java)?.let { policy ->
+                val translatedPolicy = translatePolicyToLanguage(policy, targetLang)
+                Log.d("Translate", "getPollById: $language $translatedPolicy")
+                translatedPolicy
+            }
+//            snapshot.toObject(Policy::class.java)
         } catch (e: Exception) {
             null
         }
@@ -250,6 +264,38 @@ class PollsRepositoryImpl @Inject constructor(
                 option.copy(
                     optionText = translateTextWithMLKit(option.optionText, targetLang),
                     optionExplanation = translateTextWithMLKit(option.optionExplanation, targetLang)
+                )
+            }
+        )
+    }
+
+
+    suspend fun translatePolicyToLanguage(policy: Policy, targetLang: String): Policy {
+        val sourceLang = if (targetLang == TranslateLanguage.ENGLISH) {
+            TranslateLanguage.SWAHILI
+        } else {
+            TranslateLanguage.ENGLISH
+        }
+
+        Log.d("translatePollToLanguage", "$targetLang $policy")
+        /*  return poll.copy(
+              pollQuestion = translateText(poll.pollQuestion, sourceLang, targetLang),
+              pollOptions = poll.pollOptions.map { option ->
+                  option.copy(
+                      optionText = translateTextWithMLKit(option.optionText, targetLang),
+                      optionExplanation = translateTextWithMLKit(option.optionExplanation, targetLang)
+                  )
+              }
+          )
+  */
+        return policy.copy(
+            policyName = translateText(policy.policyName, sourceLang, targetLang),
+            policyTitle = translateText(policy.policyTitle, sourceLang, targetLang),
+            policySector = translateText(policy.policySector, sourceLang, targetLang),
+            policyDescription = translateText(policy.policyDescription, sourceLang, targetLang),
+            statusHistory = policy.statusHistory.map {
+                it.copy(
+                    notes = translateText(it.notes, sourceLang, targetLang)
                 )
             }
         )

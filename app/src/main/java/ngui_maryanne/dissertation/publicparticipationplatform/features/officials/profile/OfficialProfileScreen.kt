@@ -84,6 +84,8 @@ fun OfficialProfileScreen(
         floatingActionButton = {
             if (state.isEditing) {
                 FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.surface,
                     onClick = {
                         if (state.editedPhoneNumber.isNotBlank()) viewModel.onEvent(
                             OfficialProfileEvent.SaveProfile
@@ -122,7 +124,7 @@ fun OfficialProfileScreen(
                         modifier = Modifier
                             .size(150.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .background(MaterialTheme.colorScheme.surface)
                             .clickable(enabled = state.isEditing) {
                                 imagePicker.launch("image/*")
                             },

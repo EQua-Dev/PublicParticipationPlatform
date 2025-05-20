@@ -53,6 +53,7 @@ import androidx.navigation.NavHostController
 import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AppNotification
+import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.FullScreenLoading
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.getTimeAgo
 import java.text.SimpleDateFormat
@@ -104,7 +105,7 @@ fun NotificationsScreen(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             when {
-//                state.isLoading -> FullScreenLoading()
+                viewModel.loading.value -> FullScreenLoading()
                 viewModel.notifications.isEmpty() -> EmptyNotificationsState()
                 else -> NotificationList(viewModel.notifications, navController)
             }

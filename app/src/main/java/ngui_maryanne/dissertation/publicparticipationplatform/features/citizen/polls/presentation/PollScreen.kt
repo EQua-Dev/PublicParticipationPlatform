@@ -1,5 +1,6 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation
 
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -61,12 +62,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.AnimatedProgressIndicator
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login.KenyanBackgroundPattern
@@ -91,23 +95,23 @@ fun CitizenPollsScreen(
     val fabScrollState = rememberLazyListState()
     val showFab by remember { derivedStateOf { fabScrollState.firstVisibleItemIndex == 0 } }
 
+    val context = LocalContext.current
+    /*   LaunchedEffect(Unit) {
+           viewModel.events.collect { event ->
+               when (event) {
+                   is CitizenPollsEvent.OnPollClicked -> {
+                       navController.navigate(
+                           Screen.PollDetailsScreen.route.replace(
+                               "{pollId}",
+                               event.poll.poll.id
+                           )
+                       )
+                   }
 
- /*   LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
-            when (event) {
-                is CitizenPollsEvent.OnPollClicked -> {
-                    navController.navigate(
-                        Screen.PollDetailsScreen.route.replace(
-                            "{pollId}",
-                            event.poll.poll.id
-                        )
-                    )
-                }
-
-                else -> Unit
-            }
-        }
-    }*/
+                   else -> Unit
+               }
+           }
+       }*/
 
     // Handle initial load and errors
 //    LaunchedEffect(Unit) {
@@ -140,7 +144,7 @@ fun CitizenPollsScreen(
                             contentColor = MaterialTheme.colorScheme.onPrimary,
                             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 2.dp),
                             icon = { Icon(Icons.Default.Add, contentDescription = "Create Poll") },
-                            text = { Text("New Poll") }
+                            text = { Text(stringResource(R.string.new_poll)) }
                         )
                     }
                 }
@@ -168,14 +172,14 @@ fun CitizenPollsScreen(
                     // Header section
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "Public Polls",
+                            text = stringResource(R.string.public_polls),
                             style = MaterialTheme.typography.headlineMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                         )
                         Text(
-                            text = "Participate in ongoing public consultations",
+                            text = stringResource(R.string.participate_in_ongoing_public_consultations),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                         )
@@ -193,7 +197,7 @@ fun CitizenPollsScreen(
                                     )
                                 )
                             },
-                            placeholder = "Search polls by question or policy...",
+                            placeholder = stringResource(R.string.search_polls_by_question_or_policy),
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -212,7 +216,7 @@ fun CitizenPollsScreen(
                                             CitizenPollsEvent.OnStatusFilterChanged(status)
                                         )
                                     },
-                                    label = { Text(status.displayName) },
+                                    label = { Text(status.getDisplayName(context)) },
                                     colors = FilterChipDefaults.filterChipColors(
                                         selectedContainerColor = MaterialTheme.colorScheme.primary.copy(
                                             alpha = 0.2f
@@ -258,9 +262,9 @@ fun CitizenPollsScreen(
                                     )
                                     Text(
                                         text = if (uiState.searchQuery.isNotEmpty() || uiState.selectedStatus != null) {
-                                            "No matching polls found"
+                                            stringResource(R.string.no_matching_polls_found)
                                         } else {
-                                            "No active polls at this time"
+                                            stringResource(R.string.no_active_polls_at_this_time)
                                         },
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                     )
@@ -355,6 +359,7 @@ fun PollCard(
     poll: PollWithPolicyName,
     onClick: () -> Unit
 ) {
+    val context = LocalContext.current
     val totalVotes = poll.poll.responses.size
 
     val pollStatus = if (poll.poll.pollExpiry.toLong() > System.currentTimeMillis()) {
@@ -364,7 +369,6 @@ fun PollCard(
     }
     val isActive = pollStatus == PollStatus.ACTIVE
 
-    Log.d("Poll Screen", "PollCard: $poll")
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -405,7 +409,7 @@ fun PollCard(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = pollStatus.displayName,
+                        text = pollStatus.getDisplayName(context),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = if (isActive) Color(0xFF2196F3) else Color(0xFF4CAF50)
                         )
@@ -414,7 +418,7 @@ fun PollCard(
             }
 
             Text(
-                text = "Policy: ${poll.policyName}",
+                text = stringResource(R.string.policy, poll.policyName),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -440,7 +444,11 @@ fun PollCard(
                             )
                             Spacer(modifier = Modifier.weight(0.1f))
                             Text(
-                                text = "$votes votes (${(percentage * 100).toInt()}%)",
+                                text = stringResource(
+                                    R.string.votes,
+                                    votes,
+                                    (percentage * 100).toInt()
+                                ),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.outline,
                                 textAlign = TextAlign.End,
@@ -469,13 +477,16 @@ fun PollCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${totalVotes} total votes",
+                    text = stringResource(R.string.total_votes, totalVotes),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
 
                 Text(
-                    text = "Expires: ${getDate(poll.poll.pollExpiry.toLong(), "EEE, dd MMM yyyy")}",
+                    text = stringResource(
+                        R.string.expires,
+                        getDate(poll.poll.pollExpiry.toLong(), "EEE, dd MMM yyyy")
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -484,8 +495,10 @@ fun PollCard(
     }
 }
 
-enum class PollStatus(val displayName: String) {
-    ACTIVE("Active"),
-    CLOSED("Closed"),
-    DRAFT("Draft")
+enum class PollStatus(val displayResId: Int) {
+    ACTIVE(R.string.active),
+    CLOSED(R.string.closed),
+    DRAFT(R.string.draft);
+
+    fun getDisplayName(context: Context): String = context.getString(displayResId)
 }

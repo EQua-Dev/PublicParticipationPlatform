@@ -25,8 +25,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.audit.presentation.SuperAdminAuditLogEvent
 
 @Composable
 fun FabMenu(
@@ -93,7 +96,7 @@ fun ExpandableFloatingActionButton(
     val fabSize = 64.dp
 
     val expandedWidth by animateDpAsState(
-        targetValue = if (expanded) 200.dp else fabSize,
+        targetValue = if (expanded) 140.dp else fabSize,
         animationSpec = spring(dampingRatio = 3f)
     )
     val expandedHeight by animateDpAsState(
@@ -117,7 +120,7 @@ fun ExpandableFloatingActionButton(
                     color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(18.dp)
                 ),
-            contentAlignment = Alignment.TopCenter
+            contentAlignment = Alignment.TopStart
         ) {
             Column(
                 modifier = Modifier.padding(8.dp),
@@ -129,52 +132,92 @@ fun ExpandableFloatingActionButton(
                         horizontalAlignment = Alignment.End
                     ) {
                         // Add Citizen Row
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            FloatingActionButton(
-                                onClick = {
-                                    expanded = false
-                                    onAddCitizen()
-                                },
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(48.dp)
-                            ) {
+                        ExtendedFloatingActionButton(
+                            onClick = {
+                                expanded = false
+                                onAddCitizen()
+                            },
+                            icon = {
                                 Icon(
                                     imageVector = Icons.Default.PersonAdd,
                                     contentDescription = "Add Citizen"
                                 )
-                            }
-                            Text(
-                                text = "Add Citizen",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-
+                            },
+                            text = {
+                                Text(
+                                    text = "Add Citizen",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.surface
+                        )
+                        /*   Row(
+                               verticalAlignment = Alignment.CenterVertically,
+                               horizontalArrangement = Arrangement.spacedBy(8.dp)
+                           ) {
+                               FloatingActionButton(
+                                   onClick = {
+                                       expanded = false
+                                       onAddCitizen()
+                                   },
+                                   containerColor = MaterialTheme.colorScheme.primary,
+                                   modifier = Modifier.size(48.dp)
+                               ) {
+                                   Icon(
+                                       imageVector = Icons.Default.PersonAdd,
+                                       contentDescription = "Add Citizen"
+                                   )
+                               }
+                               Text(
+                                   text = "Add Citizen",
+                                   style = MaterialTheme.typography.labelSmall
+                               )
+                           }
+   */
                         // Add Official Row
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            FloatingActionButton(
-                                onClick = {
-                                    expanded = false
-                                    onAddOfficial()
-                                },
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(48.dp)
-                            ) {
+                        ExtendedFloatingActionButton(
+                            onClick = {
+                                expanded = false
+                                onAddOfficial()
+                            },
+                            icon = {
                                 Icon(
                                     imageVector = Icons.Default.AccountBox,
                                     contentDescription = "Add Official"
                                 )
-                            }
-                            Text(
-                                text = "Add Official",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
+                            },
+                            text = {
+                                Text(
+                                    text = "Add Official",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.surface
+                        )
+                        /* Row(
+                             verticalAlignment = Alignment.CenterVertically,
+                             horizontalArrangement = Arrangement.spacedBy(8.dp)
+                         ) {
+                             FloatingActionButton(
+                                 onClick = {
+                                     expanded = false
+                                     onAddOfficial()
+                                 },
+                                 containerColor = MaterialTheme.colorScheme.primary,
+                                 modifier = Modifier.size(48.dp)
+                             ) {
+                                 Icon(
+                                     imageVector = Icons.Default.AccountBox,
+                                     contentDescription = "Add Official"
+                                 )
+                             }
+                             Text(
+                                 text = "Add Official",
+                                 style = MaterialTheme.typography.labelSmall
+                             )
+                         }*/
                     }
 
                 }
@@ -184,21 +227,12 @@ fun ExpandableFloatingActionButton(
         Spacer(modifier = Modifier.height(8.dp))
 
         // Main Expandable FAB
-        FloatingActionButton(
+        ExtendedFloatingActionButton(
             onClick = {
                 expanded = !expanded
                 onFabClick()
             },
-            modifier = Modifier
-                .width(expandedWidth)
-                .height(expandedHeight),
-            shape = RoundedCornerShape(18.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)
-            ) {
+            icon = {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = null,
@@ -211,7 +245,8 @@ fun ExpandableFloatingActionButton(
                             ).value
                         )
                 )
-
+            },
+            text = {
                 Text(
                     text = "Add",
                     softWrap = false,
@@ -231,10 +266,66 @@ fun ExpandableFloatingActionButton(
                                     easing = EaseIn
                                 )
                             ).value
-                        )
+                        ),
                 )
-            }
-        }
+            },
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.surface,
+            modifier = Modifier
+                .width(expandedWidth)
+                .height(expandedHeight)
+        )
+        /*  FloatingActionButton(
+              onClick = {
+                  expanded = !expanded
+                  onFabClick()
+              },
+              modifier = Modifier
+                  .width(expandedWidth)
+                  .height(expandedHeight),
+              shape = RoundedCornerShape(18.dp)
+          ) {
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.Start,
+                  modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)
+              ) {
+                  Icon(
+                      imageVector = Icons.Default.Add,
+                      contentDescription = null,
+                      modifier = Modifier
+                          .size(24.dp)
+                          .offset(
+                              x = animateDpAsState(
+                                  targetValue = if (expanded) -20.dp else 0.dp,
+                                  animationSpec = spring(dampingRatio = 3f)
+                              ).value
+                          )
+                  )
+
+                  Text(
+                      text = "Add",
+                      softWrap = false,
+                      modifier = Modifier
+                          .offset(
+                              x = animateDpAsState(
+                                  targetValue = if (expanded) 8.dp else 50.dp,
+                                  animationSpec = spring(dampingRatio = 3f)
+                              ).value
+                          )
+                          .alpha(
+                              animateFloatAsState(
+                                  targetValue = if (expanded) 1f else 0f,
+                                  animationSpec = tween(
+                                      durationMillis = if (expanded) 350 else 100,
+                                      delayMillis = if (expanded) 100 else 0,
+                                      easing = EaseIn
+                                  )
+                              ).value
+                          )
+                  )
+              }
+          }*/
     }
 }
 

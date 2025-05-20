@@ -108,7 +108,7 @@ class CitizenPollsViewModel @Inject constructor(
                     // Process each poll to get policy information
                     val pollsWithPolicyName = rawPolls.mapNotNull { poll ->
                         try {
-                            val policy = repository.getPolicySnapshot(poll.policyId)
+                            val policy = repository.getPolicySnapshot(poll.policyId, lang)
                             PollWithPolicyName(
                                 poll = poll,
                                 policyName = policy?.policyTitle ?: "Unknown Policy",

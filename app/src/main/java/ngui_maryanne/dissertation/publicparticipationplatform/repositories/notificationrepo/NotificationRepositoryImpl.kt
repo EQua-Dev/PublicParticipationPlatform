@@ -2,9 +2,11 @@ package ngui_maryanne.dissertation.publicparticipationplatform.repositories.noti
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.mlkit.nl.translate.TranslateLanguage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
@@ -13,15 +15,18 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
+import ngui_maryanne.dissertation.publicparticipationplatform.di.TranslatorProvider
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.COMMENTS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.NOTIFICATIONS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.POLICIES_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.toTargetLang
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.translateTextWithMLKit
+import kotlin.coroutines.resumeWithException
 
 class NotificationRepositoryImpl(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val translatorProvider: TranslatorProvider
 ) : NotificationRepository {
 
 //    private var listenerRegistration: ListenerRegistration? = null
@@ -32,7 +37,12 @@ class NotificationRepositoryImpl(
         onResult: (List<AppNotification>) -> Unit,
         onError: (Exception) -> Unit
     ): ListenerRegistration {
-        val targetLang = language.toTargetLang()
+        val targetLang = when (language) {
+            AppLanguage.SWAHILI -> TranslateLanguage.SWAHILI
+            AppLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+            else -> TranslateLanguage.ENGLISH
+        }
+
 
         return firestore.collection(NOTIFICATIONS_REF)
             .whereEqualTo("receiverId", userId)
@@ -66,6 +76,7 @@ class NotificationRepositoryImpl(
                 }
             }
     }
+
     override suspend fun sendPetitionSignNotifications(
         petition: Petition,
         newSignerId: String
@@ -204,12 +215,28 @@ class NotificationRepositoryImpl(
           listenerRegistration = null
       }*/
 
+    suspend fun translateText(text: String, sourceLang: String, targetLang: String): String {
+        val translator = translatorProvider.getTranslator(sourceLang, targetLang)
+        return suspendCancellableCoroutine { cont ->
+            translator.translate(text)
+                .addOnSuccessListener { cont.resume(it) {} }
+                .addOnFailureListener { e -> cont.resumeWithException(e) }
+        }
+    }
+
+
     private suspend fun translateNotificationToLanguage(
         notification: AppNotification,
         targetLang: String
     ): AppNotification {
+
+        val sourceLang = if (targetLang == TranslateLanguage.ENGLISH) {
+            TranslateLanguage.SWAHILI
+        } else {
+            TranslateLanguage.ENGLISH
+        }
         return notification.copy(
-            message = translateTextWithMLKit(notification.message, targetLang)
+            message = translateText(notification.message, sourceLang, targetLang)
         )
     }
 }

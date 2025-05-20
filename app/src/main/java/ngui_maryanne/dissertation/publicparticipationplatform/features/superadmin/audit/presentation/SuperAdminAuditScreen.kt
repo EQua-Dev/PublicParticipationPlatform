@@ -55,12 +55,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 
 
@@ -74,21 +76,26 @@ fun SuperAdminAuditScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-  /*  LaunchedEffect(Unit) {
-        viewModel.eventFlow.collect { event ->
-            when (event) {
-                is SuperAdminAuditLogEvent.ShowMessage -> {
-                    snackbarHostState.showSnackbar(event.message)
-                }
-            }
-        }
-    }*/
+    /*  LaunchedEffect(Unit) {
+          viewModel.eventFlow.collect { event ->
+              when (event) {
+                  is SuperAdminAuditLogEvent.ShowMessage -> {
+                      snackbarHostState.showSnackbar(event.message)
+                  }
+              }
+          }
+      }*/
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Audit Logs") },
+                title = {
+                    Text(
+                        stringResource(id = R.string.audit_logs),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     scrolledContainerColor = MaterialTheme.colorScheme.surface
@@ -99,7 +106,7 @@ fun SuperAdminAuditScreen(
             ExtendedFloatingActionButton(
                 onClick = { viewModel.onEvent(SuperAdminAuditLogEvent.RunDiscrepancyCheck) },
                 icon = { Icon(Icons.Default.Search, contentDescription = "Run check") },
-                text = { Text("Verify Integrity") },
+                text = { Text(stringResource(R.string.verify_integrity)) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.surface
             )
@@ -134,7 +141,9 @@ fun SuperAdminAuditScreen(
             },
             title = {
                 Text(
-                    text = if (state.discrepancyFound) "Discrepancy Detected!" else "Logs Verified",
+                    text = if (state.discrepancyFound) stringResource(R.string.discrepancy_detected) else stringResource(
+                        R.string.logs_verified
+                    ),
                     color = if (state.discrepancyFound) MaterialTheme.colorScheme.error
                     else MaterialTheme.colorScheme.primary
                 )
@@ -143,9 +152,9 @@ fun SuperAdminAuditScreen(
                 Column {
                     Text(
                         text = if (state.discrepancyFound)
-                            "Audit log integrity check failed:"
+                            stringResource(R.string.audit_log_integrity_check_failed)
                         else
-                            "All audit logs are valid and consistent",
+                            stringResource(R.string.all_audit_logs_are_valid_and_consistent),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     if (state.discrepancyFound) {
@@ -164,7 +173,7 @@ fun SuperAdminAuditScreen(
                         viewModel.onEvent(SuperAdminAuditLogEvent.DismissDiscrepancyDialog)
                     }
                 ) {
-                    Text("Dismiss")
+                    Text(stringResource(R.string.dismiss))
                 }
             }
         )
@@ -252,7 +261,7 @@ private fun AuditLogItem(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = logUI.userType ?: "Anonymous User",
+                        text = logUI.userType ?: stringResource(R.string.anonymous_user),
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -272,19 +281,19 @@ private fun AuditLogItem(
 
             // Transaction Details
             LabeledText(
-                label = "Action",
+                label = stringResource(R.string.action),
                 text = logUI.log.transactionType,
                 textColor = borderColor
             )
 
-          /*  LabeledText(
-                label = "Entity",
-                text = logUI.log.,
-                textColor = MaterialTheme.colorScheme.onSurface
-            )*/
+            /*  LabeledText(
+                  label = "Entity",
+                  text = logUI.log.,
+                  textColor = MaterialTheme.colorScheme.onSurface
+              )*/
 
             LabeledText(
-                label = "Timestamp",
+                label = stringResource(R.string.timestamp),
                 text = HelpMe.getDate(
                     logUI.log.timestamp.toLong(),
                     "MMM dd, yyyy 'at' hh:mm a"
@@ -327,7 +336,7 @@ private fun AuditLogItem(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Reveal Identity")
+                    Text(stringResource(R.string.reveal_identity))
                 }
             }
         }

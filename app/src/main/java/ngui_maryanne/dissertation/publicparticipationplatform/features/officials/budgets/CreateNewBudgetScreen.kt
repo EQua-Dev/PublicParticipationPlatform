@@ -34,11 +34,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomTextField
 import ngui_maryanne.dissertation.publicparticipationplatform.ui.components.LoadingDialog
@@ -63,7 +65,7 @@ fun CreateBudgetScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Create Budget") },
+                title = { Text(stringResource(R.string.create_budget)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -81,7 +83,7 @@ fun CreateBudgetScreen(
             CustomTextField(
                 value = state.amount,
                 onValueChange = { viewModel.onEvent(OfficialBudgetEvent.OnAmountChanged(it)) },
-                label = "Total Budget Amount",
+                label = stringResource(R.string.total_budget_amount),
                 keyboardType = KeyboardType.Number
             )
 
@@ -90,7 +92,7 @@ fun CreateBudgetScreen(
             CustomTextField(
                 value = state.budgetNote,
                 onValueChange = { viewModel.onEvent(OfficialBudgetEvent.OnNoteChanged(it)) },
-                label = "Budget Note",
+                label = stringResource(R.string.budget_note),
                 maxLines = 3
             )
 
@@ -99,7 +101,7 @@ fun CreateBudgetScreen(
             CustomTextField(
                 value = state.impact,
                 onValueChange = { viewModel.onEvent(OfficialBudgetEvent.OnImpactChanged(it)) },
-                label = "Impact",
+                label = stringResource(R.string.impact),
                 maxLines = 3
             )
 
@@ -111,23 +113,23 @@ fun CreateBudgetScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Budget Options", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.budget_options), style = MaterialTheme.typography.titleMedium)
 
                 TextButton(
                     onClick = { viewModel.onEvent(OfficialBudgetEvent.OnAddBudgetOption) }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Add Option"
+                        contentDescription = stringResource(R.string.add_option)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add Option")
+                    Text(stringResource(R.string.add_option))
                 }
             }
 
             state.budgetOptions.forEachIndexed { index, option ->
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Option ${index + 1}", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.option, index + 1), style = MaterialTheme.typography.labelLarge)
                 val launcher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.GetContent()
                 ) { uri ->
@@ -149,7 +151,7 @@ fun CreateBudgetScreen(
                             )
                         )
                     },
-                    label = "Project Name",
+                    label = stringResource(R.string.project_name),
                 )
 
                 CustomTextField(
@@ -161,7 +163,7 @@ fun CreateBudgetScreen(
                             )
                         )
                     },
-                    label = "Description",
+                    label = stringResource(R.string.description),
                 )
 
                 CustomTextField(
@@ -173,12 +175,12 @@ fun CreateBudgetScreen(
                             )
                         )
                     },
-                    label = "Amount",
+                    label = stringResource(R.string.amount),
                     keyboardType = KeyboardType.Number
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
-                CustomButton(text = "Upload Image", onClick = { launcher.launch("image/*") })
+                CustomButton(text = stringResource(R.string.upload_image), onClick = { launcher.launch("image/*") })
 
                 option.imageUri?.let {
                     AsyncImage(
@@ -201,11 +203,11 @@ fun CreateBudgetScreen(
                 onClick = { viewModel.submitBudget() },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.isLoading,
-                text = "Create Budget"
+                text = stringResource(R.string.create_budget)
             )
 
             if (state.isLoading) {
-                LoadingDialog(
+                FullScreenLoading(
 
                 )
 //                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())

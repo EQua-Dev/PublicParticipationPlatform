@@ -50,12 +50,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import java.text.SimpleDateFormat
@@ -95,7 +97,7 @@ fun OfficialBudgetsScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Public Budgets") },
+                title = { Text(stringResource(R.string.public_budgets)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     scrolledContainerColor = MaterialTheme.colorScheme.surface
@@ -107,7 +109,7 @@ fun OfficialBudgetsScreen(
                 ExtendedFloatingActionButton(
                     onClick = { navController.navigate(Screen.CreateNewBudgetScreen.route) },
                     icon = { Icon(Icons.Default.Add, contentDescription = "New Budget") },
-                    text = { Text("New Budget") },
+                    text = { Text(stringResource(R.string.new_budget)) },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
@@ -344,7 +346,7 @@ private fun EmptyState(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun FullScreenLoading() {
+fun FullScreenLoading() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

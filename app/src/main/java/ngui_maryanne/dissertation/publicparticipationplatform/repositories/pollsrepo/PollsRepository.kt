@@ -13,7 +13,7 @@ interface PollsRepository {
     fun getPollsListener(policyId: String, language: AppLanguage, onUpdate: (List<Poll>) -> Unit): ListenerRegistration
     suspend fun getPollsForPolicy(policyId: String, language: AppLanguage): Flow<List<Poll>>
     fun getAllPollsListener(language: AppLanguage, onUpdate: (List<Poll>) -> Unit): ListenerRegistration
-    suspend fun getPolicySnapshot(policyId: String): Policy?
+    suspend fun getPolicySnapshot(policyId: String, language: AppLanguage): Policy?
     suspend fun getPollById(pollId: String, language: AppLanguage): Poll?
     suspend fun voteForPollOption(pollId: String, updatedResponses: MutableList<PollResponses>)
 }

@@ -44,15 +44,18 @@ class CitizenHomeViewModel @Inject constructor(
                 .collect { lang ->
                     Log.d("TAG", "selected language: $lang")
                     _selectedLanguage.value = lang
+                    loadCitizenData()
+                    loadCitizenNotifications(lang)
+                    startListeningForAnnouncements(lang)
                 }
         }
     }
 
-    init {
+/*    init {
         loadCitizenData()
-        loadCitizenNotifications()
-        startListeningForAnnouncements()
-    }
+        loadCitizenNotifications(lang)
+        startListeningForAnnouncements(lang)
+    }*/
 
     private fun loadCitizenData() {
         viewModelScope.launch {
@@ -66,12 +69,12 @@ class CitizenHomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadCitizenNotifications() {
+    private fun loadCitizenNotifications(lang: AppLanguage) {
         val userId = auth.currentUser?.uid ?: return
 
         notificationRepository.getUserNotificationsRealtime(
             userId = userId,
-            language = _selectedLanguage.value,
+            language = lang,
             onResult = { notifications ->
                 _state.value = _state.value.copy(
                     notifications = notifications.toMutableList()
@@ -82,10 +85,10 @@ class CitizenHomeViewModel @Inject constructor(
             }
         )
     }
-    private fun startListeningForAnnouncements() {
+    private fun startListeningForAnnouncements(lang: AppLanguage) {
 
         announcementRepository.getAllAnnouncementsRealtime(
-            language = _selectedLanguage.value, // Add language parameter
+            language = lang, // Add language parameter
             onResult = { announcements ->
                 _state.value = _state.value.copy(
                     announcements = announcements.toMutableList(),
