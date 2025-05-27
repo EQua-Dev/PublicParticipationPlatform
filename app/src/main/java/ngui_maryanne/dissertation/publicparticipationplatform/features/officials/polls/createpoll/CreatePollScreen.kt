@@ -47,9 +47,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomTextField
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.PollOption
@@ -73,7 +75,7 @@ fun CreatePollScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Create New Poll") },
+                title = { Text(stringResource(R.string.create_new_poll)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -121,7 +123,7 @@ fun CreatePollScreen(
             CustomTextField(
                 value = state.pollQuestion,
                 onValueChange = { viewModel.onEvent(CreatePollEvent.QuestionChanged(it)) },
-                label = "Poll Question *",
+                label = stringResource(R.string.poll_question),
                 modifier = Modifier.fillMaxWidth(),
                 isError = state.error?.contains("Poll Question") == true
             )
@@ -147,11 +149,11 @@ fun CreatePollScreen(
                 onClick = { viewModel.onEvent(CreatePollEvent.AddOption) },
                 modifier = Modifier.align(Alignment.End)
             ) {
-                Text("Add Option")
+                Text(stringResource(id = R.string.add_option))
             }
 
             // Expiry Days Selection
-            Text("Poll Duration:", style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.poll_duration), style = MaterialTheme.typography.titleSmall)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Slider(
                     value = state.expiryDays.toFloat(),
@@ -160,7 +162,7 @@ fun CreatePollScreen(
                     steps = 29,
                     modifier = Modifier.weight(1f)
                 )
-                Text("${state.expiryDays} days", modifier = Modifier.padding(start = 8.dp))
+                Text(stringResource(R.string.days, state.expiryDays), modifier = Modifier.padding(start = 8.dp))
             }
 
             if (state.isLoading) {
@@ -175,7 +177,7 @@ fun CreatePollScreen(
                     TextButton(
                         onClick = { viewModel.onEvent(CreatePollEvent.DismissError) }
                     ) {
-                        Text("Dismiss")
+                        Text(stringResource(id = R.string.dismiss))
                     }
                 }
             ) {
@@ -195,9 +197,9 @@ private fun PolicyDropdown(
 
     Box(modifier = Modifier.fillMaxWidth()) {
         CustomTextField(
-            value = selectedPolicy?.policyTitle ?: "Select Policy *",
+            value = selectedPolicy?.policyTitle ?: stringResource(R.string.select_policy),
             onValueChange = {},
-            label = "Associated Policy",
+            label = stringResource(R.string.associated_policy),
             leadingIcon = Icons.Default.Category,
             trailingIcon = Icons.Default.ArrowDropDown,
             onTrailingIconClick = { expanded = true },
@@ -217,7 +219,7 @@ private fun PolicyDropdown(
                         Column {
                             Text(policy.policyTitle)
                             Text(
-                                "Status: ${policy.policyStatus.displayName}",
+                                stringResource(id = R.string.status, policy.policyStatus.displayName),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -248,14 +250,14 @@ private fun PollOptionItem(
             onValueChange = {
                 onOptionChanged(option.copy(optionText = it))
             },
-            label = "Option Text",
+            label = stringResource(R.string.option_text),
             modifier = Modifier.weight(1f)
         )
 
         CustomTextField(
             value = option.optionExplanation,
             onValueChange = { newExplanation -> onOptionChanged(option.copy(optionExplanation = newExplanation)) },
-            label = "Poll Explanation",
+            label = stringResource(R.string.poll_explanation),
             modifier = Modifier
                 .fillMaxWidth()  // Make the text area fill the available width
                 .heightIn(min = 100.dp), // Set a minimum height to give more space for input

@@ -57,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -64,6 +65,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
@@ -106,7 +108,7 @@ fun BudgetDetailsScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Budget Details") },
+                title = { Text(stringResource(R.string.budget_details)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -127,7 +129,7 @@ fun BudgetDetailsScreen(
             when {
                 detailsState.isLoading -> FullScreenLoading()
                 detailsState.budget == null -> ErrorState(
-                    error = "Budget not found",
+                    error = stringResource(R.string.budget_not_found),
                     onRetry = { detailsViewModel.onEvent(BudgetDetailsEvent.LoadBudget(budgetId)) }
                 )
                 else -> {
@@ -144,7 +146,7 @@ fun BudgetDetailsScreen(
                         // Budget Options Title
                         item {
                             Text(
-                                text = "Budget Options (${detailsState.budgetOptions.size})",
+                                text = stringResource(id = R.string.budget_options, detailsState.budgetOptions.size),
                                 style = MaterialTheme.typography.titleSmall
                             )
                         }
@@ -159,7 +161,7 @@ fun BudgetDetailsScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = "No options available for this budget",
+                                        text = stringResource(R.string.no_options_available_for_this_budget),
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                     )
                                 }
@@ -218,7 +220,9 @@ fun BudgetDetailsScreen(
                                         )
                                     ) {
                                         Text(
-                                            text = if (detailsState.budget!!.isActive) "Deactivate Budget" else "Activate Budget",
+                                            text = if (detailsState.budget!!.isActive) stringResource(
+                                                R.string.deactivate_budget
+                                            ) else stringResource(R.string.activate_budget),
                                             style = MaterialTheme.typography.labelLarge
                                         )
                                     }
@@ -227,7 +231,7 @@ fun BudgetDetailsScreen(
                                         onClick = { showBottomSheet.value = true },
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        Text("Edit Budget Details")
+                                        Text(stringResource(R.string.edit_budget_details))
                                     }
                                 }
                             }
@@ -275,7 +279,7 @@ private fun BudgetHeaderCard(budget: Budget) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Budget #${budget.budgetNo}",
+                    text = stringResource(id = R.string.budget, budget.budgetNo),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -305,16 +309,18 @@ private fun BudgetHeaderCard(budget: Budget) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                LabeledText(label = "Total Amount", text = "KSH ${budget.amount}")
-                LabeledText(label = "Impact", text = budget.impact)
-                LabeledText(label = "Description", text = budget.budgetNote)
+                LabeledText(label = stringResource(R.string.total_amount), text = "KSH ${budget.amount}")
+                LabeledText(label = stringResource(id = R.string.impact), text = budget.impact)
+                LabeledText(label = stringResource(id = R.string.description), text = budget.budgetNote)
                 LabeledText(
-                    label = "Created On",
+                    label = stringResource(R.string.created_on),
                     text = budget.dateCreated?.let { formatDate(it) } ?: "Unknown"
                 )
                 LabeledText(
-                    label = "Status",
-                    text = if (budget.isActive) "Active" else "Inactive"
+                    label = stringResource(R.string.status),
+                    text = if (budget.isActive) stringResource(id = R.string.active) else stringResource(
+                        R.string.inactive
+                    )
                 )
             }
         }
@@ -394,7 +400,7 @@ private fun BudgetOptionCard(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Your Vote",
+                                text = stringResource(id = R.string.your_vote),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -404,7 +410,7 @@ private fun BudgetOptionCard(
                             onClick = onVote,
                             modifier = Modifier.height(36.dp)
                         ) {
-                            Text("Vote")
+                            Text(stringResource(id = R.string.vote))
                         }
                     }
                 }
@@ -460,7 +466,7 @@ private fun ErrorState(error: String, onRetry: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onRetry) {
-            Text("Retry")
+            Text(stringResource(id = R.string.retry))
         }
     }
 }

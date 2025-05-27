@@ -188,7 +188,7 @@ fun BudgetCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Budget #${budget.budgetNo}",
+                    text = stringResource(id = R.string.budget, budget.budgetNo),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -232,12 +232,12 @@ fun BudgetCard(
                     ) {
                         Column {
                             Text(
-                                text = "Amount",
+                                text = stringResource(id = R.string.amount),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
                             Text(
-                                text = "KSH ${budget.amount}",
+                                text = stringResource(R.string.ksh, budget.amount),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -248,7 +248,7 @@ fun BudgetCard(
 
                     Column {
                         Text(
-                            text = "Impact",
+                            text = stringResource(id = R.string.impact),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
@@ -265,12 +265,12 @@ fun BudgetCard(
                 ) {
                     Column {
                         Text(
-                            text = "Amount",
+                            text = stringResource(id = R.string.amount),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                         Text(
-                            text = "KSH ${budget.amount}",
+                            text = stringResource(R.string.ksh, budget.amount),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -278,7 +278,7 @@ fun BudgetCard(
 
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            text = "Impact",
+                            text = stringResource(id = R.string.impact),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
@@ -296,13 +296,15 @@ fun BudgetCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "${budget.budgetOptions.size} options",
+                    text = stringResource(R.string.options, budget.budgetOptions.size),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
 
                 Text(
-                    text = "Created: ${budget.dateCreated?.let { formatDate(it) } ?: "N/A"}",
+                    text = stringResource(
+                        R.string.created,
+                        budget.dateCreated?.let { formatDate(it) } ?: "N/A"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
@@ -338,7 +340,7 @@ private fun EmptyState(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No budgets found",
+            text = stringResource(R.string.no_budgets_found),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
         )

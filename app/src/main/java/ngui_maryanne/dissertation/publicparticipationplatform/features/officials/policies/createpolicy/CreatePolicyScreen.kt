@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,6 +60,7 @@ import androidx.navigation.NavHostController
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomTextField
 import ngui_maryanne.dissertation.publicparticipationplatform.components.StatusSelectionSection
 import coil.compose.rememberImagePainter
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +79,7 @@ fun CreatePolicyScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Create New Policy") },
+                title = { Text(stringResource(R.string.create_new_policy)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -97,7 +99,7 @@ fun CreatePolicyScreen(
             ) {
                 ExtendedFloatingActionButton(
                     icon = { Icon(Icons.Default.Save, contentDescription = "Save") },
-                    text = { Text("Create Policy") },
+                    text = { Text(stringResource(R.string.create_policy)) },
                     onClick = { viewModel.onEvent(CreatePolicyEvent.Submit) }, // Empty if using Box's clickable
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -124,7 +126,7 @@ fun CreatePolicyScreen(
             CustomTextField(
                 value = state.policyName,
                 onValueChange = { viewModel.onEvent(CreatePolicyEvent.PolicyNameChanged(it)) },
-                label = "Policy Name *",
+                label = stringResource(R.string.policy_name),
                 isError = state.error?.contains("Policy Name") == true,
                 errorMessage = state.error?.takeIf { it.contains("Policy Name") },
                 leadingIcon = Icons.Default.Description,
@@ -136,7 +138,7 @@ fun CreatePolicyScreen(
             CustomTextField(
                 value = state.policyTitle,
                 onValueChange = { viewModel.onEvent(CreatePolicyEvent.PolicyTitleChanged(it)) },
-                label = "Policy Title *",
+                label = stringResource(R.string.policy_title),
                 isError = state.error?.contains("Policy Title") == true,
                 errorMessage = state.error?.takeIf { it.contains("Policy Title") },
                 leadingIcon = Icons.Default.Title,
@@ -150,7 +152,7 @@ fun CreatePolicyScreen(
                 CustomTextField(
                     value = state.policySector,
                     onValueChange = {},
-                    label = "Policy Sector *",
+                    label = stringResource(R.string.policy_sector),
                     isError = state.error?.contains("Policy Sector") == true,
                     errorMessage = state.error?.takeIf { it.contains("Policy Sector") },
                     leadingIcon = Icons.Default.Category,
@@ -186,7 +188,7 @@ fun CreatePolicyScreen(
             CustomTextField(
                 value = state.policyDescription,
                 onValueChange = { viewModel.onEvent(CreatePolicyEvent.PolicyDescriptionChanged(it)) },
-                label = "Policy Description",
+                label = stringResource(R.string.policy_description),
                 leadingIcon = Icons.Default.Notes,
                 keyboardType = KeyboardType.Text,
                 isSingleLine = false,
@@ -211,7 +213,7 @@ fun CreatePolicyScreen(
                     TextButton(
                         onClick = { viewModel.onEvent(CreatePolicyEvent.DismissError) }
                     ) {
-                        Text("Dismiss")
+                        Text(stringResource(id = R.string.dismiss))
                     }
                 }
             ) {
@@ -222,8 +224,8 @@ fun CreatePolicyScreen(
         if (state.isSuccess) {
             AlertDialog(
                 onDismissRequest = { viewModel.onEvent(CreatePolicyEvent.DismissSuccess) },
-                title = { Text("Success") },
-                text = { Text("Policy created successfully!") },
+                title = { Text(stringResource(R.string.success)) },
+                text = { Text(stringResource(R.string.policy_created_successfully)) },
                 confirmButton = {
                     TextButton(
                         onClick = {
@@ -275,7 +277,7 @@ fun PolicyCoverImageSection(
                     tint = colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Add Cover Image",
+                    text = stringResource(R.string.add_cover_image),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colorScheme.onSurfaceVariant
                 )

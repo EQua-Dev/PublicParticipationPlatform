@@ -6,6 +6,8 @@
 
 package ngui_maryanne.dissertation.publicparticipationplatform.navigation
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.MenuBook
@@ -25,20 +27,20 @@ data class BottomNavigationScreen(
 )
 
 sealed class OfficialBottomBarScreen(
-    val title: String,
+    @StringRes val title: Int,
     val icon: Int,
     val route: String
 ) {
     object Policies :
-        OfficialBottomBarScreen("Policies", R.drawable.ic_policies, "official_policies")
+        OfficialBottomBarScreen(R.string.policies, R.drawable.ic_policies, "official_policies")
 
-    object Polls : OfficialBottomBarScreen("Polls", R.drawable.ic_polls, "official_polls")
+    object Polls : OfficialBottomBarScreen(R.string.polls, R.drawable.ic_polls, "official_polls")
     object Petitions :
-        OfficialBottomBarScreen("Petitions", R.drawable.ic_petitions, "official_petitions")
+        OfficialBottomBarScreen(R.string.petitions, R.drawable.ic_petitions, "official_petitions")
 
-    object Budget : OfficialBottomBarScreen("Budget", R.drawable.ic_budget, "official_budget")
-    object Citizens : OfficialBottomBarScreen("Citizens", R.drawable.ic_citizens, "official_citizens")
-    object Profile : OfficialBottomBarScreen("Profile", R.drawable.ic_profile, "official_profile")
+    object Budget : OfficialBottomBarScreen(R.string.budget, R.drawable.ic_budget, "official_budget")
+    object Citizens : OfficialBottomBarScreen(R.string.citizens, R.drawable.ic_citizens, "official_citizens")
+    object Profile : OfficialBottomBarScreen(R.string.profile, R.drawable.ic_profile, "official_profile")
 
 
 }

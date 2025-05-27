@@ -154,7 +154,7 @@ fun OfficialHomeScreen(
 
                 // Logout item
                 NavigationDrawerItem(
-                    label = { Text("Logout", color = Color.Red) },
+                    label = { Text(stringResource(id = R.string.logout), color = Color.Red) },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -303,7 +303,9 @@ fun DrawerHeader(
 
         // Name
         Text(
-            text = official?.let { "Welcome, ${it.firstName}" } ?: "Welcome, Official",
+            text = official?.let { stringResource(id = R.string.welcome, it.firstName) } ?: stringResource(
+                R.string.welcome_official
+            ),
             style = MaterialTheme.typography.titleMedium
         )
 

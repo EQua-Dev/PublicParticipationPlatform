@@ -20,8 +20,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomTextField
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
@@ -76,7 +78,7 @@ fun EditPolicyBottomSheet(
                 CustomButton(
                     onClick = { onSave(name, imageUrl, otherDetails) },
                     modifier = Modifier.fillMaxWidth(),
-                    text = "Save Changes"
+                    text = stringResource(id = R.string.save_changes)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -86,7 +88,7 @@ fun EditPolicyBottomSheet(
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Delete Policy")
+                    Text(stringResource(R.string.delete_policy))
                 }
             }
         }

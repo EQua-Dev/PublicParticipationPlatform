@@ -31,9 +31,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CommentItem
 import ngui_maryanne.dissertation.publicparticipationplatform.components.ErrorState
 import ngui_maryanne.dissertation.publicparticipationplatform.components.PolicyStageTracker
@@ -64,7 +66,7 @@ fun OfficialPolicyDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.policy?.policyTitle ?: "Policy Details", style = MaterialTheme.typography.titleMedium) },
+                title = { Text(state.policy?.policyTitle ?: stringResource(id = R.string.policy_details), style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -153,7 +155,7 @@ private fun PolicyDetailsContent(
         // Polls Section
         if (state.polls.isNotEmpty()) {
             Text(
-                "Public Polls",
+                stringResource(id = R.string.public_polls),
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.padding(16.dp)
             )
@@ -172,7 +174,7 @@ private fun PolicyDetailsContent(
 
         // Comments Section
         Text(
-            "Public Comments",
+            stringResource(R.string.public_comments),
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(16.dp)
         )
@@ -182,7 +184,7 @@ private fun PolicyDetailsContent(
             }
         } else {
             Text(
-                "No comments yet",
+                stringResource(R.string.no_comments_yet),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp)
             )

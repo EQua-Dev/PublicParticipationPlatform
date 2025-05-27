@@ -91,7 +91,7 @@ fun CreatePetitionBottomSheet(
         OutlinedTextField(
             value = state.description,
             onValueChange = { onEvent(NewPetitionEvent.OnDescriptionChanged(it)) },
-            label = { Text("Petition Description") },
+            label = { Text(stringResource(R.string.petition_description)) },
             modifier = Modifier.fillMaxWidth(),
             maxLines = 5
         )

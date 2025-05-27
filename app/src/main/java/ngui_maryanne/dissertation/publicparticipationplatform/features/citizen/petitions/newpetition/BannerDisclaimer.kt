@@ -19,8 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 
 @Composable
 fun BannerDisclaimer() {
@@ -30,14 +32,14 @@ fun BannerDisclaimer() {
             .background(Color(0xFFFDE9E9), shape = RoundedCornerShape(12.dp))
             .padding(16.dp)
     ) {
-        Text("Please read before submitting:", style = MaterialTheme.typography.titleMedium, color = Color(0xFFD32F2F))
+        Text(stringResource(R.string.please_read_before_submitting), style = MaterialTheme.typography.titleMedium, color = Color(0xFFD32F2F))
         Spacer(modifier = Modifier.height(8.dp))
 
         val disclaimers = listOf(
-            "Ensure your petition is respectful and factual.",
-            "Avoid hateful or discriminatory language.",
-            "Petitions with false claims may be removed.",
-            "Once submitted, edits are limited — review carefully."
+            stringResource(R.string.ensure_your_petition_is_respectful_and_factual),
+            stringResource(R.string.avoid_hateful_or_discriminatory_language),
+            stringResource(R.string.petitions_with_false_claims_may_be_removed),
+            stringResource(R.string.once_submitted_edits_are_limited_review_carefully)
         )
 
         disclaimers.forEach {

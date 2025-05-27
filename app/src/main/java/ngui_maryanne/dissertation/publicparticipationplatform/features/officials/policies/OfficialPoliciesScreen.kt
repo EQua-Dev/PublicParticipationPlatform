@@ -46,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -55,6 +56,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -84,7 +86,7 @@ fun OfficialPoliciesScreen(
                         contentColor = MaterialTheme.colorScheme.onPrimary,
                         elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 2.dp),
                         icon = { Icon(Icons.Default.Add, contentDescription = "Create Policy") },
-                        text = { Text("New Policy") }
+                        text = { Text(stringResource(R.string.new_policy)) }
                     )
 
                 }
@@ -260,7 +262,7 @@ private fun EmptyPolicyList() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No policies available",
+            text = stringResource(R.string.no_policies_available),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
         )

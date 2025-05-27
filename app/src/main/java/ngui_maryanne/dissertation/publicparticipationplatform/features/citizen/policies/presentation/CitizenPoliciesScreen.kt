@@ -47,11 +47,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.features.common.auth.presentation.login.KenyanBackgroundPattern
@@ -104,7 +106,7 @@ fun CitizenPoliciesScreen(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Public Policies",
+                            stringResource(R.string.public_policies),
                             style = MaterialTheme.typography.headlineSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onBackground
@@ -151,8 +153,8 @@ fun CitizenPoliciesScreen(
             ) {
                 // Explanation text
                 Text(
-                    text = "Explore government policies and proposed legislation. " +
-                            "Participate in consultations and stay informed about new initiatives.",
+                    text = stringResource(R.string.explore_government_policies_and_proposed_legislation) +
+                            stringResource(R.string.participate_in_consultations_and_stay_informed_about_new_initiatives),
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                     ),
@@ -246,9 +248,9 @@ fun CitizenPoliciesScreen(
                                 )
                                 Text(
                                     text = if (uiState.searchQuery.isNotEmpty() || uiState.selectedStatus != null) {
-                                        "No matching policies found"
+                                        stringResource(R.string.no_matching_policies_found)
                                     } else {
-                                        "No policies available at this time"
+                                        stringResource(R.string.no_policies_available_at_this_time)
                                     },
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                 )
@@ -385,7 +387,7 @@ private fun SearchBar(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier,
-        placeholder = { Text("Search policies by title or sector...") },
+        placeholder = { Text(stringResource(R.string.search_policies_by_title_or_sector)) },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
         trailingIcon = {
             if (query.isNotEmpty()) {

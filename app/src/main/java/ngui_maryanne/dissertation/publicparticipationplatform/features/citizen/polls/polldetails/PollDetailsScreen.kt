@@ -139,13 +139,15 @@ fun PollDetailsScreen(
                                         viewModel.onEvent(
                                             PollDetailsEvent.LoadPollDetails(pollId)
                                         )
-                                        snackbarMessage = "Vote recorded successfully"
+                                        snackbarMessage =
+                                            context.getString(R.string.vote_recorded_successfully)
                                     },
                                     onFailure = { error ->
                                         snackbarMessage = error
                                     }
                                 )
-                            } ?: run { snackbarMessage = "Could not authenticate vote" }
+                            } ?: run { snackbarMessage =
+                                context.getString(R.string.could_not_authenticate_vote) }
                         },
                         onViewPolicy = {
                             navController.navigate(
@@ -194,7 +196,7 @@ private fun PollDetailsContent(
             PollStatusChip(status = pollStatus)
             Text(
                 text = if (pollStatus == PollStatus.ACTIVE) "Expires in: $timeLeft"
-                else "Closed",
+                else stringResource(id = R.string.closed),
                 color = if (pollStatus == PollStatus.ACTIVE) MaterialTheme.colorScheme.error
                 else MaterialTheme.colorScheme.outline,
                 style = MaterialTheme.typography.labelLarge
@@ -346,7 +348,7 @@ private fun PollOptionCard(
             ) {
                 Text(
                     text = if (totalVotes > 0) "${percentage.toInt()}% ($votes votes)"
-                    else "No votes yet",
+                    else stringResource(id = R.string.no_votes_yet),
                     style = MaterialTheme.typography.labelSmall
                 )
 
@@ -356,7 +358,7 @@ private fun PollOptionCard(
                         modifier = Modifier.height(36.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        Text("Vote")
+                        Text(stringResource(id = R.string.vote))
                     }
                 } else if (isSelected) {
                     Row(
@@ -369,7 +371,7 @@ private fun PollOptionCard(
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "Your vote",
+                            text = stringResource(id = R.string.your_vote),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -391,12 +393,12 @@ private fun PollStatistics(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Poll Statistics",
+                text = stringResource(R.string.poll_statistics),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(8.dp))
-            Text("Total votes: $totalVotes")
+            Text(stringResource(id = R.string.total_votes, totalVotes))
         }
     }
 }
@@ -464,7 +466,7 @@ private fun ErrorState(
         )
         Spacer(Modifier.height(16.dp))
         Button(onClick = onRetry) {
-            Text("Retry")
+            Text(stringResource(id = R.string.retry))
         }
     }
 }

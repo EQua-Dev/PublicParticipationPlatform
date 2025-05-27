@@ -45,7 +45,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -90,7 +92,7 @@ fun NotificationsScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Notifications") },
+                title = { Text(stringResource(R.string.notifications)) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     scrolledContainerColor = MaterialTheme.colorScheme.surface
@@ -120,6 +122,8 @@ private fun NotificationList(
     notifications: List<AppNotification>,
     navController: NavHostController
 ) {
+
+    val context = LocalContext.current
     val groupedNotifications = remember(notifications) {
         notifications.groupBy {
             Instant.ofEpochMilli(it.dateCreated.toLongOrNull() ?: 0L)
@@ -136,8 +140,8 @@ private fun NotificationList(
         groupedNotifications.forEach { (date, dailyNotifications) ->
             val dateString =
                 when {
-                    date.isEqual(LocalDate.now()) -> "Today"
-                    date.isEqual(LocalDate.now().minusDays(1)) -> "Yesterday"
+                    date.isEqual(LocalDate.now()) -> context.getString(R.string.today)
+                    date.isEqual(LocalDate.now().minusDays(1)) -> context.getString(R.string.yesterday)
                     else -> DateTimeFormatter.ofPattern("MMMM d, yyyy").format(date)
                 }
 
@@ -289,7 +293,7 @@ private fun EmptyNotificationsState() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No notifications yet",
+            text = stringResource(R.string.no_notifications_yet),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
         )

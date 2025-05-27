@@ -21,9 +21,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 
@@ -35,13 +37,13 @@ fun CitizenAuditScreen(
 ) {
     val state by viewModel.state
 
-    Scaffold(floatingActionButton = {
+    Scaffold(/*floatingActionButton = {
         FloatingActionButton(onClick = { viewModel.onEvent(CitizenAuditLogEvent.RunDiscrepancyCheck) }) {
             Text(text ="Run Discrepancy Check")
         }
-    }) { padding ->
+    }*/) { padding ->
         Column(modifier = modifier.padding(16.dp)) {
-            Text("Audit Logs", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(id = R.string.audit_logs), style = MaterialTheme.typography.titleLarge)
 
             LazyColumn {
                 itemsIndexed(state.logs) { index, logUI ->
@@ -103,24 +105,27 @@ fun CitizenAuditScreen(
                             Spacer(modifier = Modifier.height(12.dp))
 
                             Text(
-                                text = "Transaction: ${logUI.log.transactionType}",
+                                text = stringResource(
+                                    R.string.transaction,
+                                    logUI.log.transactionType
+                                ),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.primary
                             )
 
                             Text(
-                                text = "Hash: ${logUI.log.hash}",
+                                text = stringResource(R.string.hash, logUI.log.hash),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
                             Text(
-                                text = "Time: ${
-                                    HelpMe.getDate(
+                                text = stringResource(
+                                    R.string.time, HelpMe.getDate(
                                         logUI.log.timestamp.toLong(),
                                         "EEE, dd MMM yyyy | hh:mm a"
                                     )
-                                }",
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -128,7 +133,7 @@ fun CitizenAuditScreen(
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
-                                text = "Location: ${logUI.log.location}",
+                                text = stringResource(R.string.location, logUI.log.location),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -167,18 +172,21 @@ fun CitizenAuditScreen(
                 TextButton(onClick = {
                     viewModel.onEvent(CitizenAuditLogEvent.DismissDiscrepancyDialog)
                 }) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             title = {
-                Text(if (state.discrepancyFound) "Discrepancy Found" else "Logs Valid")
+                Text(if (state.discrepancyFound) stringResource(R.string.discrepancy_found) else stringResource(
+                    R.string.logs_valid
+                )
+                )
             },
             text = {
                 Text(
                     if (state.discrepancyFound)
-                        "There are inconsistencies in the audit logs."
+                        stringResource(R.string.there_are_inconsistencies_in_the_audit_logs)
                     else
-                        "100% valid. No discrepancies found."
+                        stringResource(R.string._100_valid_no_discrepancies_found)
                 )
             }
         )

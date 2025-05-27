@@ -66,12 +66,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.PolicyTimelineStepper
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Comment
@@ -139,7 +141,7 @@ fun CitizenPolicyDetailsScreen(
                     modifier = Modifier.background(MaterialTheme.colorScheme.surface),
                     title = {
                         Text(
-                            uiState.policy?.policyTitle ?: "Policy Details",
+                            uiState.policy?.policyTitle ?: stringResource(R.string.policy_details),
                             style = MaterialTheme.typography.headlineSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onBackground
@@ -216,7 +218,7 @@ fun CitizenPolicyDetailsScreen(
                                 tint = MaterialTheme.colorScheme.error
                             )
                             Text(
-                                text = "Failed to load policy details",
+                                text = stringResource(R.string.failed_to_load_policy_details),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
@@ -232,7 +234,7 @@ fun CitizenPolicyDetailsScreen(
                                     )
                                 }
                             ) {
-                                Text("Retry")
+                                Text(stringResource(id = R.string.retry))
                             }
                         }
                     }
@@ -255,7 +257,7 @@ fun CitizenPolicyDetailsScreen(
                                 modifier = Modifier.size(48.dp),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
-                            Text("Policy not found")
+                            Text(stringResource(R.string.policy_not_found))
                         }
                     }
                 }
@@ -321,12 +323,12 @@ fun CitizenPolicyDetailsScreen(
                                 )
 
                                 Text(
-                                    text = "Published: ${
-                                        getDate(
+                                    text = stringResource(
+                                        R.string.published, getDate(
                                             policy.dateCreated.toLong(),
                                             "dd MMM yyyy"
                                         )
-                                    }",
+                                    ),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.outline
                                 )
@@ -334,7 +336,7 @@ fun CitizenPolicyDetailsScreen(
 
                             // Description section
                             ExpandableSection(
-                                title = "Description",
+                                title = stringResource(id = R.string.description),
                                 content = policy.policyDescription,
                                 isExpanded = uiState.isDescriptionExpanded,
                                 onToggleExpand = { viewModel.handleAction(PolicyDetailsAction.ToggleDescriptionExpanded) }
@@ -342,7 +344,7 @@ fun CitizenPolicyDetailsScreen(
 
                             // Timeline section
                             ExpandableSection(
-                                title = "Policy Timeline",
+                                title = stringResource(R.string.policy_timeline),
                                 isExpanded = uiState.isTimelineExpanded,
                                 onToggleExpand = { viewModel.handleAction(PolicyDetailsAction.ToggleTimelineExpanded) }
                             ) {
@@ -354,7 +356,7 @@ fun CitizenPolicyDetailsScreen(
 
                             // Public participation section
                             if (uiState.polls.isNotEmpty()) {
-                                SectionTitle("Public Participation")
+                                SectionTitle(stringResource(R.string.public_participation))
                                 LazyColumn(
                                     verticalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier.heightIn(max = 300.dp)
@@ -562,7 +564,10 @@ private fun PolicyTimeline(
 
                     statusChange?.let {
                         Text(
-                            text = "Completed on ${getDate(it.changedAt.toLong(), "dd MMM yyyy")}",
+                            text = stringResource(
+                                R.string.completed_on,
+                                getDate(it.changedAt.toLong(), "dd MMM yyyy")
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -607,13 +612,13 @@ private fun PollCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Poll #${poll.pollNo}",
+                    text = stringResource(R.string.poll, poll.pollNo),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
 
                 Text(
-                    text = "Expires: ${getDate(poll.pollExpiry.toLong(), "EEE, dd MMM yyyy")}",
+                    text = stringResource(id = R.string.expires, getDate(poll.pollExpiry.toLong(), "EEE, dd MMM yyyy")),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -637,7 +642,7 @@ private fun CommentsSection(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        SectionTitle("Comments (${comments.size})")
+        SectionTitle(stringResource(R.string.comments, comments.size))
 
         if (canComment) {
             Card(
@@ -653,7 +658,7 @@ private fun CommentsSection(
                         value = newCommentText,
                         onValueChange = onCommentTextChanged,
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Add your comment") },
+                        label = { Text(stringResource(R.string.add_your_comment)) },
                         shape = MaterialTheme.shapes.small,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -676,7 +681,7 @@ private fun CommentsSection(
                                 )
                             )
                             Text(
-                                "Post anonymously",
+                                stringResource(R.string.post_anonymously),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -689,7 +694,7 @@ private fun CommentsSection(
                             ),
                             shape = MaterialTheme.shapes.small
                         ) {
-                            Text("Submit")
+                            Text(stringResource(R.string.submit))
                         }
                     }
                 }
@@ -713,8 +718,8 @@ private fun CommentsSection(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (canComment) "No comments yet. Be the first to comment!"
-                    else "No comments available",
+                    text = if (canComment) stringResource(R.string.no_comments_yet_be_the_first_to_comment)
+                    else stringResource(R.string.no_comments_available),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
@@ -758,7 +763,7 @@ private fun CommentCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (comment.anonymous) "Anonymous" else displayName,
+                    text = if (comment.anonymous) stringResource(R.string.anonymous) else displayName,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold
                 )

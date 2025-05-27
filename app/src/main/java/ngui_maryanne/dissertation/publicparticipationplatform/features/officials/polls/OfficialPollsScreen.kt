@@ -36,9 +36,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.EmptyState
 import ngui_maryanne.dissertation.publicparticipationplatform.components.ErrorState
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
@@ -91,7 +93,7 @@ fun OfficialPollsScreen(
 
                 state.polls.isEmpty() -> EmptyState(
                     icon = Icons.Default.Policy,
-                    title = "No polls available"
+                    title = stringResource(R.string.no_polls_available)
                 )
 
                 else -> PollList(state.polls) {
@@ -135,7 +137,10 @@ private fun PollCard(poll: Poll, onClick: (pollId: String) -> Unit) {
             Text(poll.pollQuestion, style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Expires on: ${getDate(poll.pollExpiry.toLong(), "EEE dd MMM yyyy")}",
+                stringResource(
+                    R.string.expires_on,
+                    getDate(poll.pollExpiry.toLong(), "EEE dd MMM yyyy")
+                ),
                 style = MaterialTheme.typography.bodySmall
             )
         }

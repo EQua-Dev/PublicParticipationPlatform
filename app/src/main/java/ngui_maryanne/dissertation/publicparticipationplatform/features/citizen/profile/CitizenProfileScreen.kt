@@ -214,13 +214,13 @@ fun CitizenProfileScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ProfileDetailItem(
-                                label = "Name",
+                                label = stringResource(R.string.name),
                                 value = "${state.citizen.firstName} ${state.citizen.lastName}"
                             )
 
 
                             ProfileDetailItem(
-                                label = "Email",
+                                label = stringResource(id = R.string.email),
                                 value = it.email
                             )
 
@@ -231,13 +231,13 @@ fun CitizenProfileScreen(
                                     onValueChange = {
                                         viewModel.onEvent(CitizenProfileEvent.PhoneNumberChanged(it))
                                     },
-                                    label = { Text("Phone Number") },
+                                    label = { Text(stringResource(id = R.string.phone_number)) },
                                     modifier = Modifier.fillMaxWidth(),
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                                 )
                             } else {
                                 ProfileDetailItem(
-                                    label = "Phone",
+                                    label = stringResource(R.string.phone),
                                     value = state.citizen.phoneNumber
                                 )
                             }
@@ -248,7 +248,7 @@ fun CitizenProfileScreen(
                                     onValueChange = {
                                         viewModel.onEvent(CitizenProfileEvent.OccupationChanged(it))
                                     },
-                                    label = { Text("Occupation") },
+                                    label = { Text(stringResource(id = R.string.occupation)) },
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
@@ -261,17 +261,17 @@ fun CitizenProfileScreen(
                                             )
                                         )
                                     },
-                                    label = { Text("County of Residence") },
+                                    label = { Text(stringResource(R.string.county_of_residence)) },
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             } else {
                                 ProfileDetailItem(
-                                    label = "Occupation",
+                                    label = stringResource(id = R.string.occupation),
                                     value = state.citizen.occupation
                                 )
 
                                 ProfileDetailItem(
-                                    label = "County of Residence",
+                                    label = stringResource(id = R.string.county_of_residence),
                                     value = state.citizen.countyOfResidence
                                 )
                             }
@@ -300,11 +300,11 @@ fun CitizenProfileScreen(
                         TextButton(
                             onClick = { viewModel.onEvent(CitizenProfileEvent.DismissSuccess) }
                         ) {
-                            Text("Dismiss")
+                            Text(stringResource(id = R.string.dismiss))
                         }
                     }
                 ) {
-                    Text("Profile updated successfully")
+                    Text(stringResource(R.string.profile_updated_successfully))
                 }
             }
 
@@ -315,7 +315,7 @@ fun CitizenProfileScreen(
                         TextButton(
                             onClick = { viewModel.onEvent(CitizenProfileEvent.DismissSuccess) }
                         ) {
-                            Text("Dismiss")
+                            Text(stringResource(id = R.string.dismiss))
                         }
                     }
                 ) {

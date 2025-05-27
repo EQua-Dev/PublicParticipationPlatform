@@ -75,7 +75,7 @@ fun OfficialProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Profile") },
+                title = { Text(stringResource(R.string.my_profile)) },
                 actions = {
                     IconButton(onClick = { viewModel.onEvent(OfficialProfileEvent.ToggleEditMode) }) {
                         Icon(
@@ -199,12 +199,12 @@ fun OfficialProfileScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         ProfileDetailItem(
-                            label = "Name",
+                            label = stringResource(id = R.string.name),
                             value = "${state.official.firstName} ${state.official.lastName}"
                         )
 
                         ProfileDetailItem(
-                            label = "Email",
+                            label = stringResource(id = R.string.email),
                             value = state.official.email
                         )
 
@@ -214,13 +214,13 @@ fun OfficialProfileScreen(
                                 onValueChange = {
                                     viewModel.onEvent(OfficialProfileEvent.PhoneNumberChanged(it))
                                 },
-                                label = { Text("Phone Number") },
+                                label = { Text(stringResource(id = R.string.phone_number)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                             )
                         } else {
                             ProfileDetailItem(
-                                label = "Phone",
+                                label = stringResource(id = R.string.phone),
                                 value = state.official.phoneNumber
                             )
                         }
@@ -228,7 +228,7 @@ fun OfficialProfileScreen(
                         if (state.official.permissions.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Permissions:",
+                                text = stringResource(R.string.permissions),
                                 style = MaterialTheme.typography.labelMedium
                             )
                             FlowRow(
@@ -262,7 +262,7 @@ fun OfficialProfileScreen(
                         }
                     }
                 ) {
-                    Text("Profile updated successfully")
+                    Text(stringResource(id = R.string.profile_updated_successfully))
                 }
             }
 
@@ -273,7 +273,7 @@ fun OfficialProfileScreen(
                         TextButton(
                             onClick = { viewModel.onEvent(OfficialProfileEvent.DismissSuccess) }
                         ) {
-                            Text("Dismiss")
+                            Text(stringResource(id = R.string.dismiss))
                         }
                     }
                 ) {

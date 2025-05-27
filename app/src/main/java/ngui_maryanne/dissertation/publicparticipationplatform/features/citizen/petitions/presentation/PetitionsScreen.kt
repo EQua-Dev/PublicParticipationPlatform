@@ -95,7 +95,7 @@ fun CitizenPetitionsScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Public Petitions") },
+                title = { Text(stringResource(R.string.public_petitions)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     scrolledContainerColor = MaterialTheme.colorScheme.surface
@@ -107,7 +107,7 @@ fun CitizenPetitionsScreen(
                 ExtendedFloatingActionButton(
                     onClick = { viewModel.onEvent(PetitionEvent.OnToggleCreatePetition) },
                     icon = { Icon(Icons.Default.Add, contentDescription = "New Petition") },
-                    text = { Text("New Petition") },
+                    text = { Text(stringResource(R.string.new_petition)) },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
@@ -355,7 +355,7 @@ fun PetitionCard(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = if (daysLeft < 0) "Closed" else "$daysLeft days left",
+                        text = if (daysLeft < 0) stringResource(id = R.string.closed) else "$daysLeft days left",
                         style = MaterialTheme.typography.labelSmall,
                         color = statusColor
                     )
@@ -392,7 +392,11 @@ fun PetitionCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "${petition.signatures.size} of ${petition.signatureGoal} signatures",
+                    text = stringResource(
+                        R.string.of_signatures,
+                        petition.signatures.size,
+                        petition.signatureGoal
+                    ),
                     style = MaterialTheme.typography.labelMedium
                 )
 

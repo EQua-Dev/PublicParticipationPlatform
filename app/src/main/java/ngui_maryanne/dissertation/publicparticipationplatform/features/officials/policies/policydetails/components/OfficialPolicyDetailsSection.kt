@@ -12,10 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 import coil.compose.AsyncImage
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 
 @Composable
 fun PolicyDetailsSection(
@@ -47,7 +49,7 @@ fun PolicyDetailsSection(
             style = MaterialTheme.typography.headlineMedium
         )*/
         Text(
-            text = "Sector: ${policy.policySector}",
+            text = stringResource(R.string.sector, policy.policySector),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
@@ -61,12 +63,10 @@ fun PolicyDetailsSection(
 
         // Metadata (e.g., creation date)
         Text(
-            text = "Created on ${
-                HelpMe.getDate(
-                    policy.dateCreated.toLong(),
-                    "EEE dd MMM yyyy | hh:mm a"
-                )
-            }",
+            text = stringResource(id = R.string.created_on, HelpMe.getDate(
+                policy.dateCreated.toLong(),
+                "EEE dd MMM yyyy | hh:mm a"
+            )),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )

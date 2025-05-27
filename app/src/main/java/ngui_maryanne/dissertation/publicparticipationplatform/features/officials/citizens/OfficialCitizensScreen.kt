@@ -192,7 +192,9 @@ private fun CitizenCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = if (citizen.approved == "true") "Approved" else "Pending",
+                        text = if (citizen.approved == "true") stringResource(R.string.approved) else stringResource(
+                            R.string.pending
+                        ),
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
@@ -200,7 +202,7 @@ private fun CitizenCard(
 
             if (canApprove && citizen.approved != "true") {
                 Button(onClick = onVerifyClick) {
-                    Text("Verify")
+                    Text(stringResource(R.string.verify))
                 }
             }
         }
@@ -222,7 +224,7 @@ private fun CitizenVerificationBottomSheet(
     ) {
         citizen?.let { citizen ->
             // Citizen from app database
-            Text("App Citizen", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.app_citizen), style = MaterialTheme.typography.titleLarge)
             AsyncImage(
                 model = citizen.profileImage,
                 contentDescription = "Profile image",
@@ -238,7 +240,7 @@ private fun CitizenVerificationBottomSheet(
 
             // National citizen database
             if (nationalCitizen != null) {
-                Text("National Database", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.national_database), style = MaterialTheme.typography.titleLarge)
                 AsyncImage(
                     model = nationalCitizen.profileImageUrl,
                     contentDescription = "National profile image",
@@ -250,7 +252,7 @@ private fun CitizenVerificationBottomSheet(
                 Text(nationalCitizen.name)
                 Text("ID: ${nationalCitizen.nationalId}")
             } else {
-                Text("No matching record in national database", color = Color.Red)
+                Text(stringResource(R.string.no_matching_record_in_national_database), color = Color.Red)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -263,18 +265,18 @@ private fun CitizenVerificationBottomSheet(
                     onClick = onReject,
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {
-                    Text("Reject")
+                    Text(stringResource(R.string.reject))
                 }
 
                 Button(
                     onClick = onApprove,
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Green)
                 ) {
-                    Text("Approve")
+                    Text(stringResource(R.string.approve))
                 }
             }
         } ?: run {
-            Text("No citizen selected", color = Color.Red)
+            Text(text = stringResource(R.string.no_citizen_selected), color = Color.Red)
         }
     }
 }
