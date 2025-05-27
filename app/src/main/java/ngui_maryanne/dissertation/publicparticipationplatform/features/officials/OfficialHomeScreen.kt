@@ -17,10 +17,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -52,6 +56,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -64,6 +69,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Officia
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.AppBackground
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AppNotification
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.ui.components.BackgroundAnimations
 import java.util.Calendar
@@ -130,7 +136,10 @@ fun OfficialHomeScreen(
                             }
                         },
                         icon = {
-                            Icon(painter = painterResource(id = screen.icon), contentDescription = screen.title)
+                            Icon(
+                                painter = painterResource(id = screen.icon),
+                                contentDescription = screen.title
+                            )
                         },
                         colors = NavigationDrawerItemDefaults.colors(
                             selectedContainerColor = MaterialTheme.colorScheme.surface, // same as FAB background
@@ -184,12 +193,16 @@ fun OfficialHomeScreen(
                         }
                     },
                     profileImageUrl = state.official.profileImageUrl,
-                    officialName = state.official.firstName
+                    officialName = state.official.firstName,
+                    onNotificationsClick = { navController.navigate(Screen.NotificationScreen.route) },
+                    topBarAccentColor = MaterialTheme.colorScheme.primary,
+                    notifications = officialState.notifications,
                 )
             }
         ) { innerPadding ->
             val reducedTopPadding = (innerPadding.calculateTopPadding() - 8.dp).coerceAtLeast(0.dp)
-            val reducedBottomPadding = (innerPadding.calculateBottomPadding() - 8.dp).coerceAtLeast(0.dp)
+            val reducedBottomPadding =
+                (innerPadding.calculateBottomPadding() - 8.dp).coerceAtLeast(0.dp)
 
 
 
@@ -318,7 +331,10 @@ fun AppBar(
     onMenuClick: () -> Unit,
     profileImageUrl: String? = null,
     officialName: String,
-    modifier: Modifier = Modifier
+    notifications: MutableList<AppNotification>,
+    onNotificationsClick: () -> Unit,
+    topBarAccentColor: Color,
+//    modifier: Modifier = Modifier
 ) {
     val currentHour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
     val greeting = when (currentHour) {
@@ -376,8 +392,33 @@ fun AppBar(
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.primary
         ),
-        modifier = Modifier.shadow(4.dp) // Add visual shadow/elevation
+        modifier = Modifier.shadow(4.dp), // Add visual shadow/elevation
+        actions = {
+            IconButton(onClick = onNotificationsClick) {
+                BadgedBox(
+                    badge = {
+                        if (notifications.isNotEmpty()) {
+                            Badge(
+                                containerColor = topBarAccentColor
+                            ) {
+                                Text(
+                                    notifications.size.toString(),
+                                    color = Color.White,
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        Icons.Default.Notifications,
+                        contentDescription = "Notifications",
+                        tint = topBarAccentColor
+                    )
+                }
+            }
 
+        }
     )
 }
 

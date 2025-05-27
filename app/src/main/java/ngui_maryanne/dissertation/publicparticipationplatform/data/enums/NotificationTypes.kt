@@ -5,5 +5,6 @@ enum class NotificationTypes {
     PETITION,
     POLL,
     BUDGET,
-    UNKNOWN
+    UNKNOWN,
+    CITIZEN_REGISTRATION
 }

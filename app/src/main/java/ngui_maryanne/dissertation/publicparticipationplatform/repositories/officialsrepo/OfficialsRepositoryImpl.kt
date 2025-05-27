@@ -128,4 +128,9 @@ class OfficialsRepositoryImpl @Inject constructor(
             registration.remove()
         }
     }
+
+    override suspend fun logout() {
+        auth.signOut()
+
+    }
 }

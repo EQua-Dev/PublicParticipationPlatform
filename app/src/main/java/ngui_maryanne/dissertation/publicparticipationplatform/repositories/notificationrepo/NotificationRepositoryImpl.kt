@@ -12,6 +12,8 @@ import kotlinx.coroutines.withContext
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AppNotification
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citizen
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Official
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
@@ -19,6 +21,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.di.TranslatorProvi
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.AppLanguage
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.COMMENTS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.NOTIFICATIONS_REF
+import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.OFFICIALS_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.Constants.POLICIES_REF
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.toTargetLang
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe.translateTextWithMLKit
@@ -76,6 +79,39 @@ class NotificationRepositoryImpl(
                 }
             }
     }
+
+    override suspend fun sendCitizenRegistrationNotifications(
+        citizen: Citizen,
+    ) {
+        val notificationsRef = firestore.collection(NOTIFICATIONS_REF)
+        val now = System.currentTimeMillis().toString()
+        val batch = firestore.batch()
+
+        // Step 1: Get all officials
+        val officialsSnapshot = firestore.collection(OFFICIALS_REF).get().await()
+
+        // Step 2: Filter those with 'approve_citizens' permission
+        val approvingOfficials = officialsSnapshot.documents
+            .mapNotNull { it.toObject(Official::class.java) }
+            .filter { "approve_citizens" in it.permissions }
+
+        // Step 3: Create notifications
+        approvingOfficials.forEach { official ->
+            val notification = AppNotification(
+                receiverId = official.id,
+                type = NotificationTypes.CITIZEN_REGISTRATION,
+                typeId = citizen.id,
+                dateCreated = now,
+                message = "A new citizen just registered. Go to Citizen screen to verify"
+            )
+            val docRef = notificationsRef.document()
+            batch.set(docRef, notification)
+        }
+
+        // Step 4: Commit batch
+        batch.commit().await()
+    }
+
 
     override suspend fun sendPetitionSignNotifications(
         petition: Petition,

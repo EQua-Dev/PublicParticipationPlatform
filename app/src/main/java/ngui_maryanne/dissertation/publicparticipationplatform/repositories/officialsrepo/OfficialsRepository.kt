@@ -17,7 +17,6 @@ interface OfficialsRepository {
     fun getOfficialByIdRealtime(
         officialId: String
     ): Flow<Official?>
-
-
+    suspend fun logout()
 
 }

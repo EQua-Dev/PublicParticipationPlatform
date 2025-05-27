@@ -14,12 +14,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.notification.presentation.NotificationsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.petitiondetails.PetitionDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.petitions.presentation.CitizenPetitionsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.policydetails.CitizenPolicyDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.policies.presentation.CitizenPoliciesScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.polldetails.PollDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.polls.presentation.CitizenPollsScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.citizen.profile.audit.presentation.CitizenAuditScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.CreateBudgetScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails.BudgetDetailsScreen
@@ -180,39 +182,12 @@ fun OfficialBottomNavigationGraph(navController: NavHostController) {
             )
         }
 
-        /*composable(
-            Screen.FeesSemester.route,
-            arguments = listOf(
-                navArgument(name = "level") { type = NavType.StringType },
-                navArgument(name = "semester") { type = NavType.StringType }
-            ),
-        ) {
-            val level = it.arguments?.getString("level")
-            val semester = it.arguments?.getString("semester")
-            FeesPaymentScreen(
-                level = level!!, semester = semester!!,
-                onBack = { navController.popBackStack() },
-                //onBackRequested = onBackRequested,
-
+        composable(Screen.NotificationScreen.route) {
+            NotificationsScreen(
+                navController = navController
             )
+
         }
-        composable(
-            Screen.DuesSemesterScreen.route,
-            arguments = listOf(
-                navArgument(name = "level") { type = NavType.StringType },
-                navArgument(name = "semester") { type = NavType.StringType }
-            ),
-        ) {
-            val level = it.arguments?.getString("level")
-            val semester = it.arguments?.getString("semester")
-            DuesPaymentScreen(
-                level = level!!, semester = semester!!,
-                onBack = { navController.popBackStack() },
-                onPay = {}
-                //onBackRequested = onBackRequested,
-
-            )
-        }*/
     }
 
 }

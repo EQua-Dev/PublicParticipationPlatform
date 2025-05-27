@@ -21,9 +21,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ngui_maryanne.dissertation.publicparticipationplatform.R
 import ngui_maryanne.dissertation.publicparticipationplatform.components.CustomButton
 import ngui_maryanne.dissertation.publicparticipationplatform.utils.HelpMe
 
@@ -35,13 +37,13 @@ fun OfficialAuditScreen(
 ) {
     val state by viewModel.state
 
-    Scaffold(floatingActionButton = {
+    Scaffold(/*floatingActionButton = {
         FloatingActionButton(onClick = { viewModel.onEvent(OfficialAuditLogEvent.RunDiscrepancyCheck) }) {
             Text(text = "Run Discrepancy Check")
         }
-    }) { padding ->
+    }*/) { padding ->
         Column(modifier = modifier.padding(16.dp)) {
-            Text("Audit Logs", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(id = R.string.audit_logs), style = MaterialTheme.typography.titleLarge)
 
             LazyColumn {
                 itemsIndexed(state.logs) { index, logUI ->

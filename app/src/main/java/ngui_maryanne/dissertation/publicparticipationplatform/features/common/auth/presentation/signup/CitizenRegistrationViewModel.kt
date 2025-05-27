@@ -16,6 +16,7 @@ import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import ngui_maryanne.dissertation.publicparticipationplatform.repositories.notificationrepo.NotificationRepository
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CitizenRegistrationViewModel @Inject constructor(
     private val repository: CitizenRepository,
+    private val notificationRepository: NotificationRepository,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
@@ -297,6 +299,9 @@ class CitizenRegistrationViewModel @Inject constructor(
                 _state.value.profileImage,
                 _state.value.password
             )
+
+            notificationRepository.sendCitizenRegistrationNotifications(citizen)
+
 
             _state.value = _state.value.copy(
                 isLoading = false,

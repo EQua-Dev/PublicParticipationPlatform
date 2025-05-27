@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -70,6 +73,7 @@ import ngui_maryanne.dissertation.publicparticipationplatform.features.officials
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.OfficialBudgetsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.budgets.budgetddetails.BudgetDetailsScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.features.officials.polls.createpoll.CreatePollScreen
+import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.SuperAdminHomeEvent
 import ngui_maryanne.dissertation.publicparticipationplatform.features.superadmin.SuperAdminHomeScreen
 import ngui_maryanne.dissertation.publicparticipationplatform.navigation.Screen
 import ngui_maryanne.dissertation.publicparticipationplatform.ui.components.BackgroundAnimations
@@ -235,6 +239,8 @@ fun ScaffoldSection(
     // Access the selected language from the ViewModel
     val selectedLanguage by holderViewModel.selectedLanguage
     val context = LocalContext.current
+    val openDialog = remember { mutableStateOf(false) }
+    val errorState = remember { mutableStateOf("") }
 
     LaunchedEffect(selectedLanguage) {
         // Update the locale
@@ -258,6 +264,7 @@ fun ScaffoldSection(
             },
         ) { paddingValues ->
 
+            val inPadding = paddingValues
 
             Box(
                 modifier = Modifier
@@ -267,7 +274,7 @@ fun ScaffoldSection(
                 BackgroundAnimations()
                 AppBackground {
                     Column(
-                        Modifier.padding(paddingValues)
+                        Modifier.padding()
                     ) {
                         NavHost(
                             modifier = Modifier.weight(1f),
@@ -292,19 +299,21 @@ fun ScaffoldSection(
                                 onStatusBarColorChange(MaterialTheme.colorScheme.background)
                                 LoginScreen(
                                     onLoginSuccess = { userRole ->
-                                        when (userRole) {
-                                            UserRole.SUPERADMIN.name -> {
-                                                controller.navigate(Screen.SuperAdminHome.route)
+                                        holderViewModel.getUserType(
+                                            userRole = userRole,
+                                            onLoginSuccess = { role ->
+                                                when (role) {
+                                                    UserRole.SUPERADMIN -> controller.navigate(Screen.SuperAdminHome.route)
+                                                    UserRole.OFFICIAL -> controller.navigate(Screen.OfficialHomeScreen.route)
+                                                    UserRole.CITIZEN -> controller.navigate(Screen.CitizenHome.route)
+                                                    else -> controller.navigate(Screen.CitizenHome.route)
+                                                }
+                                            },
+                                            onError = { error ->
+                                                errorState.value = error.message ?: "Unknown error occurred"
+                                                openDialog.value = true
                                             }
-
-                                            UserRole.OFFICIAL.name -> {
-                                                controller.navigate(Screen.OfficialHomeScreen.route)
-                                            }
-
-                                            else -> {
-                                                controller.navigate(Screen.CitizenHome.route)
-                                            }
-                                        }
+                                        )
 //                            if (userRole === UserRole.SUPERADMIN.name) {
 //                                controller.navigate(Screen.SuperAdminHome.route)
 //                            } else {
@@ -474,9 +483,39 @@ fun ScaffoldSection(
                             }
                         }
                     }
+
+
                 }
 
 
+            }
+
+            if (openDialog.value) {
+                AlertDialog(
+                    onDismissRequest = {
+                        // Dismiss the dialog when the user clicks outside the dialog or on the back
+                        // button. If you want to disable that functionality, simply use an empty
+                        // onDismissRequest.
+                        openDialog.value = false
+                    },
+                    title = {
+                        Text(text = "Invalid User Type", style = MaterialTheme.typography.titleLarge)
+                    },
+                    text = {
+                        Text(text = "Selected user account was not found for the selected role.")
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                openDialog.value = false
+                                controller.navigate(Screen.InitRoleTypeScreen.route)
+                            }
+                        ) {
+                            Text("Okay")
+                        }
+                    },
+
+                    )
             }
         }
     }

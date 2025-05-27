@@ -3,6 +3,7 @@ package ngui_maryanne.dissertation.publicparticipationplatform.repositories.noti
 import com.google.firebase.firestore.ListenerRegistration
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.AppNotification
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
+import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Citizen
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Petition
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Policy
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Poll
@@ -13,7 +14,7 @@ interface NotificationRepository {
         userId: String,
         language: AppLanguage,
         onResult: (List<AppNotification>) -> Unit,
-        onError: (Exception) -> Unit
+        onError: (Exception) -> Unit,
     ): ListenerRegistration
 
     suspend fun sendPetitionSignNotifications(
@@ -29,6 +30,10 @@ interface NotificationRepository {
     suspend fun sendBudgetVoteNotifications(
         budget: Budget,
         newVoterId: String,
+    )
+
+    suspend fun sendCitizenRegistrationNotifications(
+        citizen: Citizen,
     )
 
     suspend fun sendPolicyCommentNotifications(policyId: String, newCommenterId: String)
