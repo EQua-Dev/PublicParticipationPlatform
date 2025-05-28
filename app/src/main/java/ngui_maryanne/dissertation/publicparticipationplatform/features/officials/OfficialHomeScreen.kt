@@ -124,7 +124,7 @@ fun OfficialHomeScreen(
                 // Drawer items
                 screens.forEach { screen ->
                     NavigationDrawerItem(
-                        label = { Text(text = screen.title) },
+                        label = { Text(text = stringResource(id = screen.title)) },
                         selected = navController.currentBackStackEntryAsState().value?.destination?.route == screen.route,
                         onClick = {
                             scope.launch { drawerState.close() }
@@ -138,7 +138,7 @@ fun OfficialHomeScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(id = screen.icon),
-                                contentDescription = screen.title
+                                contentDescription = stringResource(id = screen.title)
                             )
                         },
                         colors = NavigationDrawerItemDefaults.colors(

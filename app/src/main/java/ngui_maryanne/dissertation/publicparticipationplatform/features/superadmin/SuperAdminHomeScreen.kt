@@ -89,9 +89,9 @@ fun SuperAdminHomeScreen(
         },
     ) { innerPadding ->
 
-        val reducedTopPadding = (innerPadding.calculateTopPadding() - 8.dp).coerceAtLeast(0.dp)
+        val reducedTopPadding = (innerPadding.calculateTopPadding() - 12.dp).coerceAtLeast(0.dp)
         val reducedBottomPadding =
-            (innerPadding.calculateBottomPadding() - 8.dp).coerceAtLeast(0.dp)
+            (innerPadding.calculateBottomPadding() - 12.dp).coerceAtLeast(0.dp)
 
 
         Box(

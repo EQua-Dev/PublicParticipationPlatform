@@ -108,7 +108,8 @@ fun SuperAdminDashboardScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
         ) {
             when {
                 state.isLoading -> FullScreenLoading()

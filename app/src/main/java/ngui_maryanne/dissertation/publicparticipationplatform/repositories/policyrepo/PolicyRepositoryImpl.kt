@@ -319,16 +319,6 @@ class PolicyRepositoryImpl @Inject constructor(
         }
 
         Log.d("translatePollToLanguage", "$targetLang $policy")
-        /*  return poll.copy(
-              pollQuestion = translateText(poll.pollQuestion, sourceLang, targetLang),
-              pollOptions = poll.pollOptions.map { option ->
-                  option.copy(
-                      optionText = translateTextWithMLKit(option.optionText, targetLang),
-                      optionExplanation = translateTextWithMLKit(option.optionExplanation, targetLang)
-                  )
-              }
-          )
-  */
         return policy.copy(
             policyName = translateText(policy.policyName, sourceLang, targetLang),
             policyTitle = translateText(policy.policyTitle, sourceLang, targetLang),

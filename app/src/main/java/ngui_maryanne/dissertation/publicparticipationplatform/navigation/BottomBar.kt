@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -63,10 +64,10 @@ fun RowScope.OfficialAddItem(
             it.route == screen.route
         } == true,
         label = {
-            Text(text = screen.title)
+            Text(text = stringResource(id = screen.title))
         },
         onClick = { navController.navigate(screen.route) },
-        icon = { Icon(painterResource(id = screen.icon), contentDescription = screen.title) })
+        icon = { Icon(painterResource(id = screen.icon), contentDescription = stringResource(id = screen.title)) })
 }
 
 @Composable
