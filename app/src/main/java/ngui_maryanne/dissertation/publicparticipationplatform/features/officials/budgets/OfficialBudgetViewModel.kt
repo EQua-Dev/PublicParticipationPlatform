@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.NotificationTypes
+import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.UserRole
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Announcement
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.Budget
 import ngui_maryanne.dissertation.publicparticipationplatform.data.models.BudgetOption
@@ -122,8 +123,10 @@ class OfficialBudgetViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
             budgetRepo.getAllBudgets(lang).collect { budgetList ->
+                val displayBudgetList =
+                    if (_uiState.value.currentUserRole == UserRole.OFFICIAL.name) budgetList else budgetList.filter { it.isActive }
                 _uiState.value = _uiState.value.copy(
-                    budgets = budgetList.filter { it.isActive },
+                    budgets = displayBudgetList,
                     isLoading = false
                 )
             }
@@ -164,7 +167,8 @@ class OfficialBudgetViewModel @Inject constructor(
                     dateCreated = System.currentTimeMillis().toString(),
                     budgetExpiry = System.currentTimeMillis().plus(30 * 24 * 60 * 60 * 1000L)
                         .toString(),
-                    impact = _uiState.value.impact
+                    impact = _uiState.value.impact,
+                    isActive = true
                 )
                 budgetRepo.createBudget(budget)
                 val announcement = Announcement(

@@ -12,7 +12,9 @@ data class Budget(
     val dateCreated: String = "",
     val budgetExpiry: String = "",
     val impact: String = "",
-    val isActive: Boolean = true,
+    @field:JvmField // use this annotation if your Boolean field is prefixed with 'is'
+    val isActive: Boolean = true
+
 )
 
 data class BudgetOption(

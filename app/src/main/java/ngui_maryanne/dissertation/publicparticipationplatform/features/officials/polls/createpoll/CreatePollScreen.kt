@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -234,7 +236,6 @@ private fun PolicyDropdown(
         }
     }
 }
-
 @Composable
 private fun PollOptionItem(
     option: PollOption,
@@ -242,32 +243,50 @@ private fun PollOptionItem(
     onRemove: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        CustomTextField(
-            value = option.optionText,
-            onValueChange = {
-                onOptionChanged(option.copy(optionText = it))
-            },
-            label = stringResource(R.string.option_text),
-            modifier = Modifier.weight(1f)
-        )
-
-        CustomTextField(
-            value = option.optionExplanation,
-            onValueChange = { newExplanation -> onOptionChanged(option.copy(optionExplanation = newExplanation)) },
-            label = stringResource(R.string.poll_explanation),
+        // Column for the two text fields
+        Column(
             modifier = Modifier
-                .fillMaxWidth()  // Make the text area fill the available width
-                .heightIn(min = 100.dp), // Set a minimum height to give more space for input
-            maxLines = 5, // Allow the user to enter multiple lines
-//            minLines = 3, // Set a minimum line height to make it more spacious
-            isSingleLine = false // Allow multi-line input
-        )
+                .weight(1f) // Take up remaining space in the row
+                .padding(end = 8.dp)
+        ) {
+            CustomTextField(
+                value = option.optionText,
+                onValueChange = { onOptionChanged(option.copy(optionText = it)) },
+                label = stringResource(R.string.option_text),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        IconButton(onClick = onRemove) {
-            Icon(Icons.Default.Delete, contentDescription = "Remove")
+            Spacer(modifier = Modifier.height(8.dp))
+
+            CustomTextField(
+                value = option.optionExplanation,
+                onValueChange = { newExplanation ->
+                    onOptionChanged(option.copy(optionExplanation = newExplanation))
+                },
+                label = stringResource(R.string.poll_explanation),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 100.dp),
+                maxLines = 5,
+                isSingleLine = false
+            )
+        }
+
+        // Delete button beside the column
+        IconButton(
+            onClick = onRemove,
+            modifier = Modifier.align(Alignment.Top) // Align it to the top of the column
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = stringResource(R.string.remove_option)
+            )
         }
     }
 }
+

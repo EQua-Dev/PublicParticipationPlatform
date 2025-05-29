@@ -324,7 +324,7 @@ private fun OfficialDetailsContent(
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.surfaceVariant
+                    contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text("Edit Details")

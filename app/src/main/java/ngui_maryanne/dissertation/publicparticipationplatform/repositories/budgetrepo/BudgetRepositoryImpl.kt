@@ -32,6 +32,7 @@ class BudgetRepositoryImpl @Inject constructor(
 ) :
     BudgetRepository {
     override suspend fun createBudget(budget: Budget) {
+        Log.d("createBudget", "$budget")
         firestore.collection(BUDGETS_REF)
             .document(budget.id)
             .set(budget)
@@ -58,7 +59,7 @@ class BudgetRepositoryImpl @Inject constructor(
             }
 
             val originalBudgets = snapshot?.documents?.mapNotNull {
-                it.toObject(Budget::class.java)?.copy(id = it.id)
+                it.toObject(Budget::class.java)//?.copy(id = it.id)
             } ?: emptyList()
 
             CoroutineScope(Dispatchers.IO).launch {
@@ -87,7 +88,9 @@ class BudgetRepositoryImpl @Inject constructor(
                 return@addSnapshotListener
             }
 
-            val originalBudget = snapshot?.toObject(Budget::class.java)?.copy(id = snapshot.id)
+            val originalBudget = snapshot?.toObject(Budget::class.java)//?.copy(id = snapshot.id)
+            Log.d("BudgetDebug", "Fetched isActive: ${originalBudget?.isActive}")
+            Log.d("BudgetDebug", "Fetched isActive: ${snapshot?.get("isActive")}")
 
             CoroutineScope(Dispatchers.IO).launch {
                 val translatedBudget = originalBudget?.let {
@@ -115,17 +118,17 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun toggleBudgetActivation(budgetId: String, isActive: Boolean) {
         try {
+            Log.d("toggleBudgetActivation", "$isActive")
             firestore.collection(BUDGETS_REF)
                 .document(budgetId)
-                .update("isActive", isActive)  // Update the 'isActive' field to the new status
-                .addOnSuccessListener {
-                    blockChainRepository.createBlockchainTransaction(
-                        TransactionTypes.TOGGLE_BUDGET_ACTIVATION
-                    )
-                }
-                .await()
+                .update("isActive", !isActive)
+                .await() // This suspends until the update is complete
+
+            // Log the blockchain transaction AFTER update completes successfully
+            blockChainRepository.createBlockchainTransaction(
+                TransactionTypes.TOGGLE_BUDGET_ACTIVATION
+            )
         } catch (e: Exception) {
-            // Handle the exception
             throw Exception("Failed to toggle budget activation status: ${e.message}")
         }
     }

@@ -93,7 +93,7 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
                 if (budget != null) {
                     val votedOption = budget.responses.find { it.userId == auth.currentUser!!.uid }
                     val votedOptionId = votedOption?.optionId
-
+                    Log.d("repository.getBudgetById","$budget")
                     _uiState.value = _uiState.value.copy(
                         budget = budget,
                         budgetOptions = budget.budgetOptions,
@@ -198,10 +198,11 @@ class OfficialBudgetDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val currentState = _uiState.value
+                Log.d("VMTA","${currentState.budget!!}")
                 // Toggle the activation status of the budget
                 repository.toggleBudgetActivation(
                     currentState.budget!!.id,
-                    !currentState.budget!!.isActive
+                    currentState.budget.isActive ?: false
                 )
 
                 // Update the UI state to reflect the new activation status

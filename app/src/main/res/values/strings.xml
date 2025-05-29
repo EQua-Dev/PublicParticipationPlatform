@@ -296,4 +296,5 @@
     <string name="welcome_official">Welcome, Official</string>
     <string name="citizens">Citizens</string>
     <string name="profile">Profile</string>
+    <string name="remove_option">Remove</string>
 </resources>

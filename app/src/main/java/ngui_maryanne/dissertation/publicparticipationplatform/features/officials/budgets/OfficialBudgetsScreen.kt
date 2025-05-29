@@ -168,7 +168,7 @@ fun BudgetCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val budgetActive = budget.budgetExpiry.toLong()> System.currentTimeMillis()
+    val budgetActive = budget.isActive// budget.budgetExpiry.toLong()> System.currentTimeMillis()
     val budgetStatus = if (budgetActive) "ACTIVE" else "INACTIVE"
     val statusColor = if (budgetActive)
         MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error

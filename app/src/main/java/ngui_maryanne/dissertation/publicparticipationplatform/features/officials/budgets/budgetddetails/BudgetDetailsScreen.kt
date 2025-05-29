@@ -207,12 +207,12 @@ fun BudgetDetailsScreen(
                                         onClick = { detailsViewModel.onEvent(BudgetDetailsEvent.ToggleActivation) },
                                         modifier = Modifier.fillMaxWidth(),
                                         colors = ButtonDefaults.filledTonalButtonColors(
-                                            containerColor = if (detailsState.budget!!.isActive) {
+                                            containerColor = if (detailsState.budget!!.isActive ?: true) {
                                                 MaterialTheme.colorScheme.errorContainer
                                             } else {
                                                 MaterialTheme.colorScheme.tertiaryContainer
                                             },
-                                            contentColor = if (detailsState.budget!!.isActive) {
+                                            contentColor = if (detailsState.budget!!.isActive ?: true) {
                                                 MaterialTheme.colorScheme.onErrorContainer
                                             } else {
                                                 MaterialTheme.colorScheme.onTertiaryContainer
@@ -220,7 +220,7 @@ fun BudgetDetailsScreen(
                                         )
                                     ) {
                                         Text(
-                                            text = if (detailsState.budget!!.isActive) stringResource(
+                                            text = if (detailsState.budget!!.isActive != false) stringResource(
                                                 R.string.deactivate_budget
                                             ) else stringResource(R.string.activate_budget),
                                             style = MaterialTheme.typography.labelLarge
@@ -284,7 +284,7 @@ private fun BudgetHeaderCard(budget: Budget) {
                     fontWeight = FontWeight.Bold
                 )
 
-                val budgetActive = budget.budgetExpiry.toLong()> System.currentTimeMillis()
+                val budgetActive = /*budget.budgetExpiry.toLong()> System.currentTimeMillis() || */budget.isActive
                 val budgetStatus = if (budgetActive) "ACTIVE" else "INACTIVE"
                 val statusColor = if (budgetActive)
                     MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
