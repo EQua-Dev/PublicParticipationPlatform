@@ -842,10 +842,10 @@ fun AnnouncementCard(
                     ) {
                         Text(
                             text = when (announcement.type) {
-                                NotificationTypes.POLICY -> "POLICY"
-                                NotificationTypes.POLL -> "POLL"
-                                NotificationTypes.PETITION -> "PETITION"
-                                else -> "BUDGET"
+                                NotificationTypes.POLICY -> stringResource(id = R.string.policy)
+                                NotificationTypes.POLL -> stringResource(id = R.string.poll)
+                                NotificationTypes.PETITION -> stringResource(id = R.string.petition)
+                                else -> stringResource(id = R.string.budget)
                             },
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                             style = MaterialTheme.typography.bodyLarge.copy(

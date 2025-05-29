@@ -419,7 +419,7 @@ private fun PolicyStatusBadge(status: PolicyStatus) {
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
-            text = status.displayName,
+            text = stringResource(id = status.displayName),
             style = MaterialTheme.typography.labelSmall.copy(
                 color = when (status) {
                     PolicyStatus.PUBLIC_CONSULTATION -> Color(0xFF2196F3)
@@ -557,7 +557,7 @@ private fun PolicyTimeline(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = status.displayName,
+                        text = stringResource(id = status.displayName),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal
                     )
@@ -574,7 +574,7 @@ private fun PolicyTimeline(
                     }
 
                     Text(
-                        text = status.description,
+                        text = stringResource(id = status.description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )

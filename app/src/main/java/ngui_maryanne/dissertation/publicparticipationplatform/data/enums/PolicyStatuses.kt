@@ -1,63 +1,66 @@
 package ngui_maryanne.dissertation.publicparticipationplatform.data.enums
 
+import androidx.annotation.StringRes
+import ngui_maryanne.dissertation.publicparticipationplatform.R
+
 enum class PolicyStatus(
-    val displayName: String,
-    val description: String,
+    @StringRes val displayName: Int,
+    @StringRes val description: Int,
     val isPublicVisible: Boolean
 ) {
     DRAFT(
-        displayName = "Draft",
-        description = "Initial drafting stage (internal only)",
+        displayName = R.string.draft,
+        description = R.string.initial_drafting_stage_internal_only,
         isPublicVisible = false
     ),
     INTERNAL_REVIEW(
-        displayName = "Internal Review",
-        description = "Under government agency review",
+        displayName = R.string.internal_review,
+        description = R.string.under_government_agency_review,
         isPublicVisible = false
     ),
     MINISTERIAL_APPROVAL(
-        displayName = "Ministerial Approval",
-        description = "Awaiting ministerial sign-off",
+        displayName = R.string.ministerial_approval,
+        description = R.string.awaiting_ministerial_sign_off,
         isPublicVisible = false
     ),
     PUBLIC_CONSULTATION(
-        displayName = "Public Consultation",
-        description = "Open for public feedback",
+        displayName = R.string.public_consultation,
+        description = R.string.open_for_public_feedback,
         isPublicVisible = true
     ),
     PUBLIC_OPINION_ANALYSIS(
-        displayName = "Public Opinion Analysis",
-        description = "Analyzing citizen feedback",
+        displayName = R.string.public_opinion_analysis,
+        description = R.string.analyzing_citizen_feedback,
         isPublicVisible = true
     ),
     REVISED_DRAFT(
-        displayName = "Revised Draft",
-        description = "Incorporating public feedback",
+        displayName = R.string.revised_draft,
+        description = R.string.incorporating_public_feedback,
         isPublicVisible = false
     ),
     CABINET_APPROVAL(
-        displayName = "Cabinet Approval",
-        description = "Awaiting cabinet decision",
+        displayName = R.string.cabinet_approval,
+        description = R.string.awaiting_cabinet_decision,
         isPublicVisible = false
     ),
     LEGISLATIVE_PROCESS(
-        displayName = "Legislative Process",
-        description = "In parliamentary discussion",
+        displayName = R.string.legislative_process,
+        description = R.string.in_parliamentary_discussion,
         isPublicVisible = true
     ),
     APPROVED(
-        displayName = "Approved",
-        description = "Policy enacted",
+        displayName = R.string.approved,
+        description = R.string.policy_enacted,
         isPublicVisible = true
     ),
     REJECTED(
-        displayName = "Rejected",
-        description = "Policy not proceeding",
+        displayName = R.string.rejected,
+        description = R.string.policy_not_proceeding,
         isPublicVisible = true
     ),
     ARCHIVED(
-        displayName = "Archived",
-        description = "Historical policy record",
+        displayName = R.string.archived,
+        description = R.string.historical_policy_record,
         isPublicVisible = true
     );
 

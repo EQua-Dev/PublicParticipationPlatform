@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
@@ -38,7 +39,7 @@ fun StatusSelectionSection(
 
         Box(modifier = Modifier.fillMaxWidth()) {
             CustomTextField(
-                value = selectedStatus.displayName,
+                value = stringResource(id = selectedStatus.displayName),
                 onValueChange = {},
                 label = "Select Policy Stage",
                 leadingIcon = Icons.Default.Leaderboard,
@@ -58,11 +59,11 @@ fun StatusSelectionSection(
                         text = {
                             Column {
                                 Text(
-                                    text = status.displayName,
+                                    text = stringResource(id = status.displayName),
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = status.description,
+                                    text = stringResource(id = status.description),
                                     style = MaterialTheme.typography.bodySmall,
                                     maxLines = 2
                                 )
@@ -86,7 +87,7 @@ fun StatusSelectionSection(
 
         // Status description
         Text(
-            text = selectedStatus.description,
+            text = stringResource(id = selectedStatus.description),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(top = 4.dp)

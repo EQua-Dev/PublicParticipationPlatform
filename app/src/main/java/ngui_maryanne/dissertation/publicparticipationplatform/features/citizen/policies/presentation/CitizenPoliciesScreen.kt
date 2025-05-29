@@ -188,7 +188,7 @@ fun CitizenPoliciesScreen(
                                     CitizenPoliciesAction.OnStatusFilterChanged(status)
                                 )
                             },
-                            label = { Text(status.displayName) },
+                            label = { Text(stringResource(id = status.displayName)) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = when (status) {
                                     PolicyStatus.PUBLIC_CONSULTATION -> Color(0xFF2196F3).copy(alpha = 0.2f)
@@ -355,7 +355,7 @@ private fun PolicyCard(policy: Policy, onClick: () -> Unit) {
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = policy.policyStatus.displayName,
+                        text = stringResource(id = policy.policyStatus.displayName),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = when (policy.policyStatus) {
                                 PolicyStatus.PUBLIC_CONSULTATION -> Color(0xFF2196F3)

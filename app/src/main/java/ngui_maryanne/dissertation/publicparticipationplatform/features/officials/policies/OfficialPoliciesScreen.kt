@@ -200,7 +200,7 @@ private fun PolicyCard(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = policy.policyStatus.displayName.uppercase(),
+                        text = stringResource(id = policy.policyStatus.displayName).uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         color = colorScheme.onPrimary
                     )

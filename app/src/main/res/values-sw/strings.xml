@@ -298,6 +298,28 @@
     <string name="citizens">Wananchi</string>
     <string name="profile">Wasifu</string>
     <string name="remove_option">Remove</string>
+    <string name="petition">Maombi</string>
+    <string name="initial_drafting_stage_internal_only">Awamu ya uandishi wa awali (kwa matumizi ya ndani tu)</string>
+    <string name="internal_review">Mapitio ya Ndani</string>
+    <string name="under_government_agency_review">Kukaguliwa na wakala wa serikali</string>
+    <string name="ministerial_approval">Idhini ya Wizara</string>
+    <string name="awaiting_ministerial_sign_off">Kusubiri saini ya Waziri</string>
+    <string name="public_consultation">Mshauriano wa Umma</string>
+    <string name="open_for_public_feedback">Umefunguliwa kwa maoni ya umma</string>
+    <string name="public_opinion_analysis">Uchambuzi wa Maoni ya Umma</string>
+    <string name="analyzing_citizen_feedback">Kuchambua maoni ya raia</string>
+    <string name="revised_draft">Rasimu iliyorekebishwa</string>
+    <string name="incorporating_public_feedback">Kujumuisha maoni ya umma</string>
+    <string name="cabinet_approval">Idhini ya Baraza la Mawaziri</string>
+    <string name="awaiting_cabinet_decision">Kusubiri uamuzi wa Baraza la Mawaziri</string>
+    <string name="legislative_process">Mchakato wa Kisheria</string>
+    <string name="in_parliamentary_discussion">Katika mjadala wa bunge</string>
+    <string name="policy_enacted">Sera imetekelezwa</string>
+    <string name="rejected">Imekataliwa</string>
+    <string name="policy_not_proceeding">Sera haijaendelea</string>
+    <string name="archived">Imehifadhiwa</string>
+    <string name="historical_policy_record">Rekodi ya sera za kihistoria</string>
+
 
 
 </resources>

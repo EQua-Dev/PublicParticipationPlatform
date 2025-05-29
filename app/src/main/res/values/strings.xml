@@ -297,4 +297,25 @@
     <string name="citizens">Citizens</string>
     <string name="profile">Profile</string>
     <string name="remove_option">Remove</string>
+    <string name="petition">Petition</string>
+    <string name="initial_drafting_stage_internal_only">Initial drafting stage (internal only)</string>
+    <string name="internal_review">Internal Review</string>
+    <string name="under_government_agency_review">Under government agency review</string>
+    <string name="ministerial_approval">Ministerial Approval</string>
+    <string name="awaiting_ministerial_sign_off">Awaiting ministerial sign-off</string>
+    <string name="public_consultation">Public Consultation</string>
+    <string name="open_for_public_feedback">Open for public feedback</string>
+    <string name="public_opinion_analysis">Public Opinion Analysis</string>
+    <string name="analyzing_citizen_feedback">Analyzing citizen feedback</string>
+    <string name="revised_draft">Revised Draft</string>
+    <string name="incorporating_public_feedback">Incorporating public feedback</string>
+    <string name="cabinet_approval">Cabinet Approval</string>
+    <string name="awaiting_cabinet_decision">Awaiting cabinet decision</string>
+    <string name="legislative_process">Legislative Process</string>
+    <string name="in_parliamentary_discussion">In parliamentary discussion</string>
+    <string name="policy_enacted">Policy enacted</string>
+    <string name="rejected">Rejected</string>
+    <string name="policy_not_proceeding">Policy not proceeding</string>
+    <string name="archived">Archived</string>
+    <string name="historical_policy_record">Historical policy record</string>
 </resources>

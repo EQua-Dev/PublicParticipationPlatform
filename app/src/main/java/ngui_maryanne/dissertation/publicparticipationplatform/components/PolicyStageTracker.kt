@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ngui_maryanne.dissertation.publicparticipationplatform.data.enums.PolicyStatus
@@ -88,7 +89,7 @@ fun PolicyStageTracker(
                         }
 
                         Text(
-                            text = stage.displayName,
+                            text = stringResource(id = stage.displayName),
                             modifier = Modifier.padding(start = 16.dp),
                             fontWeight = if (index == currentIndex) FontWeight.Bold else FontWeight.Normal,
                             style = MaterialTheme.typography.bodyMedium
